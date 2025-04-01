@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build debug",
+            "type": "shell",
+            "command": "cmake . --preset debug; pwd; cmake --build --preset debug",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+        },
+        {
+            "label": "build release",
+            "type": "shell",
+            "command": "cmake . --preset release; cmake --build --preset release",
+            "group": {
+                "kind": "build",
+            },
+        }
+    ]
+}
