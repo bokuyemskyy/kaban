@@ -1,0 +1,47 @@
+#  Ignore all the files by default, include those with any extension (excludes no-extension binary files from being pushed to the remote repository)
+*
+!*.*
+!*/
+
+
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+
+/build/
+/out/
+/.cache/
+
+!README
+!LICENSE
