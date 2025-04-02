@@ -1,2 +1,2 @@
 exclude:
-  - third_party/vcpkg/ports/gsl/0001-configure.patch
+  - third_party/vcpkg/
