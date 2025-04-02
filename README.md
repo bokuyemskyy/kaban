@@ -3,7 +3,7 @@
 A project, aimed to be a high-performance chess engine that uses bitboard techniques. Inspired by [Stockfish](https://stockfishchess.org/), this project aims to explore efficient board representation, move generation, evaluation functions, and search algorithms using modern C++ practices.
 
 ## Documentation
-The draft of documentation you can find on here: [DOCUMENTATION](docs/html/index.html)
+The draft of documentation you can find on here: [DOCUMENTATION](https://bokuyemskyy.github.io/kaban/docs/html/)
 
 ## Features (Existing and planned)
 - ✅ **Bitboard Representation**: Efficient board representation using 64-bit integers.
