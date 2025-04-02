@@ -53,7 +53,7 @@ file(GLOB_RECURSE TEST_SOURCES "project/tests/*.cpp")
 
 separate_arguments(LIBS)
 
-find_package(glfw3 3.3 REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(Stb REQUIRED)
