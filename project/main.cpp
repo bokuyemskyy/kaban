@@ -1,8 +1,11 @@
 #include "game.hpp"
 #include "input_handler.hpp"
 #include "renderer.hpp"
+#include "resource_manager.hpp"
 
 int main() {
+    ResourceManager::loadResources();
+
     Game game;
     Renderer renderer;
     InputHandler inputHandler(&renderer, &game);

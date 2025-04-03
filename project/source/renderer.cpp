@@ -5,7 +5,6 @@
 #include <cmath>
 #include <cstdint>
 #include <error_handler.hpp>
-#include <fstream>
 #include <game.hpp>
 #include <layout_manager.hpp>
 #include <navigation.hpp>
@@ -15,8 +14,8 @@
 #include <utility>
 
 #include "constants.hpp"
-#include "position.hpp"
 #include "types.hpp"
+#include "utils.hpp"
 
 bool Renderer::init(float height, const char *title) {
     float width = height * (5.0f / 3.0f);
@@ -129,19 +128,13 @@ void Renderer::fillFrame(float r, float g, float b, float a) { m_glfw.fillFrame(
 void Renderer::hookUpGame(Game *game) { m_game = game; }
 
 bool Renderer::loadTextures() {
-    std::string path = "/home/amon/Code/kaban/out/bin/debug/resource/";
     for (uint8_t i = 0; i < 12; i++) {
-        char name = PieceToFEN.at(Piece(i));
-        GLuint texture = TextureLoader::loadTexture(path + name + ".png");
+        std::string name(1, PieceToFEN.at(Piece(i)));
+        GLuint texture = TextureLoader::loadTexture(name + ".png");
         if (texture == 0) return false;
         pieceTextures[Piece(i)] = texture;
     }
     return true;
-}
-
-float euclidean_distance(const std::pair<float, float> &a, const std::pair<float, float> &b) {
-    return std::sqrt((a.first - b.first) * (a.first - b.first) +
-                     (a.second - b.second) * (a.second - b.second));
 }
 
 void Renderer::drawGame() {
@@ -184,7 +177,7 @@ void Renderer::drawGame() {
                 holdingPiecePos.second =
                     (static_cast<float>(m_glfw.getHeight()) - m_mousePos.second) - halfSquareSize;
             } else {
-                float distance = euclidean_distance(m_lastHoldedPiecePosition, m_mousePos);
+                float distance = Utils::distance(m_lastHoldedPiecePosition, m_mousePos);
                 if (distance < 0.1f) {
                     holdingPiecePos = m_lastHoldedPiecePosition;
                 } else {
