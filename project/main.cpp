@@ -1,7 +1,6 @@
-#include <input_handler.hpp>
-#include <renderer.hpp>
-
 #include "game.hpp"
+#include "input_handler.hpp"
+#include "renderer.hpp"
 
 int main() {
     Game game;
