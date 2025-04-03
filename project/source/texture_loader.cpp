@@ -4,6 +4,8 @@
 
 #include <error_handler.hpp>
 
+#include "resource_manager.hpp"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -12,7 +14,9 @@ GLuint TextureLoader::loadTexture(const std::string &filename) {
     int height{};
     int channels{};
 
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &channels, 4);
+    Resource resource = ResourceManager::getResource(filename);
+    unsigned char *data = stbi_load_from_memory(resource.first, static_cast<int>(resource.second),
+                                                &width, &height, &channels, 4);
 
     if (!data) {
         handleError(1, stbi_failure_reason());
