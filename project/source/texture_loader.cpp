@@ -1,15 +1,17 @@
+#include "texture_loader.hpp"
+
 #include <GL/gl.h>
 
 #include <error_handler.hpp>
-#include <fstream>
-#include <iostream>
-#include <texture_loader.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 GLuint TextureLoader::loadTexture(const std::string &filename) {
-    int width, height, channels;
+    int width{};
+    int height{};
+    int channels{};
+
     unsigned char *data = stbi_load(filename.c_str(), &width, &height, &channels, 4);
 
     if (!data) {
