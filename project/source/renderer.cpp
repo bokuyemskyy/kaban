@@ -6,29 +6,133 @@
 #include <cstdint>
 #include <error_bus.hpp>
 #include <game.hpp>
-#include <layout_manager.hpp>
 #include <navigation.hpp>
 #include <renderer.hpp>
 #include <string>
 #include <texture_loader.hpp>
-#include <utility>
 
-#include "constants.hpp"
 #include "types.hpp"
 #include "utils.hpp"
 
 void Renderer::initialize(Dimensions dimensions, const char *title, bool useVsync) {
-    m_layoutManager.defineSector(Sectors::INTERFACE, 0.0F, 0.0F, Ratios::INTERFACE_WIDTH, 1.0F);
-    m_layoutManager.defineSector(Sectors::GAME, Ratios::INTERFACE_WIDTH, 0.0F, Ratios::GAME_WIDTH,
-                                 1.0F);
-
     m_glfw.initialize(dimensions, title, useVsync);
     m_imgui.initialize(m_glfw.window());
+
     loadTextures();
 
     updateTime();
 }
+void Renderer::drawMainMenuBar() {
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("New Game")) {
+            }
+            if (ImGui::MenuItem("Open Game")) {
+            }
+            if (ImGui::MenuItem("Save Game")) {
+            }
+            if (ImGui::MenuItem("Exit")) {
+                m_glfw.setWindowShouldClose(true);
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Edit")) {
+            if (ImGui::MenuItem("Undo Move")) {
+            }
+            if (ImGui::MenuItem("Redo Move")) {
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Games")) {
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Commands")) {
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Options")) {
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Database")) {
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Help")) {
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+}
 
+void Renderer::drawGame() { ImGui::Text("Chess Board"); }
+
+void Renderer::drawLostPieces() { ImGui::Text("Captured Pieces"); }
+
+void Renderer::drawGameInfo() { ImGui::Text("Game Information"); }
+
+void Renderer::drawWorkspace() {
+    ImGui::GetStyle().ItemSpacing.y = 6.0f;
+    ImGui::GetStyle().ItemSpacing.x = 6.0f;
+    // Set main workspace window position and size
+    ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetFrameHeight()));
+    ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x,
+                                    ImGui::GetIO().DisplaySize.y - ImGui::GetFrameHeight()));
+
+    // Begin main workspace window
+    ImGui::Begin("Workspace", nullptr,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                     ImGuiWindowFlags_NoBringToFrontOnFocus);
+
+    // Tab bar for game selection
+    if (ImGui::BeginTabBar("GameTabs")) {
+        if (ImGui::BeginTabItem("Game 1")) {
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Game 2")) {
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("+")) {
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+    }
+
+    // Calculate available space and division sizes
+    ImVec2 availSpace = ImGui::GetContentRegionAvail();
+    float leftPanelWidth = availSpace.x * 0.66f;
+    float rightPanelWidth = availSpace.x - leftPanelWidth;
+    float boardHeight = availSpace.y * 0.8f;
+    float lostPiecesHeight = availSpace.y - boardHeight;
+
+    // Left panel (containing game board and lost pieces)
+    ImGui::BeginChild("LeftPanel", ImVec2(leftPanelWidth, availSpace.y), false);
+    {
+        // Game board area
+        ImGui::BeginChild("Game", ImVec2(0, boardHeight), true);
+        drawGame();
+        ImGui::EndChild();
+
+        // Lost pieces area
+        ImGui::BeginChild("LostPieces", ImVec2(0, 0), true);
+        drawLostPieces();
+        ImGui::EndChild();
+    }
+    ImGui::EndChild();
+
+    // Right panel (game info)
+    ImGui::SameLine();
+    ImGui::BeginChild("RightPanel", ImVec2(0, availSpace.y), true);
+    {
+        drawGameInfo();
+    }
+    ImGui::EndChild();
+
+    ImGui::End();
+}
+void Renderer::drawDemoWindow() {
+    if (m_showDemoWindow) {
+        m_imgui.showDemoWindow();
+        m_imgui.keepWindowInBounds("Dear ImGui Demo");
+    }
+}
 void Renderer::render() {
     updateTime();
     updateMousePosition();
@@ -38,56 +142,10 @@ void Renderer::render() {
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, 1000, 0, 600, -1, 1);
+    drawMainMenuBar();
+    drawWorkspace();
 
-    ImGui::SetNextWindowSize(ImVec2(m_layoutManager.getSector("Interface").width,
-                                    m_layoutManager.getSector("Interface").height));
-    ImGui::SetNextWindowPos(
-        ImVec2(m_layoutManager.getSector("Interface").x, m_layoutManager.getSector("Interface").y));
-    ImGui::Begin("Game", nullptr,
-                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
-    ImGui::Text("Hello, welcome to the Kaban!");
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
-    if (ImGui::Button("Start a new game")) {
-        if (m_game != nullptr) {
-            m_game->setFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-        }
-    }
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
-    ImGui::Separator();
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
-    ImGui::Text("Current turn: %s", m_game->getTurn() == WHITE ? "White" : "Black");
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
-    std::string selectedPieceStr = "None";
-    if (m_game->getSelectedSquare() != NO_SQ) {
-        std::string ranks[] = {"A", "B", "C", "D", "E", "F", "G", "H"};
-        int row = m_game->getSelectedSquare() / 8;
-        int col = m_game->getSelectedSquare() % 8;
-        selectedPieceStr = ranks[col] + std::to_string(8 - row);
-    }
-    ImGui::Text("Selected piece: %s", selectedPieceStr.c_str());
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
-    std::string isHoldingPieceText = "";
-    if (m_game->isHoldingPiece()) {
-        isHoldingPieceText = "true";
-    } else {
-        isHoldingPieceText = "false";
-    }
-    ImGui::Text("Is holding a piece: %s", isHoldingPieceText.c_str());
-    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
-    ImGui::End();
-
-    if (m_game) {
-        drawGame();
-    }
-
-    if (m_showDemoWindow) {
-        m_imgui.showDemoWindow();
-        m_imgui.keepWindowInBounds("Dear ImGui Demo");
-    }
+    drawDemoWindow();
 
     finishFrame();
 }
@@ -111,7 +169,7 @@ void Renderer::finishFrame() {
     m_glfw.finishFrame();
 }
 void Renderer::updateTime() {
-    m_currentTime = m_glfw.time();
+    m_currentTime = GLFWWrapper::time();
     m_deltaTime = m_currentTime - m_lastTime;
     m_lastTime = m_currentTime;
 }
@@ -120,81 +178,12 @@ void Renderer::fillFrame(float r, float g, float b, float a) { m_glfw.fillFrame(
 
 void Renderer::hookUpGame(Game *game) { m_game = game; }
 
-bool Renderer::loadTextures() {
+void Renderer::loadTextures() {
     for (uint8_t i = 0; i < 12; i++) {
         std::string name(1, PieceToFEN.at(Piece(i)));
         GLuint texture = TextureLoader::loadTexture(name + ".png");
-        if (texture == 0) return false;
+        if (texture == 0) ErrorBus::handleError(0, "Failed to load a texture");
         pieceTextures[Piece(i)] = texture;
-    }
-    return true;
-}
-
-void Renderer::drawGame() {
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    const Sector &boardSector = m_layoutManager.getSector("Game");
-    float squareSize = boardSector.width / 8.0f;
-    auto board = m_game->getMatrixBoard();
-
-    for (uint8_t square = 0; square < 64; square++) {
-        float yPos = boardSector.y + (square / 8) * squareSize;
-        float xPos = boardSector.x + (square % 8) * squareSize;
-
-        uint8_t relativeSquare = getTurnSquare(Square(square), m_game->getTurn());
-
-        bool isDark = ((square >> 3) + (square % 8)) % 2 == 0;
-
-        float colorValue = isDark ? 0.3f : 0.7f;
-
-        drawSquare(xPos, yPos, squareSize, squareSize, colorValue, colorValue, colorValue);
-
-        if (relativeSquare == m_game->getSelectedSquare()) {
-            drawSquare(xPos, yPos, squareSize, squareSize, 0.7f, 0.3f, 0.3f);
-        }
-
-        Piece piece = board[(relativeSquare >> 3)][(relativeSquare % 8)];
-
-        if (piece != EMPTY &&
-            !((relativeSquare == m_game->getSelectedSquare() && m_game->isHoldingPiece()))) {
-            drawPiece(xPos, yPos, squareSize, squareSize, 4, pieceTextures[piece]);
-        }
-        if (m_game->isHoldingPiece()) {
-            std::pair<float, float> holdingPiecePos;
-            float lerpSpeed = 0.5F * static_cast<float>(m_deltaTime);
-            float halfSquareSize = squareSize / 2.0F;
-
-            if (!m_wasHoldingPiece) {
-                m_wasHoldingPiece = true;
-                holdingPiecePos.first = m_mousePos.first - halfSquareSize;
-                holdingPiecePos.second =
-                    (static_cast<float>(m_glfw.dimensions().height) - m_mousePos.second) -
-                    halfSquareSize;
-            } else {
-                float distance = eucledianDistance(m_lastHoldedPiecePosition, m_mousePos);
-                if (distance < 0.1f) {
-                    holdingPiecePos = m_lastHoldedPiecePosition;
-                } else {
-                    holdingPiecePos.first =
-                        m_lastHoldedPiecePosition.first +
-                        (m_mousePos.first - halfSquareSize - m_lastHoldedPiecePosition.first) *
-                            lerpSpeed;
-                    holdingPiecePos.second =
-                        m_lastHoldedPiecePosition.second +
-                        ((static_cast<float>(m_glfw.dimensions().height) - m_mousePos.second) -
-                         halfSquareSize - m_lastHoldedPiecePosition.second) *
-                            lerpSpeed;
-                }
-            }
-
-            uint8_t selectedPiece = m_game->getSelectedSquare();
-            drawPiece(holdingPiecePos.first, holdingPiecePos.second, squareSize, squareSize, 4,
-                      pieceTextures[board[selectedPiece >> 3][selectedPiece % 8]]);
-
-            m_lastHoldedPiecePosition = holdingPiecePos;
-        } else {
-            m_wasHoldingPiece = false;
-        }
     }
 }
 
@@ -224,8 +213,6 @@ void Renderer::drawImage(float x, float y, float width, float height, GLuint tex
     glEnd();
     glDisable(GL_TEXTURE_2D);
 }
-
-LayoutManager *Renderer::getLayoutManager() { return &m_layoutManager; }
 
 void Renderer::drawPiece(float x, float y, float width, float height, float padding,
                          GLuint texture) {
