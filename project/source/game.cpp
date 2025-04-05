@@ -1,11 +1,8 @@
 #include <array>
 #include <game.hpp>
-#include <string>
 
 #include "constants.hpp"
 #include "types.hpp"
-
-void Game::setFEN(const std::string &fen) { m_position.setFEN(fen); }
 
 void Game::holdPiece(int index) {
     if (m_position.getPiece(Square(index)) == EMPTY) {
