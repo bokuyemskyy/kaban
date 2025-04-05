@@ -4,16 +4,31 @@
         {
             "label": "build debug",
             "type": "shell",
-            "command": "cmake . --preset debug; pwd; cmake --build --preset debug",
+            "command": "cmake --build --preset debug",
             "group": {
                 "kind": "build",
-                "isDefault": true
             },
         },
         {
             "label": "build release",
             "type": "shell",
-            "command": "cmake . --preset release; cmake --build --preset release",
+            "command": "cmake --build --preset release",
+            "group": {
+                "kind": "build",
+            },
+        },
+        {
+            "label": "config debug",
+            "type": "shell",
+            "command": "cmake . --preset debug",
+            "group": {
+                "kind": "build",
+            },
+        },
+        {
+            "label": "config release",
+            "type": "shell",
+            "command": "cmake . --preset release",
             "group": {
                 "kind": "build",
             },
