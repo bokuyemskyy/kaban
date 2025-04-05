@@ -2,6 +2,7 @@
 #include "input_handler.hpp"
 #include "renderer.hpp"
 #include "resource_manager.hpp"
+#include "utils.hpp"
 
 int main() {
     ResourceManager::loadResources();
@@ -9,7 +10,7 @@ int main() {
     Game game;
     Renderer renderer;
     InputHandler inputHandler(&renderer, &game);
-    renderer.init(600, "Kaban");
+    renderer.initialize(Dimensions(800, 600), "Kaban", true);
     renderer.hookUpGame(&game);
 
     game.setFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
@@ -18,5 +19,5 @@ int main() {
         inputHandler.update();
         renderer.render();
     }
-    renderer.shutdown();
+    renderer.terminate();
 }

@@ -3,29 +3,40 @@
 
 #include <GLFW/glfw3.h>
 
+#include <string>
+
+#include "utils.hpp"
+
 class GLFWWrapper {
    public:
     GLFWWrapper() = default;
     ~GLFWWrapper() = default;
-    bool init(float width, float height, const char *title, bool useVsync = false);
-    void shutdown();
-    bool windowShouldClose();
-    void setWindowShouldClose(bool value);
+
+    void initialize(Dimensions dimensions, const char *title, bool useVsync);
+    void terminate();
+
     void updateDimensions();
-    static float getTime();
-    void newFrame();
-    void finishFrame();
+    void beginFrame();
     void fillFrame(float r, float g, float b, float a) const;
-    [[nodiscard]] int getWidth() const { return m_display_w; };
-    [[nodiscard]] int getHeight() const { return m_display_h; };
-    GLFWwindow *getWindow() const;
+    void finishFrame() const;
+
+    bool windowShouldClose() { return glfwWindowShouldClose(m_window) != 0; };
+    void setWindowShouldClose(bool value);
+
+    [[nodiscard]] Dimensions dimensions() const noexcept { return m_dimensions; }
+    [[nodiscard]] GLFWwindow *window() const noexcept { return m_window; }
+    [[nodiscard]] static double time() noexcept { return glfwGetTime(); }
+    [[nodiscard]] bool shouldClose() { return glfwWindowShouldClose(m_window) != 0; }
 
    private:
-    GLFWwindow *m_window;
-    GLFWmonitor *m_monitor;
-    const GLFWvidmode *m_mode;
+    Dimensions m_dimensions{};
+    std::string m_title;
+    bool m_useVsync{};
 
-    int m_display_w, m_display_h;
+    GLFWmonitor *m_monitor{};
+    GLFWwindow *m_window{};
+
+    bool m_initialized{};
 };
 
 #endif

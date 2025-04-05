@@ -1,6 +1,6 @@
 #include <array>
 #include <cstdint>
-#include <error_handler.hpp>
+#include <error_bus.hpp>
 #include <position.hpp>
 #include <sstream>
 #include <string>
