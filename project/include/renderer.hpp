@@ -11,17 +11,27 @@
 #include <unordered_map>
 #include <utility>
 
+namespace Ratios {
+constexpr float INTERFACE_WIDTH = 0.4F;
+constexpr float GAME_WIDTH = 0.6F;
+}  // namespace Ratios
+
+namespace Sectors {
+constexpr auto INTERFACE = "Interface";
+constexpr auto GAME = "Game";
+}  // namespace Sectors
+
 class Renderer {
    public:
     Renderer() = default;
     ~Renderer() = default;
 
-    bool init(float height, const char *title);
-    void shutdown();
+    void initialize(Dimensions dimensions, const char *title, bool useVsync);
+    void terminate();
 
     void render();
     void updateTime();
-    void newFrame();
+    void beginFrame();
     void fillFrame(float r = 0, float g = 0, float b = 0, float a = 1);
     void finishFrame();
 
@@ -56,9 +66,9 @@ class Renderer {
     bool m_wasHoldingPiece = false;
     std::pair<float, float> m_lastHoldedPiecePosition = {0, 0};
 
-    float m_lastTime = 0;
-    float m_deltaTime = 0;
-    float m_currentTime = 0;
+    double m_lastTime = 0;
+    double m_deltaTime = 0;
+    double m_currentTime = 0;
     bool m_showDemoWindow = false;
 };
 

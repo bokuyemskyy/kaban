@@ -4,6 +4,8 @@ Checks: >
   cert-*,
   clang-analyzer-*,
   cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-non-const-global-variables,
+  -cppcoreguidelines-special-member-functions,
   modernize-*,
   -modernize-use-trailing-return-type,
   performance-*,
@@ -14,4 +16,5 @@ Checks: >
   -readability-function-cognitive-complexity,
   -readability-identifier-length,
   misc-*,
+  -misc-use-internal-linkage,
   portability-*

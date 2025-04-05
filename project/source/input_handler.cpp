@@ -40,7 +40,7 @@ void InputHandler::handleInput() {
     }
 
     if (ImGui::IsKeyPressed(ImGuiKey_Q)) {
-        m_renderer->shutdown();
+        m_renderer->terminate();
     }
     if (ImGui::IsKeyPressed(ImGuiKey_X)) {
         // m_game->test();

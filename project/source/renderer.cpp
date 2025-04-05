@@ -4,7 +4,7 @@
 
 #include <cmath>
 #include <cstdint>
-#include <error_handler.hpp>
+#include <error_bus.hpp>
 #include <game.hpp>
 #include <layout_manager.hpp>
 #include <navigation.hpp>
@@ -17,29 +17,23 @@
 #include "types.hpp"
 #include "utils.hpp"
 
-bool Renderer::init(float height, const char *title) {
-    float width = height * (5.0f / 3.0f);
+void Renderer::initialize(Dimensions dimensions, const char *title, bool useVsync) {
+    m_layoutManager.defineSector(Sectors::INTERFACE, 0.0F, 0.0F, Ratios::INTERFACE_WIDTH, 1.0F);
+    m_layoutManager.defineSector(Sectors::GAME, Ratios::INTERFACE_WIDTH, 0.0F, Ratios::GAME_WIDTH,
+                                 1.0F);
 
-    m_layoutManager.defineSector("Interface", 0, 0, width * (2.0f / 5.0f), height);
-    m_layoutManager.defineSector("Game", width * (2.0f / 5.0f), 0, width * (3.0f / 5.0f), height);
-
-    if (!m_glfw.init(width, height, title, true) || !m_imgui.init(m_glfw.getWindow()) ||
-        !loadTextures()) {
-        shutdown();
-        handleError(1, "Failed to init graphics");
-        return false;
-    }
+    m_glfw.initialize(dimensions, title, useVsync);
+    m_imgui.initialize(m_glfw.window());
+    loadTextures();
 
     updateTime();
-
-    return true;
-};
+}
 
 void Renderer::render() {
     updateTime();
     updateMousePosition();
 
-    newFrame();
+    beginFrame();
     fillFrame();
 
     glClear(GL_COLOR_BUFFER_BIT);
@@ -58,7 +52,7 @@ void Renderer::render() {
     ImGui::Text("Hello, welcome to the Kaban!");
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);
     if (ImGui::Button("Start a new game")) {
-        if (m_game) {
+        if (m_game != nullptr) {
             m_game->setFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         }
     }
@@ -98,27 +92,26 @@ void Renderer::render() {
     finishFrame();
 }
 
-void Renderer::shutdown() {
-    m_imgui.shutdown();
-    m_glfw.shutdown();
+void Renderer::terminate() {
+    m_imgui.terminate();
+    m_glfw.terminate();
 }
 
 bool Renderer::windowShouldClose() { return m_glfw.windowShouldClose(); }
 
 void Renderer::toggleDemoWindow() { m_showDemoWindow = !m_showDemoWindow; }
 
-void Renderer::newFrame() {
-    m_glfw.newFrame();
-    m_imgui.newFrame();
+void Renderer::beginFrame() {
+    m_glfw.beginFrame();
+    m_imgui.beginFrame();
 }
 
 void Renderer::finishFrame() {
     m_imgui.finishFrame();
     m_glfw.finishFrame();
 }
-
 void Renderer::updateTime() {
-    m_currentTime = m_glfw.getTime();
+    m_currentTime = m_glfw.time();
     m_deltaTime = m_currentTime - m_lastTime;
     m_lastTime = m_currentTime;
 }
@@ -168,16 +161,17 @@ void Renderer::drawGame() {
         }
         if (m_game->isHoldingPiece()) {
             std::pair<float, float> holdingPiecePos;
-            float lerpSpeed = 0.5f * m_deltaTime;
-            float halfSquareSize = squareSize / 2.0f;
+            float lerpSpeed = 0.5F * static_cast<float>(m_deltaTime);
+            float halfSquareSize = squareSize / 2.0F;
 
             if (!m_wasHoldingPiece) {
                 m_wasHoldingPiece = true;
                 holdingPiecePos.first = m_mousePos.first - halfSquareSize;
                 holdingPiecePos.second =
-                    (static_cast<float>(m_glfw.getHeight()) - m_mousePos.second) - halfSquareSize;
+                    (static_cast<float>(m_glfw.dimensions().height) - m_mousePos.second) -
+                    halfSquareSize;
             } else {
-                float distance = Utils::distance(m_lastHoldedPiecePosition, m_mousePos);
+                float distance = eucledianDistance(m_lastHoldedPiecePosition, m_mousePos);
                 if (distance < 0.1f) {
                     holdingPiecePos = m_lastHoldedPiecePosition;
                 } else {
@@ -187,7 +181,7 @@ void Renderer::drawGame() {
                             lerpSpeed;
                     holdingPiecePos.second =
                         m_lastHoldedPiecePosition.second +
-                        ((static_cast<float>(m_glfw.getHeight()) - m_mousePos.second) -
+                        ((static_cast<float>(m_glfw.dimensions().height) - m_mousePos.second) -
                          halfSquareSize - m_lastHoldedPiecePosition.second) *
                             lerpSpeed;
                 }

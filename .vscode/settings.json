@@ -5,10 +5,16 @@
     "C_Cpp.intelliSenseEngine": "disabled",
     "C_Cpp.formatting": "disabled",
     "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+    "C_Cpp.clang_format_path": "/usr/bin/clang-format",
     "C_Cpp.codeAnalysis.clangTidy.path": "/usr/bin/clang-tidy",
     "C_Cpp.default.compilerPath": "/usr/bin/clang++",
     "clangd.path": "/usr/bin/clangd",
     "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
     "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
     "cmake.configureOnOpen": true,
+    "explorer.confirmDragAndDrop": false,
+    "search.exclude": {
+        "docs/**": true
+    }
 }

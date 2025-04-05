@@ -7,21 +7,28 @@
 #include <unordered_map>
 
 #include "constants.hpp"
+#include "utils.hpp"
 
+struct PixelSector {
+    float x, y, w, h;
+};
 struct Sector {
-    float x, y, width, height;
+    float xRatio, yRatio, wRatio, hRatio;
 };
 
 class LayoutManager {
    private:
-    std::unordered_map<std::string, Sector> sectors;
+    std::unordered_map<std::string, Sector> m_sectors;
+    Dimensions &m_dimensions;
 
    public:
-    void defineSector(const std::string &name, float x, float y, float w, float h) {
-        sectors[name] = {x, y, w, h};
-    }
+    void attachDimensions(Dimensions &dimensions) { m_dimensions = dimensions; };
+    void defineSector(const std::string &name, Sector sector) { m_sectors[name] = sector; }
 
-    const Sector &getSector(const std::string &name) const { return sectors.at(name); }
+    const Sector &getPixelSector(const std::string &name) const {
+        const Sector *sector = &(sectors.at(name));
+        return PixelSector(sector->xRatio *);
+    }
 
     Square getBoardSquarePosition(float mouseX, float mouseY) const {
         Sector gameSector = getSector("Game");
