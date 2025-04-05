@@ -4,9 +4,11 @@
 #include <cmath>
 #include <utility>
 
-class Utils {
-   public:
-    static float distance(const std::pair<float, float> &a, const std::pair<float, float> &b);
+float eucledianDistance(const std::pair<float, float> &a, const std::pair<float, float> &b);
+
+struct Dimensions {
+    int width;
+    int height;
 };
 
 #endif

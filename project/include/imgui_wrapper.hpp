@@ -8,21 +8,29 @@
 
 #include <string>
 
+#include "utils.hpp"
+
 class GLFWwindow {};
 
 class IMGUIWrapper {
    public:
-    static bool init(GLFWwindow *window);
-    static void shutdown();
-    static void showDemoWindow();
-    void newFrame();
-    void finishFrame();
-    void setWindowPos(std::string title, float x, float y);
+    IMGUIWrapper() = default;
+    ~IMGUIWrapper() = default;
+
+    void initialize(GLFWwindow *window);
+    void terminate();
+
     void updateDimensions();
-    void keepWindowInBounds(const char *windowName);
+    void showDemoWindow();
+
+    void beginFrame();
+    void finishFrame();
+
+    void setWindowPos(const std::string &title, float x, float y);
+    void keepWindowInBounds(const char *windowName) const;
 
    private:
-    float m_display_w, m_display_h;
+    Dimensions m_dimensions;
 };
 
 #endif

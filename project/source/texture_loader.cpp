@@ -2,12 +2,11 @@
 
 #include <GL/gl.h>
 
-#include <error_handler.hpp>
-
-#include "resource_manager.hpp"
-
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
+#include "error_bus.hpp"
+#include "resource_manager.hpp"
 
 GLuint TextureLoader::loadTexture(const std::string &filename) {
     int width{};
@@ -19,7 +18,7 @@ GLuint TextureLoader::loadTexture(const std::string &filename) {
                                                 &width, &height, &channels, 4);
 
     if (!data) {
-        handleError(1, stbi_failure_reason());
+        ErrorBus::handleError(1, stbi_failure_reason());
         return 0;
     }
 

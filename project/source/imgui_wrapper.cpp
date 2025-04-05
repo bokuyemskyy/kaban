@@ -1,21 +1,23 @@
+#include <imgui.h>
 #include <imgui_internal.h>
 
 #include <algorithm>
 #include <imgui_wrapper.hpp>
 #include <string>
 
-bool IMGUIWrapper::init(GLFWwindow *window) {
+void IMGUIWrapper::initialize(GLFWwindow *window) {
     IMGUI_CHECKVERSION();
+
     ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    (void)io;
     ImGui::StyleColorsDark();
+
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
-    return true;
+
+    updateDimensions();
 }
 
-void IMGUIWrapper::shutdown() {
+void IMGUIWrapper::terminate() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -23,11 +25,11 @@ void IMGUIWrapper::shutdown() {
 
 void IMGUIWrapper::showDemoWindow() { ImGui::ShowDemoWindow(); }
 
-void IMGUIWrapper::setWindowPos(std::string title, float x, float y) {
+void IMGUIWrapper::setWindowPos(const std::string &title, float x, float y) {
     ImGui::SetWindowPos(title.c_str(), ImVec2(x, y));
 }
 
-void IMGUIWrapper::newFrame() {
+void IMGUIWrapper::beginFrame() {
     updateDimensions();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -41,24 +43,24 @@ void IMGUIWrapper::finishFrame() {
 
 void IMGUIWrapper::updateDimensions() {
     ImGuiIO &io = ImGui::GetIO();
-    m_display_w = io.DisplaySize.x;
-    m_display_h = io.DisplaySize.y;
+    m_dimensions.width = static_cast<int>(io.DisplaySize.x);
+    m_dimensions.height = static_cast<int>(io.DisplaySize.y);
 }
 
-void IMGUIWrapper::keepWindowInBounds(const char *windowName) {
+void IMGUIWrapper::keepWindowInBounds(const char *windowName) const {
     ImGuiWindow *window = ImGui::FindWindowByName(windowName);
 
-    float maxX = m_display_w - window->Size.x;
-    float maxY = m_display_h - window->Size.y;
+    ImVec2 maxPosition{static_cast<float>(m_dimensions.width) - window->Size.x,
+                       static_cast<float>(m_dimensions.height) - window->Size.y};
 
-    float newX = maxX > 0 ? std::clamp(window->Pos.x, 0.0f, maxX) : 0;
-    float newY = maxY > 0 ? std::clamp(window->Pos.y, 0.0f, maxY) : 0;
-    float newW = maxX > 0 ? window->Size.x : m_display_w;
-    float newH = maxY > 0 ? window->Size.y : m_display_h;
+    ImVec2 newPosition{maxPosition.x > 0 ? std::clamp(window->Pos.x, 0.0F, maxPosition.x) : 0,
+                       maxPosition.y > 0 ? std::clamp(window->Pos.y, 0.0F, maxPosition.y) : 0};
+    ImVec2 newSize{maxPosition.x > 0 ? window->Size.x : static_cast<float>(m_dimensions.width),
+                   maxPosition.y > 0 ? window->Size.y : static_cast<float>(m_dimensions.height)};
 
-    if (newX != window->Pos.x || newY != window->Pos.y || newW != window->Size.x ||
-        newH != window->Size.y) {
-        ImGui::SetWindowPos(windowName, ImVec2(newX, newY));
-        ImGui::SetWindowSize(windowName, ImVec2(newW, newH));
+    if (newPosition.x != window->Pos.x || newPosition.y != window->Pos.y ||
+        newSize.x != window->Size.x || newSize.y != window->Size.y) {
+        ImGui::SetWindowPos(windowName, newPosition);
+        ImGui::SetWindowSize(windowName, newSize);
     }
 }
