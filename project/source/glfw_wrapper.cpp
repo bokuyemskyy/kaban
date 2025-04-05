@@ -19,15 +19,15 @@ void GLFWWrapper::initialize(Dimensions dimensions, const char *title, bool useV
         return;
     }
 
-    /*glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);*/
 
     m_monitor = glfwGetPrimaryMonitor();
     m_window = glfwCreateWindow(m_dimensions.width, m_dimensions.height, m_title.c_str(), nullptr,
                                 nullptr);
+
+    glfwSetWindowSizeLimits(m_window, dimensions.width, dimensions.height, GLFW_DONT_CARE,
+                            GLFW_DONT_CARE);
 
     if (m_window == nullptr) {
         ErrorBus::handleError(0, "Failed to initialize a window");
