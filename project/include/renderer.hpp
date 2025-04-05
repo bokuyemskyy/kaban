@@ -6,20 +6,9 @@
 #include <game.hpp>
 #include <glfw_wrapper.hpp>
 #include <imgui_wrapper.hpp>
-#include <layout_manager.hpp>
 #include <position.hpp>
 #include <unordered_map>
 #include <utility>
-
-namespace Ratios {
-constexpr float INTERFACE_WIDTH = 0.4F;
-constexpr float GAME_WIDTH = 0.6F;
-}  // namespace Ratios
-
-namespace Sectors {
-constexpr auto INTERFACE = "Interface";
-constexpr auto GAME = "Game";
-}  // namespace Sectors
 
 class Renderer {
    public:
@@ -44,17 +33,19 @@ class Renderer {
     }
     const std::pair<float, float> &getMousePosition() const { return m_mousePos; }
 
-    LayoutManager *getLayoutManager();
-
-    bool loadTextures();
+    void loadTextures();
+    void drawMainMenuBar();
+    void drawDemoWindow();
+    void drawChessBoard();
+    void drawLostPieces();
+    void drawGameInfo();
+    void drawWorkspace();
     void drawGame();
     void drawSquare(float x, float y, float width, float height, float r, float g, float b);
     void drawImage(float x, float y, float width, float height, GLuint texture);
     void drawPiece(float x, float y, float width, float height, float padding, GLuint texture);
 
    private:
-    LayoutManager m_layoutManager;
-
     Game *m_game;
     GLFWWrapper m_glfw;
     IMGUIWrapper m_imgui;

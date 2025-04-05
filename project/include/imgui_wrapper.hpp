@@ -1,6 +1,8 @@
 #ifndef IMGUI_WRAPPER_HPP
 #define IMGUI_WRAPPER_HPP
 
+#define IMGUI_ENABLE_DOCKING
+
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
