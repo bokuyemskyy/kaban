@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "game.hpp"
 #include "renderer.hpp"
 #include "resource_manager.hpp"
@@ -6,12 +8,13 @@
 int main() {
     ResourceManager::loadResources();
 
-    Game game;
+    std::vector<Game> games;
+    games.emplace_back();
+
     Renderer renderer;
     renderer.initialize(Dimensions(800, 600), "Kaban", true);
-    renderer.hookUpGame(&game);
+    renderer.attachGames(games);
 
-    game.setFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
     // game.countMoves(4);
     while (!renderer.windowShouldClose()) {
         renderer.render();
