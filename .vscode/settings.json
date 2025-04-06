@@ -15,6 +15,7 @@
     "cmake.configureOnOpen": true,
     "explorer.confirmDragAndDrop": false,
     "search.exclude": {
-        "docs/**": true
+        "docs/**": true,
+        "third_party/**": true
     }
 }

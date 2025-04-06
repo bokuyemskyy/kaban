@@ -1,12 +1,8 @@
 #ifndef RESOURCE_MANAGER_HPP
 #define RESOURCE_MANAGER_HPP
 
-#include <algorithm>
 #include <string>
 #include <unordered_map>
-#include <utility>
-
-#include "resources.hpp"
 
 using Resource = std::pair<const unsigned char*, const unsigned int>;
 

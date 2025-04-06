@@ -1,25 +1,15 @@
-#include <GL/gl.h>
-#include <GLFW/glfw3.h>
-#include <imgui.h>
-
-#include <cmath>
-#include <cstdint>
-#include <error_bus.hpp>
-#include <game.hpp>
-#include <navigation.hpp>
-#include <renderer.hpp>
-#include <string>
-#include <texture_loader.hpp>
+#include "renderer.hpp"
 
 #include "constants.hpp"
+#include "error_bus.hpp"
+#include "resource_manager.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#include "resource_manager.hpp"
-#include "types.hpp"
-#include "utils.hpp"
-
+constexpr float LEFT_PANEL_RATIO = 0.6;
+constexpr float VERTICAL_BOARD_RATIO = 0.86;
+constexpr float ITEM_SPACING = 6;
 constexpr int BOARD_MARGIN = 16;
 constexpr int PIECE_MARGIN = 4;
 constexpr ImU32 IM_WHITE = IM_COL32(255, 255, 255, 255);
@@ -150,57 +140,56 @@ void Renderer::drawLostPieces() { ImGui::Text("Captured Pieces"); }
 void Renderer::drawGameInfo() { ImGui::Text("Game Information"); }
 
 void Renderer::drawWorkspace() {
-    ImGui::GetStyle().ItemSpacing.y = 6.0f;
-    ImGui::GetStyle().ItemSpacing.x = 6.0f;
-    // Set main workspace window position and size
+    ImGui::GetStyle().ItemSpacing.y = ITEM_SPACING;
+    ImGui::GetStyle().ItemSpacing.x = ITEM_SPACING;
     ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetFrameHeight()));
     ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x,
                                     ImGui::GetIO().DisplaySize.y - ImGui::GetFrameHeight()));
 
-    // Begin main workspace window
     ImGui::Begin("Workspace", nullptr,
                  ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                      ImGuiWindowFlags_NoBringToFrontOnFocus);
 
-    // Tab bar for game selection
     if (ImGui::BeginTabBar("GameTabs")) {
-        if (ImGui::BeginTabItem("Game 1")) {
-            ImGui::EndTabItem();
+        for (size_t i = 0; i < m_games->size(); ++i) {
+            ImGuiTabItemFlags flags = 0;
+            if (m_justCreatedGame && static_cast<int>(i) == m_gameIndex) {
+                flags |= ImGuiTabItemFlags_SetSelected;
+                m_justCreatedGame = false;
+            }
+
+            if (ImGui::BeginTabItem(("Game " + std::to_string(i)).c_str(), nullptr, flags)) {
+                ImGui::EndTabItem();
+            }
         }
-        if (ImGui::BeginTabItem("Game 2")) {
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("+")) {
-            ImGui::EndTabItem();
+        if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip)) {
+            m_games->emplace_back();
+            m_gameIndex = m_games->size() - 1;
+            m_justCreatedGame = true;
         }
         ImGui::EndTabBar();
     }
 
-    // Calculate available space and division sizes
     ImVec2 availSpace = ImGui::GetContentRegionAvail();
-    float leftPanelWidth = availSpace.x * 0.66f;
+    float leftPanelWidth = availSpace.x * LEFT_PANEL_RATIO;
     float rightPanelWidth = availSpace.x - leftPanelWidth;
-    float boardHeight = availSpace.y * 0.8f;
+    float boardHeight = availSpace.y * VERTICAL_BOARD_RATIO;
     float lostPiecesHeight = availSpace.y - boardHeight;
 
-    // Left panel (containing game board and lost pieces)
-    ImGui::BeginChild("LeftPanel", ImVec2(leftPanelWidth, availSpace.y), false);
+    ImGui::BeginChild("LeftPanel", ImVec2(leftPanelWidth, availSpace.y), 0);
     {
-        // Game board area
-        ImGui::BeginChild("Game", ImVec2(0, boardHeight), true);
+        ImGui::BeginChild("Game", ImVec2(0, boardHeight), 1);
         drawGame();
         ImGui::EndChild();
 
-        // Lost pieces area
-        ImGui::BeginChild("LostPieces", ImVec2(0, 0), true);
+        ImGui::BeginChild("LostPieces", ImVec2(0, 0), 1);
         drawLostPieces();
         ImGui::EndChild();
     }
     ImGui::EndChild();
 
-    // Right panel (game info)
     ImGui::SameLine();
-    ImGui::BeginChild("RightPanel", ImVec2(0, availSpace.y), true);
+    ImGui::BeginChild("RightPanel", ImVec2(0, availSpace.y), 1);
     {
         drawGameInfo();
     }

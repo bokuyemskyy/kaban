@@ -4,7 +4,6 @@
 #include <array>
 #include <cstdint>
 #include <string>
-#include <types.hpp>
 #include <vector>
 
 #include "constants.hpp"
