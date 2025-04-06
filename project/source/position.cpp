@@ -1,13 +1,12 @@
+#include "position.hpp"
+
 #include <array>
 #include <cstdint>
-#include <error_bus.hpp>
-#include <position.hpp>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include "constants.hpp"
-#include "types.hpp"
 
 bool Bitboard::isSet(uint8_t square) const { return (_value & (1ULL << square)) != 0; };
 
@@ -27,11 +26,12 @@ void Position::setFEN(std::string fen) {
                     if (c == '/') {
                         boardSquarePosition.first--;
                         boardSquarePosition.second = 0;
-                    } else if (isdigit(c)) {
+                    } else if (isdigit(c) != 0) {
                         boardSquarePosition.second =
                             static_cast<unsigned char>(boardSquarePosition.second + (c - '0'));
                     } else {
-                        setPiece(Square(boardSquarePosition.first * 8 + boardSquarePosition.second),
+                        setPiece(Square((boardSquarePosition.first * BOARD_SIZE) +
+                                        boardSquarePosition.second),
                                  FENtoPiece.at(c));
                         boardSquarePosition.second++;
                     }
