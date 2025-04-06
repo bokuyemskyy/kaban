@@ -3,10 +3,9 @@
 
 #include <imgui.h>
 
-#include <cstdint>
-#include <position.hpp>
-#include <string>
 #include <vector>
+
+#include "position.hpp"
 
 constexpr auto DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 

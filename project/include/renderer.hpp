@@ -1,15 +1,12 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
-#include <GLFW/glfw3.h>
-
-#include <game.hpp>
-#include <glfw_wrapper.hpp>
-#include <imgui_wrapper.hpp>
-#include <position.hpp>
 #include <unordered_map>
-#include <utility>
 #include <vector>
+
+#include "game.hpp"
+#include "glfw_wrapper.hpp"
+#include "imgui_wrapper.hpp"
 
 class Renderer {
    public:
@@ -44,6 +41,7 @@ class Renderer {
    private:
     std::vector<Game> *m_games;
     int m_gameIndex = 0;
+    bool m_justCreatedGame = false;
 
     GLFWWrapper m_glfw;
     IMGUIWrapper m_imgui;

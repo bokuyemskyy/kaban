@@ -1,6 +1,6 @@
+#include "navigation.hpp"
+
 #include <cstdint>
-#include <navigation.hpp>
-#include <types.hpp>
 
 #include "constants.hpp"
 

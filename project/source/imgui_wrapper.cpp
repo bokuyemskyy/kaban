@@ -1,8 +1,9 @@
+#include "imgui_wrapper.hpp"
+
 #include <imgui.h>
 #include <imgui_internal.h>
 
 #include <algorithm>
-#include <imgui_wrapper.hpp>
 #include <string>
 
 void IMGUIWrapper::initialize(GLFWwindow *window) {

@@ -1,7 +1,8 @@
+#include "navigation.hpp"
+
 #include <gtest/gtest.h>
 
 #include <cstdint>
-#include <navigation.hpp>
 
 TEST(NavigationTest, TurnPos) {
     EXPECT_EQ(getTurnSquare(uint8_t(0), WHITE), 0);

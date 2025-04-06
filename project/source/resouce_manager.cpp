@@ -1,4 +1,7 @@
-#include <resource_manager.hpp>
+#include <algorithm>
+
+#include "resource_manager.hpp"
+#include "resources.hpp"
 
 std::unordered_map<std::string, Resource> ResourceManager::resources;
 

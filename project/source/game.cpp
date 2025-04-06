@@ -1,8 +1,9 @@
+#include "game.hpp"
+
 #include <array>
-#include <game.hpp>
 
 #include "constants.hpp"
-#include "types.hpp"
+
 
 void Game::holdPiece(int index) {
     if (m_position.getPiece(Square(index)) == EMPTY) {

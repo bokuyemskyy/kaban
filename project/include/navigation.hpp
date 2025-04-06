@@ -2,8 +2,8 @@
 #define NAVIGATION_HPP
 
 #include <cstdint>
-#include <game.hpp>
 
+#include "constants.hpp"
 
 uint8_t getTurnSquare(uint8_t screenSquare, Turn turn);
 
