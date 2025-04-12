@@ -1,0 +1,60 @@
+PROJECT_NAME           = "Chess Engine"
+PROJECT_BRIEF          = "A Chess Engine project written in C++."
+OUTPUT_DIRECTORY       = docs
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+USE_MDFILE_AS_MAINPAGE = README.md
+INPUT                  =  project/
+EXCLUDE_PATTERNS       = */test/*
+RECURSIVE              = YES
+
+FILE_PATTERNS          = *.c \
+                         *.cc \
+                         *.cxx \
+                         *.cxxm \
+                         *.cpp \
+                         *.cppm \
+                         *.c++ \
+                         *.c++m \
+                         *.java \
+                         *.ii \
+                         *.ixx \
+                         *.ipp \
+                         *.i++ \
+                         *.inl \
+                         *.idl \
+                         *.ddl \
+                         *.odl \
+                         *.h \
+                         *.hh \
+                         *.hxx \
+                         *.hpp \
+                         *.h++ \
+                         *.ixx \
+                         *.l \
+                         *.cs \
+                         *.d \
+                         *.php \
+                         *.php4 \
+                         *.php5 \
+                         *.phtml \
+                         *.inc \
+                         *.m \
+                         *.markdown \
+                         *.md \
+                         *.mm \
+                         *.dox \
+                         *.py \
+                         *.pyw \
+                         *.f90 \
+                         *.f95 \
+                         *.f03 \
+                         *.f08 \
+                         *.f18 \
+                         *.f \
+                         *.for \
+                         *.vhd \
+                         *.vhdl \
+                         *.ucf \
+                         *.qsf \
+                         *.ice

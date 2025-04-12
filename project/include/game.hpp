@@ -6,12 +6,10 @@
 #include <vector>
 
 #include "position.hpp"
-
-constexpr auto DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+#include "types.hpp"
 
 class Game {
    public:
-    // Improved method names for better clarity
     [[nodiscard]] bool isHoldingPiece() const { return m_holdingPiece; }
     [[nodiscard]] Square getSelectedSquare() const { return m_selectedSquare; }
 
@@ -26,9 +24,8 @@ class Game {
    private:
     Position m_position;
 
-    // Renamed variables to make them more descriptive
     bool m_holdingPiece = false;
-    Square m_selectedSquare = NO_SQ;
+    Square m_selectedSquare = Square::NONE;
 };
 
 #endif
