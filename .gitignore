@@ -3,13 +3,15 @@
 !*.*
 !*/
 
+########## CMAKE AND CLANG ##########
+
+/build/
+/out/
+/.cache/
 
 ########## PROJECT-SPECIFIC ##########
 
 imgui.ini
-/build/
-/out/
-/.cache/
 
 ########## C++ GENERAL ##########
 
@@ -43,3 +45,7 @@ imgui.ini
 
 !README
 !LICENSE
+
+########## OTHER ##########
+
+!Doxyfile

@@ -1,7 +1,9 @@
 Checks: >
   -*,
   bugprone-*,
+  -bugprone-easily-swappable-parameters,
   cert-*,
+  -cert-int09-c,
   clang-analyzer-*,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-non-const-global-variables,
@@ -15,6 +17,8 @@ Checks: >
   -readability-named-parameter,
   -readability-function-cognitive-complexity,
   -readability-identifier-length,
+  -readability-enum-initial-value,
   misc-*,
+  -misc-non-private-member-variables-in-classes,
   -misc-use-internal-linkage,
   portability-*

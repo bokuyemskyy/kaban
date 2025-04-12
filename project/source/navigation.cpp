@@ -2,11 +2,15 @@
 
 #include <cstdint>
 
-#include "constants.hpp"
+#include "types.hpp"
 
-uint8_t getTurnSquare(uint8_t screenSquare, Turn turn) {
-    if (screenSquare == NO_SQ) return NO_SQ;
-    uint8_t newRow = turn == WHITE ? (screenSquare >> 3) : 7 - (screenSquare >> 3);
-    uint8_t newCol = turn == WHITE ? (screenSquare % 8) : 7 - (screenSquare % 8);
-    return Square(newRow * 8 + newCol);
+Square getTurnSquare(Square screenSquare, Turn turn) {
+    if (screenSquare == Square::NONE) return Square::NONE;
+    Rank r = turn == Turn::WHITE
+                 ? getRank(screenSquare)
+                 : static_cast<Rank>(BOARD_SIZE - 1 - static_cast<uint8_t>(getRank(screenSquare)));
+    File f = turn == Turn::WHITE
+                 ? getFile(screenSquare)
+                 : static_cast<File>(BOARD_SIZE - 1 - static_cast<uint8_t>(getFile(screenSquare)));
+    return makeSquare(f, r);
 }

@@ -1,8 +1,10 @@
 #include "renderer.hpp"
 
-#include "constants.hpp"
+#include <cstring>
+
 #include "error_bus.hpp"
 #include "resource_manager.hpp"
+#include "types.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -98,9 +100,9 @@ void Renderer::drawGame() {
                                     ImVec2(squarePos.x + SQUARE_SIZE, squarePos.y + SQUARE_SIZE),
                                     squareColor);
 
-            Piece piece = WPAWN;
-            if (piece != EMPTY) {
-                int textureIndex = piece;
+            Piece piece = Piece::WPAWN;
+            if (piece != Piece::NONE) {
+                int textureIndex = static_cast<int>(piece);
                 drawList->AddImage(pieceTextures.at(piece),
                                    ImVec2(squarePos.x + PIECE_MARGIN, squarePos.y + PIECE_MARGIN),
                                    ImVec2(squarePos.x + SQUARE_SIZE - PIECE_MARGIN,
@@ -110,28 +112,28 @@ void Renderer::drawGame() {
     }
 
     for (int row = 0; row < BOARD_SIZE; row++) {
-        const char *label = std::to_string(8 - row).c_str();
+        std::string label = std::to_string(BOARD_SIZE - row);
 
         drawList->AddText(
             ImVec2(boardStartPos.x - CHAR_SIZE.x - PIECE_MARGIN,
                    boardStartPos.y + (row * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.y / 2)),
-            IM_WHITE, label);
+            IM_WHITE, label.c_str());
         drawList->AddText(
             ImVec2(boardStartPos.x + PX_BOARD_SIZE + PIECE_MARGIN,
                    boardStartPos.y + (row * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.y / 2)),
-            IM_WHITE, label);
+            IM_WHITE, label.c_str());
     }
     for (int col = 0; col < BOARD_SIZE; col++) {
-        const char label[] = {static_cast<char>(a_CHAR + col), '\0'};
+        std::string label(1, static_cast<char>(a_CHAR + col));
 
         drawList->AddText(
             ImVec2(boardStartPos.x + (col * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.x / 2),
                    boardStartPos.y - CHAR_SIZE.y - PIECE_MARGIN),
-            IM_WHITE, label);
+            IM_WHITE, label.c_str());
         drawList->AddText(
             ImVec2(boardStartPos.x + (col * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.x / 2),
                    boardStartPos.y + PX_BOARD_SIZE + PIECE_MARGIN),
-            IM_WHITE, label);
+            IM_WHITE, label.c_str());
     }
 }
 
@@ -247,8 +249,8 @@ void Renderer::updateTime() {
 void Renderer::fillFrame(float r, float g, float b, float a) { m_glfw.fillFrame(r, g, b, a); }
 
 void Renderer::loadTextures() {
-    for (uint8_t i = 0; i < 12; i++) {
-        std::string name(1, PieceToFEN.at(Piece(i)));
+    for (auto i = static_cast<uint8_t>(Piece::FIRST); i <= static_cast<uint8_t>(Piece::LAST); ++i) {
+        std::string name(1, pieceToChar(Piece(i)));
         GLuint texture = loadTextureFromResources(name + ".png");
         if (texture == 0) ErrorBus::handleError(0, "Failed to load a texture");
         pieceTextures.emplace(Piece(i), texture);

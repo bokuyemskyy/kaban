@@ -2,12 +2,11 @@
 
 #include <array>
 
-#include "constants.hpp"
-
+#include "types.hpp"
 
 void Game::holdPiece(int index) {
-    if (m_position.getPiece(Square(index)) == EMPTY) {
-        m_selectedSquare = NO_SQ;
+    if (m_position.pieceAt(Square(index)) == Piece::NONE) {
+        m_selectedSquare = Square::NONE;
     } else {
         m_selectedSquare = Square(index);
         m_holdingPiece = true;
@@ -15,9 +14,3 @@ void Game::holdPiece(int index) {
 }
 
 void Game::releasePiece() { m_holdingPiece = false; }
-
-const std::array<std::array<Piece, 8>, 8> &Game::getMatrixBoard() {
-    return m_position.getMatrixBoard();
-}
-
-const std::vector<Move> &Game::getPossibleMoves() { return m_position.getPossibleMoves(); }
