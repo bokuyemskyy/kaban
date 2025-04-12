@@ -3,66 +3,47 @@
 
 #include <array>
 #include <cstdint>
+#include <list>
 #include <string>
 #include <vector>
 
-#include "constants.hpp"
+#include "bitboard.hpp"
+#include "types.hpp"
 
-inline bool isWhite(Piece piece) { return (piece <= 5); }
-
-struct GameState {
-    CastlingRights castlingRights;
-    uint8_t movesRepeated;
-    uint8_t movesRule50;
-
-    GameState *next;
-    GameState *previous;
-};
-
-class Bitboard {
-   public:
-    uint64_t _value;
-
-    Bitboard() : _value(0ULL) {}
-    Bitboard(uint64_t value) : _value(value) {}
-
-    bool isSet(uint8_t square) const;
-    void set(uint8_t square);
-    void unset(uint8_t square);
-};
+constexpr auto DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
 class Position {
    public:
-    Position() {
-        m_possibleMoves.reserve(MAX_MOVES);
-        m_gameState = new GameState{ANY_CASTLING, 0, 0, nullptr, nullptr};
-    }
-    void setFEN(std::string fen);
+    Position(const std::string &fen = DEFAULT_FEN) : m_castling(Castling::ANY), m_halfmoves(0) {
+        setFEN(fen);
 
-    void setPiece(uint8_t square, Piece piece);
-    void unsetPiece(uint8_t square);
-    Piece getPiece(uint8_t square) const;
+        m_possibleMoves.reserve(MAX_MOVES);
+    }
+
+    void setFEN(const std::string &fen);
+    std::string getFEN() const;
+
+    void setPiece(Square s, Piece p);
+    void unsetPiece(Square s);
+    [[nodiscard]] Piece pieceAt(Square s) const;
+
     void generatePossibleMoves();
-    void makeMove(const Move &move);
+
+    void makeMove(Move move);
     void unmakeMove();
-    void updateExternalData();
-    const std::array<std::array<Piece, 8>, 8> &getMatrixBoard();
-    const std::vector<Move> &getPossibleMoves();
-    Turn getTurn() const { return m_turn; }
+    [[nodiscard]] Turn getTurn() const { return m_turn; }
 
    private:
-    bool m_isExternalDataDirty = true;
-    std::array<std::array<Piece, 8>, 8> m_matrixBoard;
+    std::array<Bitboard, BITBOARDS_NUMBER> m_bitboards;
+
     std::vector<Move> m_possibleMoves;
 
-    Bitboard m_piece_bitboards[12];
-    Bitboard m_white_occupied;
-    Bitboard m_black_occupied;
-    Bitboard m_occupied;
+    std::list<Delta> m_deltas;
+    std::list<Move> m_moves;
 
-    Turn m_turn = WHITE;
-
-    GameState *m_gameState;
+    Turn m_turn = Turn::WHITE;
+    Castling m_castling;
+    uint8_t m_halfmoves;
 };
 
 #endif

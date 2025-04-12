@@ -1,44 +1,38 @@
 #include "position.hpp"
 
-#include <array>
+#include <cassert>
 #include <cstdint>
 #include <sstream>
 #include <string>
-#include <vector>
 
-#include "constants.hpp"
+#include "types.hpp"
 
-bool Bitboard::isSet(uint8_t square) const { return (_value & (1ULL << square)) != 0; };
-
-void Bitboard::set(uint8_t square) { _value |= (1ULL << square); }
-
-void Bitboard::unset(uint8_t square) { _value &= (1ULL << square); }
-
-void Position::setFEN(std::string fen) {
+void Position::setFEN(const std::string &fen) {
     std::stringstream ss(fen);
     std::string argument;
     size_t argument_index = 0;
     while (std::getline(ss, argument, ' ')) {
         switch (argument_index) {
             case 0: {
-                std::pair<uint8_t, uint8_t> boardSquarePosition = {7, 0};
+                int current_rank = BOARD_SIZE - 1;
+                int current_file = 0;
+
                 for (char c : argument) {
                     if (c == '/') {
-                        boardSquarePosition.first--;
-                        boardSquarePosition.second = 0;
-                    } else if (isdigit(c) != 0) {
-                        boardSquarePosition.second =
-                            static_cast<unsigned char>(boardSquarePosition.second + (c - '0'));
+                        current_rank--;
+                        current_file = 0;
+                    } else if (std::isdigit(c) != 0) {
+                        int num = c - '0';
+                        current_file += num;
                     } else {
-                        setPiece(Square((boardSquarePosition.first * BOARD_SIZE) +
-                                        boardSquarePosition.second),
-                                 FENtoPiece.at(c));
-                        boardSquarePosition.second++;
+                        Square s = makeSquare(static_cast<File>(current_file),
+                                              static_cast<Rank>(current_rank));
+                        setPiece(s, charToPiece(c));
+                        current_file++;
                     }
                 }
                 break;
             }
-
             default:
                 break;
         }
@@ -46,65 +40,86 @@ void Position::setFEN(std::string fen) {
     }
 }
 
-void Position::setPiece(uint8_t destination, Piece piece) {
-    if (piece == EMPTY) return;
-    m_piece_bitboards[piece].set(destination);
-    if (isWhite(piece))
-        m_white_occupied.set(destination);
-    else
-        m_black_occupied.set(destination);
-}
+std::string Position::getFEN() const {
+    std::stringstream fen;
 
-void Position::unsetPiece(uint8_t square) {
-    if (square == NO_SQ) return;
-    const uint64_t mask = ~(1ULL << square);
-    for (uint8_t i = 0; i < 12; i++) {
-        m_piece_bitboards[i]._value &= mask;
-    }
-    m_white_occupied._value &= mask;
-    m_black_occupied._value &= mask;
-    m_occupied._value &= mask;
-}
+    for (int r = BOARD_SIZE - 1; r >= 0; r--) {
+        int empty = 0;
+        for (int f = 0; f < BOARD_SIZE; f++) {
+            Square s = makeSquare(File(f), Rank(r));
+            Piece p = pieceAt(s);
 
-Piece Position::getPiece(uint8_t source) const {
-    if (source == NO_SQ) return EMPTY;
-    const uint64_t mask = (1ULL << source);
-    for (uint8_t i = 0; i < 12; i++) {
-        if ((m_piece_bitboards[i]._value & mask) != 0) return Piece(i);
-    }
-    return EMPTY;
-}
-
-void Position::makeMove(const Move &move) {
-    setPiece(move.to, getPiece(move.from));
-    unsetPiece(move.from);
-    // m_Turn = !m_Turn;
-}
-
-void Position::unmakeMove() {}
-
-void Position::updateExternalData() {
-    if (m_isExternalDataDirty) {
-        // update matrix board
-        for (uint8_t row = 0; row < 8; row++) {
-            for (uint8_t col = 0; col < 8; col++) {
-                m_matrixBoard[row][col] = getPiece(Square(row * 8 + col));
+            if (p == Piece::NONE) {
+                empty++;
+            } else {
+                if (empty > 0) {
+                    fen << empty;
+                    empty = 0;
+                }
+                fen << pieceToChar(p);
             }
         }
-        // update moves
-        // ADD
-        m_isExternalDataDirty = false;
+        if (empty > 0) {
+            fen << empty;
+        }
+        if (r > 0) fen << '/';
+    }
+
+    return fen.str();
+}
+
+void Position::setPiece(Square s, Piece p) {
+    assert(p != Piece::NONE);
+    assert(s != Square::NONE);
+
+    unsetPiece(s);
+    m_bitboards.at(static_cast<uint8_t>(p)).set(s);
+}
+
+void Position::unsetPiece(Square s) {
+    assert(s != Square::NONE);
+
+    for (auto i = static_cast<uint8_t>(Piece::FIRST); i <= static_cast<uint8_t>(Piece::LAST); ++i) {
+        m_bitboards.at(i).unset(s);
     }
 }
 
-const std::array<std::array<Piece, 8>, 8> &Position::getMatrixBoard() {
-    updateExternalData();
-    return m_matrixBoard;
+Piece Position::pieceAt(Square s) const {
+    assert(s != Square::NONE);
+
+    for (auto i = static_cast<uint8_t>(Piece::FIRST); i <= static_cast<uint8_t>(Piece::LAST); ++i) {
+        if (m_bitboards.at(i).isSet(s)) return Piece(i);
+    }
+    return Piece::NONE;
 }
 
-const std::vector<Move> &Position::getPossibleMoves() {
-    updateExternalData();
-    return m_possibleMoves;
+void Position::makeMove(const Move move) {
+    m_deltas.emplace_back(createDelta(pieceAt(getTo(move)), m_castling, 0, m_halfmoves));
+    m_moves.emplace_back(move);
+
+    setPiece(getTo(move), pieceAt(getFrom(move)));
+    unsetPiece(getFrom(move));
+
+    m_turn = m_turn == Turn::WHITE ? Turn::BLACK : Turn::WHITE;
+}
+
+void Position::unmakeMove() {
+    if (m_deltas.empty() || m_moves.empty()) return;
+
+    uint32_t delta = m_deltas.back();
+    uint16_t move = m_moves.back();
+    m_deltas.pop_back();
+    m_moves.pop_back();
+
+    Square from = getFrom(move);
+    Square to = getTo(move);
+    uint8_t flags = getFlags(move);
+
+    setPiece(from, pieceAt(to));
+    setPiece(to, getCaptured(delta));
+
+    m_castling = getCastling(delta);
+    m_halfmoves = getHalfmoves(delta);
 }
 
 /*const std::vector<Move>& generateMoveMap() {
