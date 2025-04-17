@@ -1,16 +1,15 @@
 #include "position.hpp"
 
 #include <cassert>
-#include <cstdint>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include "types.hpp"
 
-inline u8 lsb(const Bitboard &x) { return __builtin_ctzll(x); }
-inline u8 popLsb(Bitboard &x) {
-    u8 i = lsb(x);
+inline Square lsb(const Bitboard &x) { return static_cast<Square>(__builtin_ctzll(x)); }
+inline Square popLsb(Bitboard &x) {
+    Square i = lsb(x);
     x &= x - 1;
     return i;
 }
@@ -108,6 +107,8 @@ Piece Position::pieceAt(Square s) const {
     return Piece::NONE;
 }
 
+bool Position::isEmpty(Square s) const { return pieceAt(s) == Piece::NONE; }
+
 void Position::doMove(const Move move) {
     m_deltas.emplace_back(createDelta(pieceAt(getTo(move)), m_castling, 0, m_halfmoves));
     m_moves.emplace_back(move);
@@ -137,26 +138,31 @@ void Position::undoMove() {
     m_halfmoves = getHalfmoves(delta);
 }
 
-void Position::generatePseudoLegalMoves(std::vector<Move> &moveList) {
+void Position::generatePawnMoves(std::vector<Move> &moves, Square s) {
+    u8 direction = (m_turn == Color::WHITE) ? BOARD_SIZE : -BOARD_SIZE;
+}
+
+void Position::generatePseudoLegalMoves(std::vector<Move> &moves) {
     Bitboard pawns = m_bitboards.at(static_cast<u8>(createPiece(m_turn, PieceType::PAWN)));
-    while (pawns) {
-        Square sq = popLsb(pawns);
+    while (pawns != 0ULL) {
+        Square s = popLsb(pawns);
+        generatePawnMoves(moves, s);
     }
 }
 
 bool Position::isLegal() { return true; }
 
 u64 Position::perft(u8 depth) {
-    std::vector<Move> moveList;
-    moveList.reserve(BOARD_SQUARES);
+    std::vector<Move> moves;
+    moves.reserve(BOARD_SQUARES);
 
     u64 nodes = 0;
 
     if (depth == 0) return 1ULL;
 
-    generatePseudoLegalMoves(moveList);
+    generatePseudoLegalMoves(moves);
 
-    for (const auto &move : moveList) {
+    for (const auto &move : moves) {
         doMove(move);
         if (!isLegal()) {
             nodes += perft(depth - 1);
