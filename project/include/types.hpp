@@ -1,46 +1,60 @@
-#ifndef CONSTANTS_HPP
-#define CONSTANTS_HPP
+#ifndef TYPES_HPP
+#define TYPES_HPP
 
+#include <cassert>
 #include <cstdint>
 
 // clang-format off
 
-using Move = uint16_t;
-using Delta = uint32_t;
-using Bitboard = uint64_t;
+// ########## RENAME ##########
 
-constexpr uint8_t MAX_MOVES = 256;
-constexpr uint8_t BOARD_SIZE = 8;
+using u8 = uint8_t;
+using u16 = uint16_t;
+using u32 = uint32_t;
+using u64 = uint64_t;
 
-enum class Piece : uint8_t {
-  WPAWN,
-  WKNIGHT,
-  WBISHOP,
-  WROOK,
-  WQUEEN,
-  WKING,
+using Move = u16;
+using Delta = u32;
+using Bitboard = u64;
 
-  BPAWN,
-  BKNIGHT,
-  BBISHOP,
-  BROOK,
-  BQUEEN,
-  BKING,
+// ########## CONSTANTS ##########
 
-  NONE,
+constexpr u8 MAX_MOVES = 256;
+constexpr u8 BOARD_SIZE = 8;
+constexpr u8 BOARD_SQUARES = BOARD_SIZE * BOARD_SIZE;
 
-  FIRST = WPAWN,
-  LAST = BKING
+// ########## PIECES ##########
+
+enum class PieceType : u8 {
+  PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING, 
+};
+constexpr u8 PIECETYPE_NB = 6;
+
+enum class Color : bool {
+  WHITE, BLACK
 };
 
-enum class Color : uint8_t {
-  WHITE, BLACK, NONE
-};
+enum class Piece : u8 {
+  WPAWN, WKNIGHT, WBISHOP, WROOK, WQUEEN, WKING,
 
-constexpr Color getColor(Piece p) {
-  if (p == Piece::NONE) return Color::NONE;
-  auto val = static_cast<uint8_t>(p);
-  return static_cast<Color>((val & static_cast<uint8_t>(Piece::BPAWN)) >> 3);
+  BPAWN, BKNIGHT, BBISHOP, BROOK, BQUEEN, BKING,
+  
+  NONE
+};
+constexpr u8 PIECE_NB = 12;
+
+inline Piece createPiece(Color c, PieceType pt) {
+  return static_cast<Piece>(static_cast<u8>(pt)+(static_cast<u8>(c)*PIECETYPE_NB));
+}
+
+inline Color getColor(Piece p) {
+  assert(p != Piece::NONE);
+  return static_cast<Color>((static_cast<u8>(p) % PIECETYPE_NB != static_cast<u8>(p)));
+}
+
+inline PieceType getPieceType(Piece p) {
+  assert(p != Piece::NONE);
+  return static_cast<PieceType>(static_cast<u8>(p) % PIECETYPE_NB); 
 }
 
 constexpr Piece charToPiece(char c) {
@@ -79,7 +93,9 @@ constexpr char pieceToChar(Piece p) {
   }
 }
     
-enum class Square : uint8_t {
+// ########## SQUARES ##########
+
+enum class Square : u8 {
   A1, B1, C1, D1, E1, F1, G1, H1,    
   A2, B2, C2, D2, E2, F2, G2, H2,
   A3, B3, C3, D3, E3, F3, G3, H3,
@@ -90,34 +106,40 @@ enum class Square : uint8_t {
   A8, B8, C8, D8, E8, F8, G8, H8, 
   NONE
 };
- 
-enum class File : uint8_t { FA, FB, FC, FD, FE, FF, FG, FH };
-enum class Rank : uint8_t { R1, R2, R3, R4, R5, R6, R7, R8 };
 
-enum class Castling : uint8_t {
-  WHITE_KING = 1 << 0,
-  WHITE_QUEEN = 1 << 1,
-  BLACK_KING = 1 << 2,
-  BLACK_QUEEN = 1 << 3,
-  NONE,
-  
-  KING = WHITE_KING | BLACK_KING,
-  QUEEN = WHITE_QUEEN | BLACK_QUEEN,
-  WHITE = WHITE_KING | WHITE_QUEEN,
-  BLACK = BLACK_KING | BLACK_QUEEN,
-  ANY = WHITE | BLACK
-};
+enum class File : u8 { FA, FB, FC, FD, FE, FF, FG, FH };
+enum class Rank : u8 { R1, R2, R3, R4, R5, R6, R7, R8 };
 
-enum class Turn : bool { WHITE, BLACK };
-
-
-inline Move createMove(Square from, Square to, uint8_t flags) {
-    return (static_cast<uint8_t>(from) & 0x3F) | ((static_cast<uint8_t>(to) & 0x3F) << 6) | ((flags & 0xF) << 12);
+inline File getFile(Square s) {
+    return static_cast<File>(static_cast<u8>(s) & (0b111));
 }
 
-inline Square getFrom(Move move) { return static_cast<Square>(move & 0x3F); }
-inline Square getTo(Move move) { return static_cast<Square>((move >> 6) & 0x3F); }
-inline uint8_t getFlags(Move move) { return (move >> 12) & 0xF; }
+inline Rank getRank(Square s) {
+    return static_cast<Rank>(static_cast<u8>(s) >> 3);
+}
+
+inline Square makeSquare(File f, Rank r) {
+    return static_cast<Square>(static_cast<u8>(r) << 3 | static_cast<u8>(f));
+}
+
+// ########## CASTLING ##########
+
+enum class Castling : u8 {
+  WKINGSIDE = 1 << 0,
+  WQUEENSIDE = 1 << 1,
+  BKINGSIDE = 1 << 2,
+  BQUEENSIDE = 1 << 3,
+  
+  KINGSIDE = WKINGSIDE | BKINGSIDE,
+  QUEENSIZE = WQUEENSIDE | BQUEENSIDE,
+  WSIDE = WKINGSIDE | WQUEENSIDE,
+  BSIDE = BKINGSIDE | BQUEENSIDE,
+  ANY = WSIDE | BSIDE,
+
+  NONE
+};
+
+// ########## MOVES ##########
 
 /*
 0	Quiet move	No capture, no special move
@@ -136,10 +158,19 @@ inline uint8_t getFlags(Move move) { return (move >> 12) & 0xF; }
 15	Queen promotion capture	Promotion with capture, to queen
 */
 
+inline Move createMove(Square from, Square to, u8 flags) {
+    return (static_cast<u8>(from) & 0x3F) | ((static_cast<u8>(to) & 0x3F) << 6) | ((flags & 0xF) << 12);
+}
 
-inline Delta createDelta(Piece captured, Castling castling, uint8_t enpassant, uint8_t halfmoves) {
-    return (static_cast<uint8_t>(captured) & 0xF) | 
-           ((static_cast<uint8_t>(castling) & 0xF) << 4) | 
+inline Square getFrom(Move move) { return static_cast<Square>(move & 0x3F); }
+inline Square getTo(Move move) { return static_cast<Square>((move >> 6) & 0x3F); }
+inline u8 getFlags(Move move) { return (move >> 12) & 0xF; }
+
+// ########## DELTAS ##########
+
+inline Delta createDelta(Piece captured, Castling castling, u8 enpassant, u8 halfmoves) {
+    return (static_cast<u8>(captured) & 0xF) | 
+           ((static_cast<u8>(castling) & 0xF) << 4) | 
            ((enpassant & 0x3F) << 8) | 
            ((halfmoves & 0xFF) << 14);
 }
@@ -152,26 +183,13 @@ inline Castling getCastling(Delta delta) {
     return Castling((delta >> 4) & 0xF);
 }
 
-inline uint8_t getEnpassant(Delta delta) {
+inline u8 getEnpassant(Delta delta) {
     return (delta >> 8) & 0x3F;
 }
 
-inline uint8_t getHalfmoves(Delta delta) {
+inline u8 getHalfmoves(Delta delta) {
     return (delta >> 14) & 0xFF;
   }
-
-
-constexpr File getFile(Square s) {
-    return static_cast<File>(static_cast<uint8_t>(s) & (0b111));
-}
-
-constexpr Rank getRank(Square s) {
-    return static_cast<Rank>(static_cast<uint8_t>(s) >> 3);
-}
-
-constexpr Square makeSquare(File f, Rank r) {
-    return static_cast<Square>(static_cast<uint8_t>(r) << 3 | static_cast<uint8_t>(f));
-}
 
 // clang-format on
 
