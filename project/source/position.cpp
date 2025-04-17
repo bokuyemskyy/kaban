@@ -8,13 +8,14 @@
 
 #include "types.hpp"
 
-Bitboard lsb(Bitboard &bitboard) {
-    Bitboard lsb = bitboard & -bitboard;
-    bitboard &= bitboard - 1;
-    return lsb;
+inline u8 lsb(const Bitboard &x) { return __builtin_ctzll(x); }
+inline u8 popLsb(Bitboard &x) {
+    u8 i = lsb(x);
+    x &= x - 1;
+    return i;
 }
 
-void Position::setFen(const std::string &fen) {
+void Position::setFromFen(const std::string &fen) {
     std::stringstream ss(fen);
     std::string argument;
     size_t argument_index = 0;
@@ -47,7 +48,7 @@ void Position::setFen(const std::string &fen) {
     }
 }
 
-std::string Position::getFen() const {
+std::string Position::toFen() const {
     std::stringstream fen;
 
     for (int r = BOARD_SIZE - 1; r >= 0; r--) {
@@ -80,15 +81,15 @@ void Position::setPiece(Square s, Piece p) {
     assert(s != Square::NONE);
 
     unsetPiece(s);
-    m_bitboards.at(static_cast<uint8_t>(p)) |= (1ULL << static_cast<uint8_t>(s));
+    m_bitboards.at(static_cast<u8>(p)) |= (1ULL << static_cast<u8>(s));
 }
 
 void Position::unsetPiece(Square s) {
     assert(s != Square::NONE);
 
-    uint64_t mask = 1ULL << static_cast<uint8_t>(s);
+    u64 mask = 1ULL << static_cast<u8>(s);
 
-    for (auto i = static_cast<uint8_t>(Piece::FIRST); i <= static_cast<uint8_t>(Piece::LAST); ++i) {
+    for (u8 i = 0; i < PIECE_NB; ++i) {
         if ((m_bitboards.at(i) & mask) != 0ULL) {
             m_bitboards.at(i) &= ~mask;
             break;
@@ -99,9 +100,9 @@ void Position::unsetPiece(Square s) {
 Piece Position::pieceAt(Square s) const {
     assert(s != Square::NONE);
 
-    uint64_t mask = 1ULL << static_cast<uint8_t>(s);
+    u64 mask = 1ULL << static_cast<u8>(s);
 
-    for (auto i = static_cast<uint8_t>(Piece::FIRST); i <= static_cast<uint8_t>(Piece::LAST); ++i) {
+    for (u8 i = 0; i < PIECE_NB; ++i) {
         if ((m_bitboards.at(i) & mask) != 0ULL) return Piece(i);
     }
     return Piece::NONE;
@@ -114,20 +115,20 @@ void Position::doMove(const Move move) {
     setPiece(getTo(move), pieceAt(getFrom(move)));
     unsetPiece(getFrom(move));
 
-    m_turn = m_turn == Turn::WHITE ? Turn::BLACK : Turn::WHITE;
+    m_turn = static_cast<Color>(!static_cast<bool>(m_turn));
 }
 
 void Position::undoMove() {
     if (m_deltas.empty() || m_moves.empty()) return;
 
-    uint32_t delta = m_deltas.back();
-    uint16_t move = m_moves.back();
+    u32 delta = m_deltas.back();
+    u16 move = m_moves.back();
     m_deltas.pop_back();
     m_moves.pop_back();
 
     Square from = getFrom(move);
     Square to = getTo(move);
-    uint8_t flags = getFlags(move);
+    u8 flags = getFlags(move);
 
     setPiece(from, pieceAt(to));
     setPiece(to, getCaptured(delta));
@@ -136,19 +137,28 @@ void Position::undoMove() {
     m_halfmoves = getHalfmoves(delta);
 }
 
-uint64_t Position::perft(uint8_t depth) {
-    std::vector<Move> moveList;
-    moveList.reserve(BOARD_SIZE * BOARD_SIZE);
+void Position::generatePseudoLegalMoves(std::vector<Move> &moveList) {
+    Bitboard pawns = m_bitboards.at(static_cast<u8>(createPiece(m_turn, PieceType::PAWN)));
+    while (pawns) {
+        Square sq = popLsb(pawns);
+    }
+}
 
-    uint64_t nodes = 0;
+bool Position::isLegal() { return true; }
+
+u64 Position::perft(u8 depth) {
+    std::vector<Move> moveList;
+    moveList.reserve(BOARD_SQUARES);
+
+    u64 nodes = 0;
 
     if (depth == 0) return 1ULL;
 
-    generateMoves(moveList);
+    generatePseudoLegalMoves(moveList);
 
     for (const auto &move : moveList) {
         doMove(move);
-        if (!IsLegal()) {
+        if (!isLegal()) {
             nodes += perft(depth - 1);
             undoMove();
         }

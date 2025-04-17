@@ -6,7 +6,7 @@ while IFS= read -r line || [ -n "$line" ]; do
     [[ -z "$line" ]] && continue
 
     fen=$(echo "$line" | cut -d ';' -f1 | awk '{print $1, $2, $3, $4, $5, $6}')
-    echo "pos.setFen(\"$fen\");"
+    echo "pos.setFromFen(\"$fen\");"
 
     rest=$(echo "$line" | cut -d ';' -f2-)
     IFS=';' read -ra parts <<< "$rest"

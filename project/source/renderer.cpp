@@ -249,7 +249,7 @@ void Renderer::updateTime() {
 void Renderer::fillFrame(float r, float g, float b, float a) { m_glfw.fillFrame(r, g, b, a); }
 
 void Renderer::loadTextures() {
-    for (auto i = static_cast<uint8_t>(Piece::FIRST); i <= static_cast<uint8_t>(Piece::LAST); ++i) {
+    for (u8 i = 0; i < PIECE_NB; ++i) {
         std::string name(1, pieceToChar(Piece(i)));
         GLuint texture = loadTextureFromResources(name + ".png");
         if (texture == 0) ErrorBus::handleError(0, "Failed to load a texture");
