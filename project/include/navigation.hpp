@@ -5,6 +5,6 @@
 
 #include "types.hpp"
 
-uint8_t getTurnSquare(uint8_t screenSquare, Turn turn);
+u8 turnSquare(u8 screenSquare, Color turn);
 
 #endif
