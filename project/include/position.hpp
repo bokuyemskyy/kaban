@@ -7,30 +7,32 @@
 #include <string>
 #include <vector>
 
-#include "bitboard.hpp"
 #include "types.hpp"
 
 constexpr auto DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+constexpr uint8_t BITBOARDS_NUMBER = 12;
 
 class Position {
    public:
     Position(const std::string &fen = DEFAULT_FEN) : m_castling(Castling::ANY), m_halfmoves(0) {
-        setFEN(fen);
+        setFen(fen);
 
         m_possibleMoves.reserve(MAX_MOVES);
     }
 
-    void setFEN(const std::string &fen);
-    std::string getFEN() const;
+    void setFen(const std::string &fen);
+    std::string getFen() const;
 
     void setPiece(Square s, Piece p);
     void unsetPiece(Square s);
     [[nodiscard]] Piece pieceAt(Square s) const;
 
-    void generatePossibleMoves();
+    void generateMoves();
+    void generatePseudoMoves();
+    int perft(uint8_t depth);
 
-    void makeMove(Move move);
-    void unmakeMove();
+    void doMove(Move move);
+    void undoMove();
     [[nodiscard]] Turn getTurn() const { return m_turn; }
 
    private:

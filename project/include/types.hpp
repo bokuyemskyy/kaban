@@ -5,6 +5,10 @@
 
 // clang-format off
 
+using Move = uint16_t;
+using Delta = uint32_t;
+using Bitboard = uint64_t;
+
 constexpr uint8_t MAX_MOVES = 256;
 constexpr uint8_t BOARD_SIZE = 8;
 
@@ -106,7 +110,6 @@ enum class Castling : uint8_t {
 
 enum class Turn : bool { WHITE, BLACK };
 
-using Move = uint16_t;
 
 inline Move createMove(Square from, Square to, uint8_t flags) {
     return (static_cast<uint8_t>(from) & 0x3F) | ((static_cast<uint8_t>(to) & 0x3F) << 6) | ((flags & 0xF) << 12);
@@ -133,7 +136,7 @@ inline uint8_t getFlags(Move move) { return (move >> 12) & 0xF; }
 15	Queen promotion capture	Promotion with capture, to queen
 */
 
-using Delta = uint32_t;
+
 inline Delta createDelta(Piece captured, Castling castling, uint8_t enpassant, uint8_t halfmoves) {
     return (static_cast<uint8_t>(captured) & 0xF) | 
            ((static_cast<uint8_t>(castling) & 0xF) << 4) | 
@@ -167,7 +170,7 @@ constexpr Rank getRank(Square s) {
 }
 
 constexpr Square makeSquare(File f, Rank r) {
-    return Square(static_cast<uint8_t>(r) << 3 | static_cast<uint8_t>(f));
+    return static_cast<Square>(static_cast<uint8_t>(r) << 3 | static_cast<uint8_t>(f));
 }
 
 // clang-format on
