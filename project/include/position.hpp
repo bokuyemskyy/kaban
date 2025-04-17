@@ -22,9 +22,11 @@ class Position {
     void setPiece(Square s, Piece p);
     void unsetPiece(Square s);
     [[nodiscard]] Piece pieceAt(Square s) const;
+    [[nodiscard]] bool isEmpty(Square s) const;
 
     [[nodiscard]] bool isLegal();
-    void generatePseudoLegalMoves(std::vector<Move> &moveList);
+    void generatePawnMoves(std::vector<Move> &moves, Square s);
+    void generatePseudoLegalMoves(std::vector<Move> &moves);
     u64 perft(u8 depth);
 
     void doMove(Move move);

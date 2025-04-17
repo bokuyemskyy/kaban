@@ -107,6 +107,24 @@ enum class Square : u8 {
   NONE
 };
 
+inline Square operator+(Square s, u8 offset) {
+    return static_cast<Square>(static_cast<u8>(s) + offset);
+}
+
+inline Square operator-(Square s, u8 offset) {
+    return static_cast<Square>(static_cast<u8>(s) - offset);
+}
+
+inline Square& operator+=(Square& s, u8 offset) {
+    s = s + offset;
+    return s;
+}
+
+inline Square& operator-=(Square& s, u8 offset) {
+    s = s - offset;
+    return s;
+}
+
 enum class File : u8 { FA, FB, FC, FD, FE, FF, FG, FH };
 enum class Rank : u8 { R1, R2, R3, R4, R5, R6, R7, R8 };
 
