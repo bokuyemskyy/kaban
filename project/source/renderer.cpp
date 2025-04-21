@@ -103,7 +103,7 @@ void Renderer::drawGame() {
             Piece piece = Piece::WPAWN;
             if (piece != Piece::NONE) {
                 int textureIndex = static_cast<int>(piece);
-                drawList->AddImage(pieceTextures.at(piece),
+                drawList->AddImage(pieceTextures[piece],
                                    ImVec2(squarePos.x + PIECE_MARGIN, squarePos.y + PIECE_MARGIN),
                                    ImVec2(squarePos.x + SQUARE_SIZE - PIECE_MARGIN,
                                           squarePos.y + SQUARE_SIZE - PIECE_MARGIN));

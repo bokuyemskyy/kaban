@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "move.hpp"
 #include "types.hpp"
 
 TEST(Position, SetUnset) {
@@ -38,4 +39,26 @@ TEST(Position, Move) {
     pos.undoMove();
 
     EXPECT_EQ(pos.toFen(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+}
+
+TEST(Position, IsQuestions) {
+    Position pos = Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+
+    EXPECT_EQ(pos.isAlly(Square::A2), true);
+    EXPECT_EQ(pos.isAlly(Square::A8), false);
+
+    pos.doMove(createMove(Square::A1, Square::A3, 0));
+
+    EXPECT_EQ(pos.isAlly(Square::A8), true);
+    EXPECT_EQ(pos.isAlly(Square::A2), false);
+
+    EXPECT_EQ(isPawnPromotionRank(Rank::R8, Color::WHITE), true);
+    EXPECT_EQ(isPawnPromotionRank(Rank::R8, Color::BLACK), false);
+    EXPECT_EQ(isPawnPromotionRank(Rank::R1, Color::BLACK), true);
+    EXPECT_EQ(isPawnPromotionRank(Rank::R3, Color::WHITE), false);
+
+    EXPECT_EQ(isPawnStartingRank(Rank::R2, Color::WHITE), true);
+    EXPECT_EQ(isPawnStartingRank(Rank::R3, Color::BLACK), false);
+    EXPECT_EQ(isPawnStartingRank(Rank::R7, Color::BLACK), true);
+    EXPECT_EQ(isPawnStartingRank(Rank::R3, Color::WHITE), false);
 }
