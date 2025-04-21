@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "types.hpp"
+#include "piece.hpp"
 
 TEST(Pieces, CreateGet) {
     EXPECT_EQ(createPiece(Color::BLACK, PieceType::ROOK), Piece::BROOK);

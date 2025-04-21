@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "castling.hpp"
+#include "square.hpp"
 #include "types.hpp"
 
 constexpr auto DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
@@ -21,13 +23,25 @@ class Position {
 
     void setPiece(Square s, Piece p);
     void unsetPiece(Square s);
+    void resetBoard();
     [[nodiscard]] Piece pieceAt(Square s) const;
     [[nodiscard]] bool isEmpty(Square s) const;
+    [[nodiscard]] bool isAlly(Square s) const;
+    [[nodiscard]] bool isOpponent(Square s) const;
+    [[nodiscard]] bool isOpponent(Square s, PieceType pt) const;
+    [[nodiscard]] bool isOpponent(Square s, Piece p) const;
 
     [[nodiscard]] bool isLegal();
-    void generatePawnMoves(std::vector<Move> &moves, Square s);
+
+    void generatePawnMoves(std::vector<Move> &moves, Square s) const;
+    void generateKnightMoves(std::vector<Move> &moves, Square s) const;
+    void generateBishopMoves(std::vector<Move> &moves, Square s) const;
+    void generateRookMoves(std::vector<Move> &moves, Square s) const;
+    void generateQueenMoves(std::vector<Move> &moves, Square s) const;
+    void generateKingMoves(std::vector<Move> &moves, Square s) const;
+
     void generatePseudoLegalMoves(std::vector<Move> &moves);
-    u64 perft(u8 depth);
+    int perft(u8 depth, bool verbose = false);
 
     void doMove(Move move);
     void undoMove();

@@ -1,7 +1,6 @@
 #include "navigation.hpp"
 
-#include <cstdint>
-
+#include "square.hpp"
 #include "types.hpp"
 
 Square turnSquare(Square screenSquare, Color turn) {

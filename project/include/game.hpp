@@ -5,6 +5,8 @@
 
 class Game {
    public:
+    [[nodiscard]] Position& position() { return m_position; }
+
    private:
     Position m_position;
     std::string m_gameName;
