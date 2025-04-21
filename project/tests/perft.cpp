@@ -2,7 +2,15 @@
 
 #include "position.hpp"
 
-TEST(Position, Perft) {
+TEST(Perft, PerftMicroset) {
+    Position pos;
+    pos.setFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w");
+    EXPECT_EQ(pos.perft(1), 20);
+    EXPECT_EQ(pos.perft(2), 400);
+    EXPECT_EQ(pos.perft(3), 8902);
+}
+
+TEST(Perft, PerftMegaset) {
     Position pos;
     pos.setFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
     EXPECT_EQ(pos.perft(4), 197281);
