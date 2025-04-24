@@ -14,6 +14,7 @@ enum class PieceType : u8 {
 constexpr u8 PIECETYPE_NB = 6;
 
 enum class Color : bool { WHITE, BLACK };
+constexpr u8 COLOR_NB = 2;
 inline Color operator!(Color c) { return static_cast<Color>(!static_cast<bool>(c)); }
 
 enum class Piece : u8 {

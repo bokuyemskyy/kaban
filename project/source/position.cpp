@@ -1,5 +1,7 @@
 #include "position.hpp"
 
+#include <imgui.h>
+
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
@@ -8,6 +10,8 @@
 #include <string>
 
 #include "move.hpp"
+#include "piece.hpp"
+#include "precomputed.hpp"
 #include "square.hpp"
 #include "types.hpp"
 
@@ -27,7 +31,7 @@ void Position::setFromFen(const std::string &fen) {
     while (std::getline(ss, argument, ' ')) {
         switch (argument_index) {
             case 0: {
-                int current_rank = BOARD_SIZE - 1;
+                int current_rank = FILE_NB - 1;
                 int current_file = 0;
 
                 for (char c : argument) {
@@ -61,9 +65,9 @@ void Position::setFromFen(const std::string &fen) {
 std::string Position::toFen() const {
     std::stringstream fen;
 
-    for (int r = BOARD_SIZE - 1; r >= 0; r--) {
+    for (int r = FILE_NB - 1; r >= 0; r--) {
         int empty = 0;
-        for (int f = 0; f < BOARD_SIZE; f++) {
+        for (int f = 0; f < FILE_NB; f++) {
             Square s = makeSquare(File(f), Rank(r));
             Piece p = pieceAt(s);
 
@@ -100,10 +104,7 @@ void Position::unsetPiece(Square s) {
     u64 mask = 1ULL << static_cast<u8>(s);
 
     for (u8 i = 0; i < PIECE_NB; ++i) {
-        if ((m_bitboards[i] & mask) != 0ULL) {
-            m_bitboards[i] &= ~mask;
-            break;
-        }
+        m_bitboards[i] &= ~mask;
     }
 }
 void Position::resetBoard() {
@@ -128,6 +129,14 @@ bool Position::isEmpty(Square s) const { return pieceAt(s) == Piece::NONE; }
 bool Position::isAlly(Square s) const {
     Piece p = pieceAt(s);
     return p != Piece::NONE && getColor(p) == m_turn;
+}
+Bitboard Position::getAllyBb(Color us) const {
+    return m_bitboards[static_cast<u8>(createPiece(us, PieceType::PAWN))] |
+           m_bitboards[static_cast<u8>(createPiece(us, PieceType::KNIGHT))] |
+           m_bitboards[static_cast<u8>(createPiece(us, PieceType::BISHOP))] |
+           m_bitboards[static_cast<u8>(createPiece(us, PieceType::ROOK))] |
+           m_bitboards[static_cast<u8>(createPiece(us, PieceType::QUEEN))] |
+           m_bitboards[static_cast<u8>(createPiece(us, PieceType::KING))];
 }
 bool Position::isOpponent(Square s) const {
     Piece p = pieceAt(s);
@@ -398,7 +407,7 @@ bool Position::isLegal() {
 
 int Position::perft(u8 depth, bool verbose) {
     std::vector<Move> moves;
-    moves.reserve(BOARD_SQUARES);
+    moves.reserve(SQUARE_NB);
 
     u64 nodes = 0;
 
