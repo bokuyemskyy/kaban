@@ -73,9 +73,9 @@ void Renderer::drawGame() {
     const int WINDOW_PADDING = ImGui::GetStyle().WindowPadding.x;
     const int FONT_SIZE = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
 
-    const float PX_BOARD_SIZE = std::min(availSize.x, availSize.y) -
-                                static_cast<float>(2 * (FONT_SIZE + WINDOW_PADDING + BOARD_MARGIN));
-    const float SQUARE_SIZE = PX_BOARD_SIZE / BOARD_SIZE;
+    const float PX_FILE_NB = std::min(availSize.x, availSize.y) -
+                             static_cast<float>(2 * (FONT_SIZE + WINDOW_PADDING + BOARD_MARGIN));
+    const float SQUARE_SIZE = PX_FILE_NB / FILE_NB;
     const ImVec2 CHAR_SIZE = ImGui::CalcTextSize("A");
 
     drawList->AddText(ImVec2(gameStartPos.x, gameStartPos.y), IM_WHITE, "Player Black");
@@ -83,11 +83,11 @@ void Renderer::drawGame() {
         ImVec2(gameStartPos.x, gameStartPos.y + availSize.y - static_cast<float>(FONT_SIZE)),
         IM_WHITE, "Player White");
 
-    ImVec2 boardStartPos = ImVec2(gameStartPos.x + ((availSize.x - PX_BOARD_SIZE) / 2),
-                                  gameStartPos.y + ((availSize.y - PX_BOARD_SIZE) / 2));
+    ImVec2 boardStartPos = ImVec2(gameStartPos.x + ((availSize.x - PX_FILE_NB) / 2),
+                                  gameStartPos.y + ((availSize.y - PX_FILE_NB) / 2));
 
-    for (int row = 0; row < BOARD_SIZE; row++) {
-        for (int col = 0; col < BOARD_SIZE; col++) {
+    for (int row = 0; row < FILE_NB; row++) {
+        for (int col = 0; col < FILE_NB; col++) {
             ImVec2 squarePos = boardStartPos;
             squarePos.x += col * SQUARE_SIZE;
             squarePos.y += row * SQUARE_SIZE;
@@ -111,19 +111,19 @@ void Renderer::drawGame() {
         }
     }
 
-    for (int row = 0; row < BOARD_SIZE; row++) {
-        std::string label = std::to_string(BOARD_SIZE - row);
+    for (int row = 0; row < FILE_NB; row++) {
+        std::string label = std::to_string(FILE_NB - row);
 
         drawList->AddText(
             ImVec2(boardStartPos.x - CHAR_SIZE.x - PIECE_MARGIN,
                    boardStartPos.y + (row * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.y / 2)),
             IM_WHITE, label.c_str());
         drawList->AddText(
-            ImVec2(boardStartPos.x + PX_BOARD_SIZE + PIECE_MARGIN,
+            ImVec2(boardStartPos.x + PX_FILE_NB + PIECE_MARGIN,
                    boardStartPos.y + (row * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.y / 2)),
             IM_WHITE, label.c_str());
     }
-    for (int col = 0; col < BOARD_SIZE; col++) {
+    for (int col = 0; col < FILE_NB; col++) {
         std::string label(1, static_cast<char>(a_CHAR + col));
 
         drawList->AddText(
@@ -132,7 +132,7 @@ void Renderer::drawGame() {
             IM_WHITE, label.c_str());
         drawList->AddText(
             ImVec2(boardStartPos.x + (col * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.x / 2),
-                   boardStartPos.y + PX_BOARD_SIZE + PIECE_MARGIN),
+                   boardStartPos.y + PX_FILE_NB + PIECE_MARGIN),
             IM_WHITE, label.c_str());
     }
 }

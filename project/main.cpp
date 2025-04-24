@@ -50,7 +50,7 @@ int main() {
     renderer.initialize(Dimensions(800, 600), "Kaban", true);
     renderer.attachGames(games);
 
-    games[0].position().setFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b");
+    games[0].position().setFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w");
     testPerformance(games[0], 5, true);
 
     while (!renderer.windowShouldClose()) {

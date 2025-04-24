@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "castling.hpp"
+#include "precomputed.hpp"
 #include "square.hpp"
 #include "types.hpp"
 
@@ -16,7 +17,10 @@ constexpr u8 BITBOARDS_NUMBER = 12;
 
 class Position {
    public:
-    Position(const std::string &fen = DEFAULT_FEN) { setFromFen(fen); }
+    Position(const std::string &fen = DEFAULT_FEN) {
+        setFromFen(fen);
+        precomputeAttacks();
+    }
 
     void setFromFen(const std::string &fen);
     [[nodiscard]] std::string toFen() const;
@@ -27,6 +31,7 @@ class Position {
     [[nodiscard]] Piece pieceAt(Square s) const;
     [[nodiscard]] bool isEmpty(Square s) const;
     [[nodiscard]] bool isAlly(Square s) const;
+    [[nodiscard]] Bitboard getAllyBb(Color us) const;
     [[nodiscard]] bool isOpponent(Square s) const;
     [[nodiscard]] bool isOpponent(Square s, PieceType pt) const;
     [[nodiscard]] bool isOpponent(Square s, Piece p) const;

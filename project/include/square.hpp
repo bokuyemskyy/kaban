@@ -3,13 +3,13 @@
 
 #include <string>
 
-#include "constants.hpp"
+#include "macros.hpp"
 #include "piece.hpp"
 #include "types.hpp"
 
 // clang-format off
 
-enum class Square : u8 {
+enum Square : u8 {
     A1, B1, C1, D1, E1, F1, G1, H1,
     A2, B2, C2, D2, E2, F2, G2, H2,
     A3, B3, C3, D3, E3, F3, G3, H3,
@@ -18,11 +18,34 @@ enum class Square : u8 {
     A6, B6, C6, D6, E6, F6, G6, H6,
     A7, B7, C7, D7, E7, F7, G7, H7,
     A8, B8, C8, D8, E8, F8, G8, H8,
+
+    FIRST = A1,
+    LAST = H8,
+
     NONE
 };
+constexpr u8 SQUARE_NB = 64;
 
-enum class File : u8 { FA, FB, FC, FD, FE, FF, FG, FH, NONE };
-enum class Rank : u8 { R1, R2, R3, R4, R5, R6, R7, R8, NONE };
+ENABLE_ENUM_CLASS_OPERATIONS(Square);
+
+enum class File : u8 { 
+    FA, FB, FC, FD, FE, FF, FG, FH, 
+    
+    FIRST = FA,
+    LAST = FH,
+    
+    NONE 
+};
+constexpr u8 FILE_NB = 8;
+
+enum class Rank : u8 { 
+    R1, R2, R3, R4, R5, R6, R7, R8,
+    
+    FIRST = R1,
+    LAST = R8,
+    
+    NONE 
+};
 
 inline File getFile(Square s) { return static_cast<File>(static_cast<u8>(s) & (0b111)); }
 
@@ -33,38 +56,35 @@ inline Square makeSquare(File f, Rank r) {
 }
 inline File operator+(File f, u8 offset) {
     u8 newIndex = static_cast<u8>(f) + offset;
-    return (newIndex >= 0 && newIndex < BOARD_SIZE) ? static_cast<File>(newIndex) : File::NONE;
+    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<File>(newIndex) : File::NONE;
 }
 inline File operator-(File f, u8 offset) {
     u8 newIndex = static_cast<u8>(f) - offset;
-    return (newIndex >= 0 && newIndex < BOARD_SIZE) ? static_cast<File>(newIndex) : File::NONE;
+    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<File>(newIndex) : File::NONE;
 }
 inline File operator+(File f, File offset) {
     u8 newIndex = static_cast<u8>(f) + static_cast<u8>(offset);
-    return (newIndex >= 0 && newIndex < BOARD_SIZE) ? static_cast<File>(newIndex) : File::NONE;
+    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<File>(newIndex) : File::NONE;
 }
 inline File operator-(File f, File offset) {
     u8 newIndex = static_cast<u8>(f) - static_cast<u8>(offset);
-    return (newIndex >= 0 && newIndex < BOARD_SIZE) ? static_cast<File>(newIndex) : File::NONE;
+    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<File>(newIndex) : File::NONE;
 }
 inline Rank operator+(Rank f, u8 offset) {
     u8 newIndex = static_cast<u8>(f) + offset;
-    return (newIndex >= 0 && newIndex < BOARD_SIZE) ? static_cast<Rank>(newIndex) : Rank::NONE;
+    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<Rank>(newIndex) : Rank::NONE;
 }
 inline Rank operator-(Rank f, u8 offset) {
     u8 newIndex = static_cast<u8>(f) - offset;
-    return (newIndex >= 0 && newIndex < BOARD_SIZE) ? static_cast<Rank>(newIndex) : Rank::NONE;
+    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<Rank>(newIndex) : Rank::NONE;
 }
 inline Rank operator+(Rank f, Rank offset) {
     u8 newIndex = static_cast<u8>(f) + static_cast<u8>(offset);
-    return (newIndex >= 0 && newIndex < BOARD_SIZE) ? static_cast<Rank>(newIndex) : Rank::NONE;
+    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<Rank>(newIndex) : Rank::NONE;
 }
 inline Rank operator-(Rank f, Rank offset) {
     u8 newIndex = static_cast<u8>(f) - static_cast<u8>(offset);
-    return (newIndex >= 0 && newIndex < BOARD_SIZE) ? static_cast<Rank>(newIndex) : Rank::NONE;
-}
-inline Square operator+(Square s, u8 offset) {
-    return static_cast<Square>(static_cast<u8>(s) + offset);
+    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<Rank>(newIndex) : Rank::NONE;
 }
 
 inline Square operator-(Square s, u8 offset) {
