@@ -10,8 +10,8 @@
 #include <sstream>
 #include <string>
 
+#include "bitboards.hpp"
 #include "piece.hpp"
-#include "precomputed.hpp"
 #include "square.hpp"
 
 inline Square lsb(const Bitboard &x) { return static_cast<Square>(__builtin_ctzll(x)); }
@@ -21,7 +21,7 @@ inline Square popLsb(Bitboard &x) {
     return i;
 }
 
-void Position::setFromFen(const std::string &fen) {
+void Position::setFromFEN(const std::string &fen) {
     resetBoard();
 
     std::stringstream ss(fen);
@@ -43,7 +43,7 @@ void Position::setFromFen(const std::string &fen) {
                     } else {
                         Square s = makeSquare(current_file, current_rank);
                         setPiece(s, charToPiece(c));
-                        current_file++;
+                        ++current_file;
                     }
                 }
                 break;
@@ -56,21 +56,21 @@ void Position::setFromFen(const std::string &fen) {
             default:
                 break;
         }
-        argument_index++;
+        ++argument_index;
     }
 }
 
-std::string Position::toFen() const {
+std::string Position::toFEN() const {
     std::stringstream fen;
 
     for (int r = Ranks::NB - 1; r >= 0; r--) {
         int empty = 0;
-        for (int f = 0; f < Files::NB; f++) {
+        for (int f = 0; f < Files::NB; ++f) {
             Square s = makeSquare(File(f), Rank(r));
             Piece  p = m_board[s];
 
             if (p == Pieces::NONE) {
-                empty++;
+                ++empty;
             } else {
                 if (empty > 0) {
                     fen << empty;
@@ -109,10 +109,10 @@ void Position::unsetPiece(Square square) {
 void Position::resetBoard() {
     m_colorBB[Colors::WHITE] = BITBOARD_ZERO;
     m_colorBB[Colors::BLACK] = BITBOARD_ZERO;
-    for (uint8_t i = 0; i < PieceTypes::NB; i++) {
+    for (uint8_t i = 0; i < PieceTypes::NB; ++i) {
         m_pieceTypeBB[i] = BITBOARD_ZERO;
     }
-    for (uint8_t i = 0; i < Squares::NB; i++) {
+    for (uint8_t i = 0; i < Squares::NB; ++i) {
         m_board[i] = Pieces::NONE;
     }
     m_turn = Colors::WHITE;
@@ -125,7 +125,7 @@ void Position::doMove(const Move move) {
     setPiece(getTo(move), m_board[getFrom(move)]);
     unsetPiece(getFrom(move));
 
-    m_turn = toggleColor(m_turn);
+    m_turn = !m_turn;
 }
 
 void Position::undoMove() {
@@ -149,7 +149,7 @@ void Position::undoMove() {
     m_castling  = getCastling(delta);
     m_halfmoves = getHalfmoves(delta);
 
-    m_turn = toggleColor(m_turn);
+    m_turn = !m_turn;
 }
 
 void Position::generatePawnMoves(std::vector<Move> &moves, Square square) const {
@@ -158,12 +158,12 @@ void Position::generatePawnMoves(std::vector<Move> &moves, Square square) const 
         (m_turn == Colors::WHITE) ? std::vector<Direction>{Directions::NORTH_EAST, Directions::NORTH_WEST}
                                   : std::vector<Direction>{Directions::SOUTH_EAST, Directions::SOUTH_WEST};
 
-    Bitboard singlePush = getDestination(square, moveDirection) & ~m_colorBB[Colors::WHITE] & ~m_colorBB[Colors::BLACK];
+    Bitboard singlePush = destinationBB(square, moveDirection) & ~m_colorBB[Colors::WHITE] & ~m_colorBB[Colors::BLACK];
 
     if (singlePush != BITBOARD_ZERO) {
         if (isPawnStartingRank(getRank(square), m_turn)) {
             Bitboard doublePush =
-                getDestination(square, moveDirection * 2) & ~m_colorBB[Colors::WHITE] & ~m_colorBB[Colors::BLACK];
+                destinationBB(square, moveDirection * 2) & ~m_colorBB[Colors::WHITE] & ~m_colorBB[Colors::BLACK];
 
             if (doublePush != BITBOARD_ZERO) {
                 moves.emplace_back(createMove(square, popLsb(doublePush), 0));
@@ -173,7 +173,7 @@ void Position::generatePawnMoves(std::vector<Move> &moves, Square square) const 
     }
 
     for (const auto &direction : attackDirections) {
-        Bitboard attack = getDestination(square, direction) & m_colorBB[toggleColor(m_turn)];
+        Bitboard attack = destinationBB(square, direction) & m_colorBB[!m_turn];
         if (attack != BITBOARD_ZERO) {
             moves.emplace_back(createMove(square, popLsb(attack), 0));
         }
@@ -190,8 +190,8 @@ void Position::generateKnightMoves(std::vector<Move> &moves, Square square) cons
                                                       Directions::SOUTH + Directions::WEST + Directions::WEST};
 
     for (const auto &direction : directions) {
-        Bitboard destinationBB = getDestination(square, direction);
-        Bitboard validMoves    = destinationBB & ~m_colorBB[m_turn];
+        Bitboard destBB     = destinationBB(square, direction);
+        Bitboard validMoves = destBB & ~m_colorBB[m_turn];
 
         if (validMoves != BITBOARD_ZERO) {
             moves.emplace_back(createMove(square, popLsb(validMoves), 0));
@@ -204,12 +204,12 @@ void Position::generateBishopMoves(std::vector<Move> &moves, Square square) cons
 
     for (const auto &direction : directions) {
         for (uint8_t i = 1;; ++i) {
-            Bitboard destination = getDestination(square + (direction * (i - 1)), direction);
+            Bitboard destination = destinationBB(square + (direction * (i - 1)), direction);
             if (destination == BITBOARD_ZERO) break;
 
             if (m_colorBB[m_turn] & destination) break;
             moves.emplace_back(createMove(square, lsb(destination), 0));
-            if (m_colorBB[toggleColor(m_turn)] & destination) break;
+            if (m_colorBB[!m_turn] & destination) break;
         }
     }
 }
@@ -219,14 +219,14 @@ void Position::generateRookMoves(std::vector<Move> &moves, Square square) const 
                                                       Directions::WEST};
 
     for (const auto &direction : directions) {
-        Bitboard destination = getDestination(square, direction);
+        Bitboard destination = destinationBB(square, direction);
         for (uint8_t i = 1;; ++i) {
-            Bitboard destination = getDestination(square + (direction * (i - 1)), direction);
+            Bitboard destination = destinationBB(square + (direction * (i - 1)), direction);
             if (destination == BITBOARD_ZERO) break;
 
             if (m_colorBB[m_turn] & destination) break;
             moves.emplace_back(createMove(square, lsb(destination), 0));
-            if (m_colorBB[toggleColor(m_turn)] & destination) break;
+            if (m_colorBB[!m_turn] & destination) break;
         }
     }
 }
@@ -238,28 +238,20 @@ void Position::generateQueenMoves(std::vector<Move> &moves, Square square) const
 
     for (const auto &direction : directions) {
         for (uint8_t i = 1;; ++i) {
-            Bitboard destination = getDestination(square + (direction * (i - 1)), direction);
+            Bitboard destination = destinationBB(square + (direction * (i - 1)), direction);
             if (destination == BITBOARD_ZERO) break;
 
             if (m_colorBB[m_turn] & destination) break;
             moves.emplace_back(createMove(square, lsb(destination), 0));
-            if (m_colorBB[toggleColor(m_turn)] & destination) break;
+            if (m_colorBB[!m_turn] & destination) break;
         }
     }
 }
 
 void Position::generateKingMoves(std::vector<Move> &moves, Square square) const {
-    static const std::vector<Direction> directions = {
-        Directions::NORTH,      Directions::EAST,       Directions::SOUTH,      Directions::WEST,
-        Directions::NORTH_EAST, Directions::NORTH_WEST, Directions::SOUTH_EAST, Directions::SOUTH_WEST};
-
-    for (const auto &direction : directions) {
-        Bitboard destination = getDestination(square, direction);
-        Bitboard validMove   = destination & ~m_colorBB[m_turn];
-
-        if (validMove != BITBOARD_ZERO) {
-            moves.emplace_back(createMove(square, popLsb(validMove), 0));
-        }
+    Bitboard attacks = pseudoAttacks[PieceTypes::KING][square] & ~m_colorBB[m_turn];
+    while (attacks != BITBOARD_ZERO) {
+        moves.emplace_back(createMove(square, popLsb(attacks), 0));
     }
 }
 
@@ -297,7 +289,7 @@ void Position::generatePseudoLegalMoves(std::vector<Move> &moves) {
 }
 
 bool Position::isLegal() {
-    Color us   = toggleColor(m_turn);
+    Color us   = !m_turn;
     Color them = m_turn;
 
     Square king   = lsb(m_colorBB[us] & m_pieceTypeBB[PieceTypes::KING]);
@@ -324,7 +316,7 @@ bool Position::isLegal() {
                                                             Directions::SOUTH + Directions::WEST + Directions::WEST};
 
     for (const auto &dir : knightDirections) {
-        Bitboard destination = getDestination(king, dir);
+        Bitboard destination = destinationBB(king, dir);
         if (destination != BITBOARD_ZERO &&
             (m_colorBB[them] & m_pieceTypeBB[PieceTypes::KNIGHT] & destination) != BITBOARD_ZERO)
             return false;
@@ -336,7 +328,7 @@ bool Position::isLegal() {
     for (const auto &dir : bishopDirections) {
         Square current = king;
         while (true) {
-            Bitboard destBB = getDestination(current, dir);
+            Bitboard destBB = destinationBB(current, dir);
             if (destBB == BITBOARD_ZERO) break;
 
             Square dst = lsb(destBB);
@@ -355,7 +347,7 @@ bool Position::isLegal() {
     for (const auto &dir : rookDirections) {
         Square current = king;
         while (true) {
-            Bitboard destBB = getDestination(current, dir);
+            Bitboard destBB = destinationBB(current, dir);
             if (destBB == BITBOARD_ZERO) break;
 
             Square dst = lsb(destBB);
