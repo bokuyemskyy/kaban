@@ -35,14 +35,10 @@ enum value : PieceType {
 using Color = uint8_t;
 namespace Colors {
 enum value : uint8_t {
-    WHITE = 0b0000,
-    BLACK = 0b1000,
+    WHITE = 0,
+    BLACK = 1,
 
-    FIRST = WHITE,
-    LAST  = BLACK,
-
-    NONE = 0b1111,
-    MASK = 0b1000,
+    MASK = 0b1,
     SIZE = 1,
     NB   = 2
 };
@@ -81,20 +77,17 @@ enum value : uint8_t {
 
 // ##### Color #####
 
-inline Color toggleColor(Color color) { return color ^ Colors::MASK; }
-
 inline Color getColor(Piece piece) {
     assert(piece != Pieces::NONE);
-    Color returnValue = piece & Colors::MASK;
-    return returnValue;
+    return (piece >> PieceTypes::SIZE) & Colors::MASK;
 }
 
 // ##### Piece #####
 
 inline Piece createPiece(Color color, PieceType pieceType) {
-    assert(color != Colors::NONE);
+    assert(color < Colors::NB);
     assert(pieceType != PieceTypes::NONE);
-    return pieceType | color;
+    return (color << PieceTypes::SIZE) | pieceType;
 }
 
 constexpr std::string_view charPieceMap = "PNBRQK  pnbrqk?";

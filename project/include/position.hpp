@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "bitboards.hpp"
 #include "piece.hpp"
-#include "precomputed.hpp"
 #include "square.hpp"
 
 constexpr auto DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
@@ -15,22 +15,17 @@ constexpr auto DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 class Position {
    public:
     Position(const std::string &fen = DEFAULT_FEN) {
-        setFromFen(fen);
-        precomputeAll();
+        setFromFEN(fen);
+        precompute();
     }
 
-    void                      setFromFen(const std::string &fen);
-    [[nodiscard]] std::string toFen() const;
+    void                      setFromFEN(const std::string &fen);
+    [[nodiscard]] std::string toFEN() const;
 
-    void                   setPiece(Square square, Piece p);
-    void                   unsetPiece(Square square);
-    void                   resetBoard();
-    [[nodiscard]] Piece    pieceAt(Square square) const;
-    [[nodiscard]] bool     isEmpty(Square square) const;
-    [[nodiscard]] bool     isAlly(Square square) const;
-    [[nodiscard]] Bitboard getAllyBb(Color us) const;
-    [[nodiscard]] bool     isOpponent(Square square) const;
-    [[nodiscard]] bool     isOpponent(Square square, PieceType pt) const;
+    void                setPiece(Square square, Piece p);
+    void                unsetPiece(Square square);
+    void                resetBoard();
+    [[nodiscard]] Piece pieceAt(Square square) const;
 
     [[nodiscard]] bool isLegal();
 
@@ -49,9 +44,9 @@ class Position {
     [[nodiscard]] Color turn() const { return m_turn; }
 
    private:
-    std::array<Piece, Squares::NB>         m_board{};
-    std::array<Bitboard, Colors::LAST + 1> m_colorBB{BITBOARD_ZERO};
-    std::array<Bitboard, PieceTypes::NB>   m_pieceTypeBB{BITBOARD_ZERO};
+    std::array<Piece, Squares::NB>       m_board{};
+    std::array<Bitboard, Colors::NB>     m_colorBB{BITBOARD_ZERO};
+    std::array<Bitboard, PieceTypes::NB> m_pieceTypeBB{BITBOARD_ZERO};
 
     std::list<Delta> m_deltas;
     std::list<Move>  m_moves;
