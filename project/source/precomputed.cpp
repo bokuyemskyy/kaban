@@ -1,16 +1,43 @@
 #include "precomputed.hpp"
 
-std::array<std::array<Bitboard, SQUARE_NB>, COLOR_NB> pawnAttacks{};
-std::array<std::array<Bitboard, SQUARE_NB>, PIECETYPE_NB> pseudoAttacks{};
+#include <array>
+#include <cstdlib>
 
-void precomputeAttacks() {
-    for (Square s = Square::FIRST; s <= Square::LAST; ++s) {
-        for (auto direction :
-             {Direction(1, 0), Direction(0, 1), Direction(-1, 0), Direction(0, -1), Direction(1, 1),
-              Direction(-1, 1), Direction(-1, -1), Direction(1, -1)}) {
-            if (s + direction != Square::NONE)
-                pseudoAttacks[static_cast<u8>(PieceType::KING)][static_cast<u8>(s)] |=
-                    1ULL << static_cast<u8>(s + direction);
+#include "piece.hpp"
+#include "square.hpp"
+
+std::array<std::array<uint8_t, Squares::NB>, Squares::NB> squareDistance{};
+
+std::array<std::array<Bitboard, Squares::NB>, Colors::NB>     pawnAttacks{};
+std::array<std::array<Bitboard, Squares::NB>, PieceTypes::NB> pseudoAttacks{};
+
+constexpr Bitboard getDestination(Square square, Direction direction) {
+    Square destination = square + direction;
+    return (isSquareInBounds(destination) && squareDistance[square][destination] <= 2) ? squareBB(destination)
+                                                                                       : BITBOARD_ZERO;
+}
+
+void precomputeSquareDistance() {
+    for (Square square1 = Squares::FIRST; square1 <= Squares::LAST; square1++) {
+        for (Square square2 = Squares::FIRST; square2 <= Squares::LAST; square2++) {
+            squareDistance[square1][square2] =
+                std::max(abs(getFile(square1) - getFile(square2)), abs(getRank(square1) - getRank(square2)));
         }
     }
+}
+void precomputeAttacks() {
+    for (Square square = Squares::FIRST; square <= Squares::LAST; square++) {
+        for (auto direction :
+             {Directions::EAST, Directions::NORTH, Directions::WEST, Directions::SOUTH, Directions::NORTH_EAST,
+              Directions::NORTH_WEST, Directions::SOUTH_EAST, Directions::SOUTH_WEST}) {
+            Bitboard destination = getDestination(square, direction);
+            if (destination != BITBOARD_ZERO) {
+                pseudoAttacks[PieceTypes::KING][square] |= destination;
+            }
+        }
+    }
+}
+void precomputeAll() {
+    precomputeSquareDistance();
+    precomputeAttacks();
 }

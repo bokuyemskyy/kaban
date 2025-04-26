@@ -22,12 +22,12 @@ int testPerformance(Game& game, int depth, bool verbose = false) {
 
     int nodes = game.position().perft(depth, verbose);
 
-    auto end = std::chrono::high_resolution_clock::now();
+    auto                          end     = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
 
-    double seconds = elapsed.count();
+    double seconds     = elapsed.count();
     double nodesPerSec = nodes / seconds;
-    double secPerNode = seconds / nodes;
+    double secPerNode  = seconds / nodes;
 
     std::cout << std::fixed << std::setprecision(6);
     std::cout << "Perft(" << depth << "): " << nodes << " nodes\n";
@@ -51,7 +51,7 @@ int main() {
     renderer.attachGames(games);
 
     games[0].position().setFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w");
-    testPerformance(games[0], 5, true);
+    testPerformance(games[0], 4, true);
 
     while (!renderer.windowShouldClose()) {
         renderer.render();

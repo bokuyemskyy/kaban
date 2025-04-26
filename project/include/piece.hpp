@@ -1,115 +1,119 @@
 #ifndef PIECE_HPP
 #define PIECE_HPP
 
-#include "types.hpp"
+#include <algorithm>
+#include <cassert>
+#include <cstdint>
+#include <string_view>
 
-enum class PieceType : u8 {
-    PAWN,
-    KNIGHT,
-    BISHOP,
-    ROOK,
-    QUEEN,
-    KING,
+/* ############### Definitions ############### */
+
+// ##### Piece Type #####
+
+using PieceType = uint8_t;
+namespace PieceTypes {
+enum value : PieceType {
+    PAWN   = 0b000,
+    KNIGHT = 0b001,
+    BISHOP = 0b010,
+    ROOK   = 0b011,
+    QUEEN  = 0b100,
+    KING   = 0b101,
+
+    FIRST = PAWN,
+    LAST  = KING,
+
+    NONE = 0b111,
+    MASK = 0b111,
+    SIZE = 3,
+    NB   = 6
 };
-constexpr u8 PIECETYPE_NB = 6;
+}  // namespace PieceTypes
 
-enum class Color : bool { WHITE, BLACK };
-constexpr u8 COLOR_NB = 2;
-inline Color operator!(Color c) { return static_cast<Color>(!static_cast<bool>(c)); }
+// ##### Color #####
 
-enum class Piece : u8 {
-    WPAWN,
-    WKNIGHT,
-    WBISHOP,
-    WROOK,
-    WQUEEN,
-    WKING,
+using Color = uint8_t;
+namespace Colors {
+enum value : uint8_t {
+    WHITE = 0b0000,
+    BLACK = 0b1000,
 
-    BPAWN,
-    BKNIGHT,
-    BBISHOP,
-    BROOK,
-    BQUEEN,
-    BKING,
+    FIRST = WHITE,
+    LAST  = BLACK,
 
-    NONE
+    NONE = 0b1111,
+    MASK = 0b1000,
+    SIZE = 1,
+    NB   = 2
 };
-constexpr u8 PIECE_NB = 12;
+}  // namespace Colors
 
-inline Piece createPiece(Color c, PieceType pt) {
-    return static_cast<Piece>(static_cast<u8>(pt) + (static_cast<u8>(c) * PIECETYPE_NB));
+// ##### Piece #####
+
+using Piece = uint8_t;
+namespace Pieces {
+enum value : uint8_t {
+    WPAWN   = static_cast<uint8_t>(Colors::WHITE) | static_cast<uint8_t>(PieceTypes::PAWN),
+    WKNIGHT = static_cast<uint8_t>(Colors::WHITE) | static_cast<uint8_t>(PieceTypes::KNIGHT),
+    WBISHOP = static_cast<uint8_t>(Colors::WHITE) | static_cast<uint8_t>(PieceTypes::BISHOP),
+    WROOK   = static_cast<uint8_t>(Colors::WHITE) | static_cast<uint8_t>(PieceTypes::ROOK),
+    WQUEEN  = static_cast<uint8_t>(Colors::WHITE) | static_cast<uint8_t>(PieceTypes::QUEEN),
+    WKING   = static_cast<uint8_t>(Colors::WHITE) | static_cast<uint8_t>(PieceTypes::KING),
+
+    BPAWN   = static_cast<uint8_t>(Colors::BLACK) | static_cast<uint8_t>(PieceTypes::PAWN),
+    BKNIGHT = static_cast<uint8_t>(Colors::BLACK) | static_cast<uint8_t>(PieceTypes::KNIGHT),
+    BBISHOP = static_cast<uint8_t>(Colors::BLACK) | static_cast<uint8_t>(PieceTypes::BISHOP),
+    BROOK   = static_cast<uint8_t>(Colors::BLACK) | static_cast<uint8_t>(PieceTypes::ROOK),
+    BQUEEN  = static_cast<uint8_t>(Colors::BLACK) | static_cast<uint8_t>(PieceTypes::QUEEN),
+    BKING   = static_cast<uint8_t>(Colors::BLACK) | static_cast<uint8_t>(PieceTypes::KING),
+
+    FIRST = WPAWN,
+    LAST  = BKING,
+
+    NONE = 0b1111,
+    MASK = 0b1111,
+    SIZE = 4,
+    NB   = 12
+};
+}  // namespace Pieces
+
+// ############### Helpers ###############
+
+// ##### Color #####
+
+inline Color toggleColor(Color color) { return color ^ Colors::MASK; }
+
+inline Color getColor(Piece piece) {
+    assert(piece != Pieces::NONE);
+    Color returnValue = piece & Colors::MASK;
+    return returnValue;
 }
 
-inline Color getColor(Piece p) {
-    assert(p != Piece::NONE);
-    return static_cast<Color>((static_cast<u8>(p) % PIECETYPE_NB != static_cast<u8>(p)));
+// ##### Piece #####
+
+inline Piece createPiece(Color color, PieceType pieceType) {
+    assert(color != Colors::NONE);
+    assert(pieceType != PieceTypes::NONE);
+    return pieceType | color;
 }
 
-inline PieceType getPieceType(Piece p) {
-    assert(p != Piece::NONE);
-    return static_cast<PieceType>(static_cast<u8>(p) % PIECETYPE_NB);
-}
+constexpr std::string_view charPieceMap = "PNBRQK  pnbrqk?";
 
 constexpr Piece charToPiece(char c) {
-    switch (c) {
-        case 'P':
-            return Piece::WPAWN;
-        case 'N':
-            return Piece::WKNIGHT;
-        case 'B':
-            return Piece::WBISHOP;
-        case 'R':
-            return Piece::WROOK;
-        case 'Q':
-            return Piece::WQUEEN;
-        case 'K':
-            return Piece::WKING;
-        case 'p':
-            return Piece::BPAWN;
-        case 'n':
-            return Piece::BKNIGHT;
-        case 'b':
-            return Piece::BBISHOP;
-        case 'r':
-            return Piece::BROOK;
-        case 'q':
-            return Piece::BQUEEN;
-        case 'k':
-            return Piece::BKING;
-        default:
-            return Piece::NONE;
-    }
+    const auto *it = std::ranges::find(charPieceMap, c);
+    return it != charPieceMap.end() ? Pieces::value(it - charPieceMap.begin()) : Pieces::NONE;
 }
 
 constexpr char pieceToChar(Piece p) {
-    switch (p) {
-        case Piece::WPAWN:
-            return 'P';
-        case Piece::WKNIGHT:
-            return 'N';
-        case Piece::WBISHOP:
-            return 'B';
-        case Piece::WROOK:
-            return 'R';
-        case Piece::WQUEEN:
-            return 'Q';
-        case Piece::WKING:
-            return 'K';
-        case Piece::BPAWN:
-            return 'p';
-        case Piece::BKNIGHT:
-            return 'n';
-        case Piece::BBISHOP:
-            return 'b';
-        case Piece::BROOK:
-            return 'r';
-        case Piece::BQUEEN:
-            return 'q';
-        case Piece::BKING:
-            return 'k';
-        default:
-            return '?';
-    }
+    assert(p != Pieces::NONE);
+    return charPieceMap[p];
+}
+
+// ##### Piece Type #####
+
+inline PieceType getPieceType(Piece piece) {
+    assert(piece != Pieces::NONE);
+    return piece & PieceTypes::MASK;
 }
 
 #endif
