@@ -2,23 +2,23 @@
 
 #include <gtest/gtest.h>
 
-#include "move.hpp"
-#include "types.hpp"
+#include "piece.hpp"
+#include "square.hpp"
 
 TEST(Position, SetUnset) {
     Position pos = Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
     EXPECT_EQ(pos.toFen(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
-    pos.setPiece(Square::A1, Piece::BKING);
+    pos.setPiece(Squares::A1, Pieces::BKING);
 
     EXPECT_EQ(pos.toFen(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/kNBQKBNR");
 
-    pos.setPiece(Square::B4, Piece::WPAWN);
+    pos.setPiece(Squares::B4, Pieces::WPAWN);
 
     EXPECT_EQ(pos.toFen(), "rnbqkbnr/pppppppp/8/8/1P6/8/PPPPPPPP/kNBQKBNR");
 
-    pos.unsetPiece(Square::A8);
+    pos.unsetPiece(Squares::A8);
 
     EXPECT_EQ(pos.toFen(), "1nbqkbnr/pppppppp/8/8/1P6/8/PPPPPPPP/kNBQKBNR");
 }
@@ -28,7 +28,7 @@ TEST(Position, Move) {
 
     EXPECT_EQ(pos.toFen(), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
-    pos.doMove(createMove(Square::A1, Square::A2, 0));
+    pos.doMove(createMove(Squares::A1, Squares::A2, 0));
 
     EXPECT_EQ(pos.toFen(), "rnbqkbnr/pppppppp/8/8/8/8/RPPPPPPP/1NBQKBNR");
 
@@ -44,21 +44,15 @@ TEST(Position, Move) {
 TEST(Position, IsQuestions) {
     Position pos = Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 
-    EXPECT_EQ(pos.isAlly(Square::A2), true);
-    EXPECT_EQ(pos.isAlly(Square::A8), false);
+    pos.doMove(createMove(Squares::A1, Squares::A3, 0));
 
-    pos.doMove(createMove(Square::A1, Square::A3, 0));
+    EXPECT_EQ(isPawnPromotionRank(Ranks::R8, Colors::WHITE), true);
+    EXPECT_EQ(isPawnPromotionRank(Ranks::R8, Colors::BLACK), false);
+    EXPECT_EQ(isPawnPromotionRank(Ranks::R1, Colors::BLACK), true);
+    EXPECT_EQ(isPawnPromotionRank(Ranks::R3, Colors::WHITE), false);
 
-    EXPECT_EQ(pos.isAlly(Square::A8), true);
-    EXPECT_EQ(pos.isAlly(Square::A2), false);
-
-    EXPECT_EQ(isPawnPromotionRank(Rank::R8, Color::WHITE), true);
-    EXPECT_EQ(isPawnPromotionRank(Rank::R8, Color::BLACK), false);
-    EXPECT_EQ(isPawnPromotionRank(Rank::R1, Color::BLACK), true);
-    EXPECT_EQ(isPawnPromotionRank(Rank::R3, Color::WHITE), false);
-
-    EXPECT_EQ(isPawnStartingRank(Rank::R2, Color::WHITE), true);
-    EXPECT_EQ(isPawnStartingRank(Rank::R3, Color::BLACK), false);
-    EXPECT_EQ(isPawnStartingRank(Rank::R7, Color::BLACK), true);
-    EXPECT_EQ(isPawnStartingRank(Rank::R3, Color::WHITE), false);
+    EXPECT_EQ(isPawnStartingRank(Ranks::R2, Colors::WHITE), true);
+    EXPECT_EQ(isPawnStartingRank(Ranks::R3, Colors::BLACK), false);
+    EXPECT_EQ(isPawnStartingRank(Ranks::R7, Colors::BLACK), true);
+    EXPECT_EQ(isPawnStartingRank(Ranks::R3, Colors::WHITE), false);
 }

@@ -16,7 +16,7 @@ class GLFWwindow {};
 
 class IMGUIWrapper {
    public:
-    IMGUIWrapper() = default;
+    IMGUIWrapper()  = default;
     ~IMGUIWrapper() = default;
 
     void initialize(GLFWwindow *window);
