@@ -1,21 +1,23 @@
 #include "renderer.hpp"
 
 #include <cstring>
+#include <stdexcept>
+#include <string>
 
-#include "error_bus.hpp"
+#include "piece.hpp"
 #include "resource_manager.hpp"
-#include "types.hpp"
+#include "square.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-constexpr float LEFT_PANEL_RATIO = 0.6;
+constexpr float LEFT_PANEL_RATIO     = 0.6;
 constexpr float VERTICAL_BOARD_RATIO = 0.86;
-constexpr float ITEM_SPACING = 6;
-constexpr int BOARD_MARGIN = 16;
-constexpr int PIECE_MARGIN = 4;
-constexpr ImU32 IM_WHITE = IM_COL32(255, 255, 255, 255);
-constexpr int a_CHAR = 97;
+constexpr float ITEM_SPACING         = 6;
+constexpr int   BOARD_MARGIN         = 16;
+constexpr int   PIECE_MARGIN         = 4;
+constexpr ImU32 IM_WHITE             = IM_COL32(255, 255, 255, 255);
+constexpr int   a_CHAR               = 97;
 
 void Renderer::initialize(Dimensions dimensions, const char *title, bool useVsync) {
     m_glfw.initialize(dimensions, title, useVsync);
@@ -66,74 +68,66 @@ void Renderer::drawMainMenuBar() {
 }
 
 void Renderer::drawGame() {
-    ImVec2 gameStartPos = ImGui::GetCursorScreenPos();
-    ImVec2 availSize = ImGui::GetContentRegionAvail();
-    ImDrawList *drawList = ImGui::GetWindowDrawList();
+    ImVec2      gameStartPos = ImGui::GetCursorScreenPos();
+    ImVec2      availSize    = ImGui::GetContentRegionAvail();
+    ImDrawList *drawList     = ImGui::GetWindowDrawList();
 
     const int WINDOW_PADDING = ImGui::GetStyle().WindowPadding.x;
-    const int FONT_SIZE = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
+    const int FONT_SIZE      = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
 
-    const float PX_FILE_NB = std::min(availSize.x, availSize.y) -
-                             static_cast<float>(2 * (FONT_SIZE + WINDOW_PADDING + BOARD_MARGIN));
-    const float SQUARE_SIZE = PX_FILE_NB / FILE_NB;
-    const ImVec2 CHAR_SIZE = ImGui::CalcTextSize("A");
+    const float PX_FILE_NB =
+        std::min(availSize.x, availSize.y) - static_cast<float>(2 * (FONT_SIZE + WINDOW_PADDING + BOARD_MARGIN));
+    const float  SQUARE_SIZE = PX_FILE_NB / Files::NB;
+    const ImVec2 CHAR_SIZE   = ImGui::CalcTextSize("A");
 
     drawList->AddText(ImVec2(gameStartPos.x, gameStartPos.y), IM_WHITE, "Player Black");
-    drawList->AddText(
-        ImVec2(gameStartPos.x, gameStartPos.y + availSize.y - static_cast<float>(FONT_SIZE)),
-        IM_WHITE, "Player White");
+    drawList->AddText(ImVec2(gameStartPos.x, gameStartPos.y + availSize.y - static_cast<float>(FONT_SIZE)), IM_WHITE,
+                      "Player White");
 
-    ImVec2 boardStartPos = ImVec2(gameStartPos.x + ((availSize.x - PX_FILE_NB) / 2),
-                                  gameStartPos.y + ((availSize.y - PX_FILE_NB) / 2));
+    ImVec2 boardStartPos =
+        ImVec2(gameStartPos.x + ((availSize.x - PX_FILE_NB) / 2), gameStartPos.y + ((availSize.y - PX_FILE_NB) / 2));
 
-    for (int row = 0; row < FILE_NB; row++) {
-        for (int col = 0; col < FILE_NB; col++) {
+    for (int row = 0; row < Files::NB; row++) {
+        for (int col = 0; col < Files::NB; col++) {
             ImVec2 squarePos = boardStartPos;
             squarePos.x += col * SQUARE_SIZE;
             squarePos.y += row * SQUARE_SIZE;
 
-            bool isLightSquare = (row + col) % 2 == 0;
-            ImU32 squareColor =
-                isLightSquare ? IM_COL32(240, 217, 181, 255) : IM_COL32(181, 136, 99, 255);
+            bool  isLightSquare = (row + col) % 2 == 0;
+            ImU32 squareColor   = isLightSquare ? IM_COL32(240, 217, 181, 255) : IM_COL32(181, 136, 99, 255);
 
-            drawList->AddRectFilled(squarePos,
-                                    ImVec2(squarePos.x + SQUARE_SIZE, squarePos.y + SQUARE_SIZE),
+            drawList->AddRectFilled(squarePos, ImVec2(squarePos.x + SQUARE_SIZE, squarePos.y + SQUARE_SIZE),
                                     squareColor);
 
-            Piece piece = Piece::WPAWN;
-            if (piece != Piece::NONE) {
+            Piece piece = Pieces::WPAWN;
+            if (piece != Pieces::NONE) {
                 int textureIndex = static_cast<int>(piece);
-                drawList->AddImage(pieceTextures[piece],
-                                   ImVec2(squarePos.x + PIECE_MARGIN, squarePos.y + PIECE_MARGIN),
-                                   ImVec2(squarePos.x + SQUARE_SIZE - PIECE_MARGIN,
-                                          squarePos.y + SQUARE_SIZE - PIECE_MARGIN));
+                drawList->AddImage(
+                    pieceTextures[piece], ImVec2(squarePos.x + PIECE_MARGIN, squarePos.y + PIECE_MARGIN),
+                    ImVec2(squarePos.x + SQUARE_SIZE - PIECE_MARGIN, squarePos.y + SQUARE_SIZE - PIECE_MARGIN));
             }
         }
     }
 
-    for (int row = 0; row < FILE_NB; row++) {
-        std::string label = std::to_string(FILE_NB - row);
+    for (int row = 0; row < Files::NB; row++) {
+        std::string label = std::to_string(Files::NB - row);
 
-        drawList->AddText(
-            ImVec2(boardStartPos.x - CHAR_SIZE.x - PIECE_MARGIN,
-                   boardStartPos.y + (row * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.y / 2)),
-            IM_WHITE, label.c_str());
-        drawList->AddText(
-            ImVec2(boardStartPos.x + PX_FILE_NB + PIECE_MARGIN,
-                   boardStartPos.y + (row * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.y / 2)),
-            IM_WHITE, label.c_str());
+        drawList->AddText(ImVec2(boardStartPos.x - CHAR_SIZE.x - PIECE_MARGIN,
+                                 boardStartPos.y + (row * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.y / 2)),
+                          IM_WHITE, label.c_str());
+        drawList->AddText(ImVec2(boardStartPos.x + PX_FILE_NB + PIECE_MARGIN,
+                                 boardStartPos.y + (row * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.y / 2)),
+                          IM_WHITE, label.c_str());
     }
-    for (int col = 0; col < FILE_NB; col++) {
+    for (int col = 0; col < Files::NB; col++) {
         std::string label(1, static_cast<char>(a_CHAR + col));
 
-        drawList->AddText(
-            ImVec2(boardStartPos.x + (col * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.x / 2),
-                   boardStartPos.y - CHAR_SIZE.y - PIECE_MARGIN),
-            IM_WHITE, label.c_str());
-        drawList->AddText(
-            ImVec2(boardStartPos.x + (col * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.x / 2),
-                   boardStartPos.y + PX_FILE_NB + PIECE_MARGIN),
-            IM_WHITE, label.c_str());
+        drawList->AddText(ImVec2(boardStartPos.x + (col * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.x / 2),
+                                 boardStartPos.y - CHAR_SIZE.y - PIECE_MARGIN),
+                          IM_WHITE, label.c_str());
+        drawList->AddText(ImVec2(boardStartPos.x + (col * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.x / 2),
+                                 boardStartPos.y + PX_FILE_NB + PIECE_MARGIN),
+                          IM_WHITE, label.c_str());
     }
 }
 
@@ -145,8 +139,8 @@ void Renderer::drawWorkspace() {
     ImGui::GetStyle().ItemSpacing.y = ITEM_SPACING;
     ImGui::GetStyle().ItemSpacing.x = ITEM_SPACING;
     ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetFrameHeight()));
-    ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x,
-                                    ImGui::GetIO().DisplaySize.y - ImGui::GetFrameHeight()));
+    ImGui::SetNextWindowSize(
+        ImVec2(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y - ImGui::GetFrameHeight()));
 
     ImGui::Begin("Workspace", nullptr,
                  ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
@@ -166,17 +160,17 @@ void Renderer::drawWorkspace() {
         }
         if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip)) {
             m_games->emplace_back();
-            m_gameIndex = m_games->size() - 1;
+            m_gameIndex       = m_games->size() - 1;
             m_justCreatedGame = true;
         }
         ImGui::EndTabBar();
     }
 
-    ImVec2 availSpace = ImGui::GetContentRegionAvail();
-    float leftPanelWidth = availSpace.x * LEFT_PANEL_RATIO;
-    float rightPanelWidth = availSpace.x - leftPanelWidth;
-    float boardHeight = availSpace.y * VERTICAL_BOARD_RATIO;
-    float lostPiecesHeight = availSpace.y - boardHeight;
+    ImVec2 availSpace       = ImGui::GetContentRegionAvail();
+    float  leftPanelWidth   = availSpace.x * LEFT_PANEL_RATIO;
+    float  rightPanelWidth  = availSpace.x - leftPanelWidth;
+    float  boardHeight      = availSpace.y * VERTICAL_BOARD_RATIO;
+    float  lostPiecesHeight = availSpace.y - boardHeight;
 
     ImGui::BeginChild("LeftPanel", ImVec2(leftPanelWidth, availSpace.y), 0);
     {
@@ -242,18 +236,20 @@ void Renderer::finishFrame() {
 }
 void Renderer::updateTime() {
     m_currentTime = GLFWWrapper::time();
-    m_deltaTime = m_currentTime - m_lastTime;
-    m_lastTime = m_currentTime;
+    m_deltaTime   = m_currentTime - m_lastTime;
+    m_lastTime    = m_currentTime;
 }
 
 void Renderer::fillFrame(float r, float g, float b, float a) { m_glfw.fillFrame(r, g, b, a); }
 
 void Renderer::loadTextures() {
-    for (u8 i = 0; i < PIECE_NB; ++i) {
+    for (uint8_t i = 0; i < Pieces::NB; ++i) {
         std::string name(1, pieceToChar(Piece(i)));
-        GLuint texture = loadTextureFromResources(name + ".png");
-        if (texture == 0) ErrorBus::handleError(0, "Failed to load a texture");
-        pieceTextures.emplace(Piece(i), texture);
+        if (name != " " && name != "?") {
+            GLuint texture = loadTextureFromResources(name + ".png");
+            if (texture == 0) throw std::runtime_error("Failed to load a texture");
+            pieceTextures.emplace(Piece(i), texture);
+        }
     }
 }
 
@@ -262,15 +258,15 @@ ImTextureID Renderer::loadTextureFromResources(const std::string &filename) {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    int width{};
-    int height{};
-    int channels{};
-    Resource resource = ResourceManager::getResource(filename);
-    unsigned char *data = stbi_load_from_memory(resource.first, static_cast<int>(resource.second),
-                                                &width, &height, &channels, 4);
+    int            width{};
+    int            height{};
+    int            channels{};
+    Resource       resource = ResourceManager::getResource(filename);
+    unsigned char *data =
+        stbi_load_from_memory(resource.first, static_cast<int>(resource.second), &width, &height, &channels, 4);
 
-    if (data == 0) {
-        ErrorBus::handleError(1, stbi_failure_reason());
+    if (data == nullptr) {
+        throw std::runtime_error(stbi_failure_reason());
         return 0;
     }
 

@@ -4,17 +4,17 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
-#include "error_bus.hpp"
+#include <stdexcept>
+
 #include "utils.hpp"
 
 void GLFWWrapper::initialize(Dimensions dimensions, const char *title, bool useVsync) {
     m_dimensions = dimensions;
-    m_title = title;
-    m_useVsync = useVsync;
-    glfwSetErrorCallback(errorCallback);
+    m_title      = title;
+    m_useVsync   = useVsync;
 
     if (glfwInit() != GL_TRUE) {
-        ErrorBus::handleError(0, "Failed to initialize GLFW");
+        throw std::runtime_error("Failed to initialize GLFW");
         terminate();
         return;
     }
@@ -23,14 +23,12 @@ void GLFWWrapper::initialize(Dimensions dimensions, const char *title, bool useV
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
     m_monitor = glfwGetPrimaryMonitor();
-    m_window = glfwCreateWindow(m_dimensions.width, m_dimensions.height, m_title.c_str(), nullptr,
-                                nullptr);
+    m_window  = glfwCreateWindow(m_dimensions.width, m_dimensions.height, m_title.c_str(), nullptr, nullptr);
 
-    glfwSetWindowSizeLimits(m_window, dimensions.width, dimensions.height, GLFW_DONT_CARE,
-                            GLFW_DONT_CARE);
+    glfwSetWindowSizeLimits(m_window, dimensions.width, dimensions.height, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
     if (m_window == nullptr) {
-        ErrorBus::handleError(0, "Failed to initialize a window");
+        throw std::runtime_error("Failed to initialize a window");
         terminate();
         return;
     }
@@ -51,9 +49,7 @@ void GLFWWrapper::terminate() {
     glfwTerminate();
 }
 
-void GLFWWrapper::updateDimensions() {
-    glfwGetFramebufferSize(window(), &m_dimensions.width, &m_dimensions.height);
-}
+void GLFWWrapper::updateDimensions() { glfwGetFramebufferSize(window(), &m_dimensions.width, &m_dimensions.height); }
 
 void GLFWWrapper::beginFrame() { updateDimensions(); }
 
@@ -68,6 +64,4 @@ void GLFWWrapper::fillFrame(float r, float g, float b, float a) const {
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void GLFWWrapper::setWindowShouldClose(bool value) {
-    glfwSetWindowShouldClose(m_window, static_cast<int>(value));
-}
+void GLFWWrapper::setWindowShouldClose(bool value) { glfwSetWindowShouldClose(m_window, static_cast<int>(value)); }

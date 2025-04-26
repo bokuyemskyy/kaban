@@ -1,15 +1,34 @@
 #ifndef SQUARE_HPP
 #define SQUARE_HPP
 
+#include <cassert>
+#include <cstdint>
 #include <string>
 
-#include "macros.hpp"
 #include "piece.hpp"
-#include "types.hpp"
 
 // clang-format off
 
-enum Square : u8 {
+/* ############### Definitions ############### */
+
+// ##### Bitboard #####
+
+using Bitboard                   = uint64_t;
+constexpr Bitboard BITBOARD_ZERO = 0ULL;
+
+// ##### Move #####
+
+using Move = uint16_t;
+
+// ##### Delta #####
+
+using Delta = uint32_t;
+
+// ##### Square #####
+
+using Square = uint8_t;
+namespace Squares {
+enum value : uint8_t {
     A1, B1, C1, D1, E1, F1, G1, H1,
     A2, B2, C2, D2, E2, F2, G2, H2,
     A3, B3, C3, D3, E3, F3, G3, H3,
@@ -22,143 +41,170 @@ enum Square : u8 {
     FIRST = A1,
     LAST = H8,
 
-    NONE
+    NONE = 64,
+    NB = 64
 };
-constexpr u8 SQUARE_NB = 64;
+}
 
-ENABLE_ENUM_CLASS_OPERATIONS(Square);
+// ##### File #####
 
-enum class File : u8 { 
+using File = uint8_t;
+namespace Files {
+enum value : uint8_t { 
     FA, FB, FC, FD, FE, FF, FG, FH, 
     
     FIRST = FA,
-    LAST = FH,
+    LAST  = FH,
     
-    NONE 
+    NONE = 8,
+    MASK = 0b111,
+    SIZE = 3,
+    NB   = 8 
 };
-constexpr u8 FILE_NB = 8;
+}
 
-enum class Rank : u8 { 
+// ##### Rank #####
+
+using Rank = uint8_t;
+namespace Ranks {
+enum value : uint8_t { 
     R1, R2, R3, R4, R5, R6, R7, R8,
     
     FIRST = R1,
-    LAST = R8,
+    LAST  = R8,
     
-    NONE 
+    NONE = 8,
+    MASK = 0b111,
+    SIZE = 3,
+    NB   = 8
 };
-
-inline File getFile(Square s) { return static_cast<File>(static_cast<u8>(s) & (0b111)); }
-
-inline Rank getRank(Square s) { return static_cast<Rank>(static_cast<u8>(s) >> 3); }
-
-inline Square makeSquare(File f, Rank r) {
-    return static_cast<Square>(static_cast<u8>(r) << 3 | static_cast<u8>(f));
-}
-inline File operator+(File f, u8 offset) {
-    u8 newIndex = static_cast<u8>(f) + offset;
-    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<File>(newIndex) : File::NONE;
-}
-inline File operator-(File f, u8 offset) {
-    u8 newIndex = static_cast<u8>(f) - offset;
-    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<File>(newIndex) : File::NONE;
-}
-inline File operator+(File f, File offset) {
-    u8 newIndex = static_cast<u8>(f) + static_cast<u8>(offset);
-    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<File>(newIndex) : File::NONE;
-}
-inline File operator-(File f, File offset) {
-    u8 newIndex = static_cast<u8>(f) - static_cast<u8>(offset);
-    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<File>(newIndex) : File::NONE;
-}
-inline Rank operator+(Rank f, u8 offset) {
-    u8 newIndex = static_cast<u8>(f) + offset;
-    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<Rank>(newIndex) : Rank::NONE;
-}
-inline Rank operator-(Rank f, u8 offset) {
-    u8 newIndex = static_cast<u8>(f) - offset;
-    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<Rank>(newIndex) : Rank::NONE;
-}
-inline Rank operator+(Rank f, Rank offset) {
-    u8 newIndex = static_cast<u8>(f) + static_cast<u8>(offset);
-    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<Rank>(newIndex) : Rank::NONE;
-}
-inline Rank operator-(Rank f, Rank offset) {
-    u8 newIndex = static_cast<u8>(f) - static_cast<u8>(offset);
-    return (newIndex >= 0 && newIndex < FILE_NB) ? static_cast<Rank>(newIndex) : Rank::NONE;
 }
 
-inline Square operator-(Square s, u8 offset) {
-    return static_cast<Square>(static_cast<u8>(s) - offset);
+// ##### Direction #####
+
+using Direction = int8_t;
+namespace Directions {
+enum value : int8_t { 
+    EAST = 1, 
+    NORTH = 8,
+    WEST = -1,
+    SOUTH = -8,
+
+    NORTH_EAST = NORTH + EAST,
+    SOUTH_EAST = SOUTH + EAST,
+    NORTH_WEST = NORTH + WEST,
+    SOUTH_WEST = SOUTH + WEST,
+    
+    NONE = 0,
+    NB   = 4
+};
 }
 
-inline Square operator+(Square s, Direction d) {
-    File newFile = getFile(s) + d.first;
-    if (newFile == File::NONE) return Square::NONE;
-    Rank newRank = getRank(s) + d.second;
-    if (newRank == Rank::NONE) return Square::NONE;
-    return makeSquare(newFile, newRank);
+// ##### Castling #####
+
+using Castling = uint8_t;
+namespace Castlings {
+enum value : uint8_t {
+    WKINGSIDE  = 0b0001,
+    WQUEENSIDE = 0b0010,
+    BKINGSIDE  = 0b0100,
+    BQUEENSIDE = 0b1000,
+
+    KINGSIDE  = WKINGSIDE | BKINGSIDE,    // 0b0101
+    QUEENSIDE = WQUEENSIDE | BQUEENSIDE,  // 0b1010
+    WSIDE     = WKINGSIDE | WQUEENSIDE,   // 0b0011
+    BSIDE     = BKINGSIDE | BQUEENSIDE,   // 0b1100
+    ANY       = WSIDE | BSIDE,            // 0b1111
+
+    NONE = 0b0000,
+
+    MASK = 0b1111,
+    SIZE = 4,
+    NB   = 4
+};
+}  // namespace Castlings
+
+/* ############### Helpers ############### */
+
+// ##### File #####
+
+inline File getFile(Square square) { return square & Files::MASK; }
+
+// ##### Rank #####
+
+inline Rank getRank(Square square) { return square >> Files::SIZE; }
+
+inline bool isPawnStartingRank(Rank rank, Color color) {
+    return (color == Colors::WHITE && rank == Ranks::R2) || (color == Colors::BLACK && rank == Ranks::R7);
+}
+inline bool isPawnPromotionRank(Rank rank, Color color) {
+    return (color == Colors::WHITE && rank == Ranks::R8) || (color == Colors::BLACK && rank == Ranks::R1);
 }
 
-inline bool isPawnStartingRank(Rank r, Color c) {
-    return (c == Color::WHITE && r == Rank::R2) || (c == Color::BLACK && r == Rank::R7);
+// ##### Square #####
+
+inline Square makeSquare(File file, Rank rank) {
+    return rank << Files::SIZE | file;
 }
-inline bool isPawnPromotionRank(Rank r, Color c) {
-    return (c == Color::WHITE && r == Rank::R8) || (c == Color::BLACK && r == Rank::R1);
+inline bool isSquareInBounds(Square square) {
+    return square <= Squares::LAST;
+}
+constexpr Bitboard squareBB(Square square) {
+    assert(isSquareInBounds(square));
+    return (1ULL << square);
+}
+constexpr std::string fileToChar(File file) {
+    return {1, static_cast<char>('a' + file)};
 }
 
-constexpr std::string fileToChar(File f) {
-    switch (f) {
-        case File::FA:
-            return "a";
-        case File::FB:
-            return "b";
-        case File::FC:
-            return "c";
-        case File::FD:
-            return "d";
-        case File::FE:
-            return "e";
-        case File::FF:
-            return "f";
-        case File::FG:
-            return "g";
-        case File::FH:
-            return "h";
-        default:
-            return "?";
-    }
-}
-constexpr std::string rankToChar(Rank r) {
-    switch (r) {
-        case Rank::R1:
-            return "1";
-        case Rank::R2:
-            return "2";
-        case Rank::R3:
-            return "3";
-        case Rank::R4:
-            return "4";
-        case Rank::R5:
-            return "5";
-        case Rank::R6:
-            return "6";
-        case Rank::R7:
-            return "7";
-        case Rank::R8:
-            return "8";
-        default:
-            return "?";
-    }
+constexpr std::string rankToChar(Rank rank) {
+    return {1, static_cast<char>('1' + rank)};
 }
 inline std::string squareToString(Square s) {
     return fileToChar(getFile(s)) + rankToChar(getRank(s));
 }
 
-inline Direction operator*(Direction d, u8 multiplier) {
-    d.first = d.first * multiplier;
-    d.second = d.second * multiplier;
-    return d;
+// ##### Move #####
+
+/*
+0	Quiet move	No capture, no special move
+1	Double pawn push	Pawn moves two squares forward
+2	King castle	Kingside castling
+3	Queen castle	Queenside castling
+4	Capture (non-special)	Regular capture, piece on to-square
+5	En passant capture	Capture via en passant, no piece on to-square initially
+8	Knight promotion	Pawn promotes to knight
+9	Bishop promotion	Pawn promotes to bishop
+10	Rook promotion	Pawn promotes to rook
+11	Queen promotion	Pawn promotes to queen
+12	Knight promotion capture	Promotion with capture, to knight
+13	Bishop promotion capture	Promotion with capture, to bishop
+14	Rook promotion capture	Promotion with capture, to rook
+15	Queen promotion capture	Promotion with capture, to queen
+*/
+
+inline Move createMove(Square from, Square to, uint8_t flags) {
+    return (static_cast<uint8_t>(from) & 0x3F) | ((static_cast<uint8_t>(to) & 0x3F) << 6) | ((flags & 0xF) << 12);
 }
+
+inline Square  getFrom(Move move) { return static_cast<Square>(move & 0x3F); }
+inline Square  getTo(Move move) { return static_cast<Square>((move >> 6) & 0x3F); }
+inline uint8_t getFlags(Move move) { return (move >> 12) & 0xF; }
+
+// ##### Delta #####
+
+inline Delta createDelta(Piece captured, Castling castling, uint8_t enpassant, uint8_t halfmoves) {
+    return (static_cast<uint8_t>(captured) & 0xF) | ((static_cast<uint8_t>(castling) & 0xF) << 4) |
+           ((enpassant & 0x3F) << 8) | ((halfmoves & 0xFF) << 14);
+}
+
+inline Piece getCaptured(Delta delta) { return Piece(delta & 0xF); }
+
+inline Castling getCastling(Delta delta) { return Castling((delta >> 4) & 0xF); }
+
+inline uint8_t getEnpassant(Delta delta) { return (delta >> 8) & 0x3F; }
+
+inline uint8_t getHalfmoves(Delta delta) { return (delta >> 14) & 0xFF; }
 
 // clang-format on
 

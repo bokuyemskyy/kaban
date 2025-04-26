@@ -5,11 +5,16 @@
 
 #include "piece.hpp"
 #include "square.hpp"
-#include "types.hpp"
 
-extern std::array<std::array<Bitboard, SQUARE_NB>, COLOR_NB> pawnAttacks;
-extern std::array<std::array<Bitboard, SQUARE_NB>, PIECETYPE_NB> pseudoAttacks;
+extern std::array<std::array<uint8_t, Squares::NB>, Squares::NB> squareDistance;
 
+extern std::array<std::array<Bitboard, Squares::NB>, Colors::NB>     pawnAttacks;
+extern std::array<std::array<Bitboard, Squares::NB>, PieceTypes::NB> pseudoAttacks;
+
+constexpr Bitboard getDestination(Square square, Direction direction);
+
+void precomputeSquareDistance();
 void precomputeAttacks();
+void precomputeAll();
 
 #endif
