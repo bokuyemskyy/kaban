@@ -62,7 +62,16 @@ enable_testing()
 include(GoogleTest)
 
 
-include_directories(${CMAKE_SOURCE_DIR}/project/include)
+file(GLOB_RECURSE HEADER_DIRS LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/project/include/*)
+set(INCLUDE_DIRS "")
+foreach(path ${HEADER_DIRS})
+    if(IS_DIRECTORY ${path})
+        list(APPEND INCLUDE_DIRS ${path})
+    endif()
+endforeach()
+include_directories(${INCLUDE_DIRS})
+
+
 include_directories(SYSTEM ${VCPKG_INCLUDE_DIR})
 
 

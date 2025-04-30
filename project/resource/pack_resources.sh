@@ -1,8 +1,8 @@
 #!/bin/bash
 
 RESOURCE_DIR="resources"
-HEADER_FILE="../include/resources.hpp"
-SOURCE_FILE="../source/resources.cpp"
+HEADER_FILE="./resources.hpp"
+SOURCE_FILE="./resources.cpp"
 
 echo "#ifndef RESOURCES_HPP" > $HEADER_FILE
 echo "#define RESOURCES_HPP" >> $HEADER_FILE
