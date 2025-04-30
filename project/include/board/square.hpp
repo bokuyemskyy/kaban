@@ -6,6 +6,7 @@
 #include <string>
 
 #include "piece.hpp"
+#include "types.hpp"
 
 // clang-format off
 
@@ -13,20 +14,10 @@
 
 // ##### Bitboard #####
 
-using Bitboard                   = uint64_t;
 constexpr Bitboard BITBOARD_ZERO = 0ULL;
-
-// ##### Move #####
-
-using Move = uint16_t;
-
-// ##### Delta #####
-
-using Delta = uint32_t;
 
 // ##### Square #####
 
-using Square = uint8_t;
 namespace Squares {
 enum value : uint8_t {
     A1, B1, C1, D1, E1, F1, G1, H1,
@@ -42,13 +33,14 @@ enum value : uint8_t {
     LAST = H8,
 
     NONE = 64,
+    MASK = 0b111111,
+    SIZE = 6,
     NB = 64
 };
 }
 
 // ##### File #####
 
-using File = uint8_t;
 namespace Files {
 enum value : uint8_t { 
     FA, FB, FC, FD, FE, FF, FG, FH, 
@@ -65,7 +57,6 @@ enum value : uint8_t {
 
 // ##### Rank #####
 
-using Rank = uint8_t;
 namespace Ranks {
 enum value : uint8_t { 
     R1, R2, R3, R4, R5, R6, R7, R8,
@@ -82,7 +73,6 @@ enum value : uint8_t {
 
 // ##### Direction #####
 
-using Direction = int8_t;
 namespace Directions {
 enum value : int8_t { 
     EAST = 1, 
@@ -102,7 +92,6 @@ enum value : int8_t {
 
 // ##### Castling #####
 
-using Castling = uint8_t;
 namespace Castlings {
 enum value : uint8_t {
     WKINGSIDE  = 0b0001,
@@ -183,13 +172,13 @@ inline std::string squareToString(Square s) {
 15	Queen promotion capture	Promotion with capture, to queen
 */
 
-inline Move createMove(Square from, Square to, uint8_t flags) {
-    return (static_cast<uint8_t>(from) & 0x3F) | ((static_cast<uint8_t>(to) & 0x3F) << 6) | ((flags & 0xF) << 12);
+inline Move createMove(Square from, Square to, Flags flags) {
+    return from | (to << Squares::SIZE) | (flags << (Squares::SIZE << 2));
 }
 
-inline Square  getFrom(Move move) { return static_cast<Square>(move & 0x3F); }
-inline Square  getTo(Move move) { return static_cast<Square>((move >> 6) & 0x3F); }
-inline uint8_t getFlags(Move move) { return (move >> 12) & 0xF; }
+inline Square  getFrom(Move move) { return move & Squares::MASK; }
+inline Square  getTo(Move move) { return (move >> Squares::SIZE) & Squares::MASK; }
+inline Flags getFlags(Move move) { return move >> (Squares::SIZE << 2); }
 
 // ##### Delta #####
 
