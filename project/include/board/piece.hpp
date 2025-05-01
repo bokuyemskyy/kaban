@@ -6,10 +6,6 @@
 #include <cstdint>
 #include <string_view>
 
-/* ############### Definitions ############### */
-
-// ##### Piece Type #####
-
 using PieceType = uint8_t;
 namespace PieceTypes {
 enum value : PieceType {
@@ -30,8 +26,6 @@ enum value : PieceType {
 };
 }  // namespace PieceTypes
 
-// ##### Color #####
-
 using Color = uint8_t;
 namespace Colors {
 enum value : uint8_t {
@@ -43,8 +37,6 @@ enum value : uint8_t {
     NB   = 2
 };
 }  // namespace Colors
-
-// ##### Piece #####
 
 using Piece = uint8_t;
 namespace Pieces {
