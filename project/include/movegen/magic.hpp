@@ -3,8 +3,9 @@
 
 #include <array>
 #include <cmath>
+#include <cstdint>
 
-#include "types.hpp"
+#include "bitboard.hpp"
 
 using Shift = uint8_t;
 

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "game.hpp"
+#include "init.hpp"
 #include "renderer.hpp"
 #include "resource_manager.hpp"
 #include "utils.hpp"
@@ -41,6 +42,7 @@ int testPerformance(Game& game, int depth, bool verbose = false) {
 }
 
 int main() {
+    initEngine();
     ResourceManager::loadResources();
 
     std::vector<Game> games;

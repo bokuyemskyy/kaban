@@ -10,10 +10,11 @@
 #include <sstream>
 #include <string>
 
-#include "bitboards.hpp"
+#include "bitboard.hpp"
+#include "movegen.hpp"
 #include "piece.hpp"
 #include "square.hpp"
-#include "types.hpp"
+#include "utils.hpp"
 
 inline Square lsb(const Bitboard &x) { return static_cast<Square>(__builtin_ctzll(x)); }
 inline Square popLsb(Bitboard &x) {
@@ -154,10 +155,10 @@ void Position::undoMove() {
 }
 
 void Position::generatePawnMoves(std::vector<Move> &moves, Square square) const {
-    Direction              moveDirection = (m_turn == Colors::WHITE) ? Directions::NORTH : Directions::SOUTH;
-    std::vector<Direction> attackDirections =
-        (m_turn == Colors::WHITE) ? std::vector<Direction>{Directions::NORTH_EAST, Directions::NORTH_WEST}
-                                  : std::vector<Direction>{Directions::SOUTH_EAST, Directions::SOUTH_WEST};
+    Direction              moveDirection    = (m_turn == Colors::WHITE) ? Directions::N : Directions::S;
+    std::vector<Direction> attackDirections = (m_turn == Colors::WHITE)
+                                                  ? std::vector<Direction>{Directions::NE, Directions::NW}
+                                                  : std::vector<Direction>{Directions::SE, Directions::SW};
 
     Bitboard singlePush = destinationBB(square, moveDirection) & ~m_colorBB[Colors::WHITE] & ~m_colorBB[Colors::BLACK];
 
@@ -182,10 +183,7 @@ void Position::generatePawnMoves(std::vector<Move> &moves, Square square) const 
 }
 void Position::generateKnightMoves(std::vector<Move> &moves, Square square) const {}
 void Position::generateBishopMoves(std::vector<Move> &moves, Square square) const {
-    static const std::vector<Direction> directions = {Directions::NORTH_EAST, Directions::NORTH_WEST,
-                                                      Directions::SOUTH_EAST, Directions::SOUTH_WEST};
-
-    for (const auto &direction : directions) {
+    for (const auto &direction : bishopDirections) {
         for (uint8_t i = 1;; ++i) {
             Bitboard destination = destinationBB(square + (direction * (i - 1)), direction);
             if (destination == BITBOARD_ZERO) break;
@@ -198,10 +196,7 @@ void Position::generateBishopMoves(std::vector<Move> &moves, Square square) cons
 }
 
 void Position::generateRookMoves(std::vector<Move> &moves, Square square) const {
-    static const std::vector<Direction> directions = {Directions::NORTH, Directions::EAST, Directions::SOUTH,
-                                                      Directions::WEST};
-
-    for (const auto &direction : directions) {
+    for (const auto &direction : rookDirections) {
         Bitboard destination = destinationBB(square, direction);
         for (uint8_t i = 1;; ++i) {
             Bitboard destination = destinationBB(square + (direction * (i - 1)), direction);
@@ -215,11 +210,7 @@ void Position::generateRookMoves(std::vector<Move> &moves, Square square) const 
 }
 
 void Position::generateQueenMoves(std::vector<Move> &moves, Square square) const {
-    static const std::vector<Direction> directions = {
-        Directions::NORTH,      Directions::EAST,       Directions::SOUTH,      Directions::WEST,
-        Directions::NORTH_EAST, Directions::NORTH_WEST, Directions::SOUTH_EAST, Directions::SOUTH_WEST};
-
-    for (const auto &direction : directions) {
+    for (const auto &direction : queenDirections) {
         for (uint8_t i = 1;; ++i) {
             Bitboard destination = destinationBB(square + (direction * (i - 1)), direction);
             if (destination == BITBOARD_ZERO) break;
@@ -279,8 +270,8 @@ bool Position::isLegal() {
     Square king   = lsb(m_colorBB[us] & m_pieceTypeBB[PieceTypes::KING]);
     Square opKing = lsb(m_colorBB[them] & m_pieceTypeBB[PieceTypes::KING]);
 
-    Direction pawnLeft  = (us == Colors::WHITE) ? Directions::NORTH_WEST : Directions::SOUTH_WEST;
-    Direction pawnRight = (us == Colors::WHITE) ? Directions::NORTH_EAST : Directions::SOUTH_EAST;
+    Direction pawnLeft  = (us == Colors::WHITE) ? Directions::NW : Directions::SW;
+    Direction pawnRight = (us == Colors::WHITE) ? Directions::NE : Directions::SE;
 
     if (m_board[king + pawnLeft] == createPiece(them, PieceTypes::PAWN) ||
         m_board[king + pawnRight] == createPiece(them, PieceTypes::PAWN))
@@ -290,24 +281,12 @@ bool Position::isLegal() {
         abs(static_cast<int>(getFile(king)) - static_cast<int>(getFile(opKing))) <= 1)
         return false;
 
-    static const std::vector<Direction> knightDirections = {Directions::NORTH + Directions::NORTH + Directions::EAST,
-                                                            Directions::NORTH + Directions::NORTH + Directions::WEST,
-                                                            Directions::NORTH + Directions::EAST + Directions::EAST,
-                                                            Directions::NORTH + Directions::WEST + Directions::WEST,
-                                                            Directions::SOUTH + Directions::SOUTH + Directions::EAST,
-                                                            Directions::SOUTH + Directions::SOUTH + Directions::WEST,
-                                                            Directions::SOUTH + Directions::EAST + Directions::EAST,
-                                                            Directions::SOUTH + Directions::WEST + Directions::WEST};
-
     for (const auto &dir : knightDirections) {
         Bitboard destination = destinationBB(king, dir);
         if (destination != BITBOARD_ZERO &&
             (m_colorBB[them] & m_pieceTypeBB[PieceTypes::KNIGHT] & destination) != BITBOARD_ZERO)
             return false;
     }
-
-    static const std::vector<Direction> bishopDirections = {Directions::NORTH_EAST, Directions::NORTH_WEST,
-                                                            Directions::SOUTH_EAST, Directions::SOUTH_WEST};
 
     for (const auto &dir : bishopDirections) {
         Square current = king;
@@ -324,9 +303,6 @@ bool Position::isLegal() {
             current = dst;
         }
     }
-
-    static const std::vector<Direction> rookDirections = {Directions::NORTH, Directions::EAST, Directions::SOUTH,
-                                                          Directions::WEST};
 
     for (const auto &dir : rookDirections) {
         Square current = king;
