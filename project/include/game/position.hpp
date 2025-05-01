@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include "bitboards.hpp"
-#include "movegen.hpp"
+#include "bitboard.hpp"
+#include "move.hpp"
 #include "piece.hpp"
 #include "square.hpp"
 
@@ -15,10 +15,7 @@ constexpr auto DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 
 class Position {
    public:
-    Position(const std::string &fen = DEFAULT_FEN) {
-        setFromFEN(fen);
-        initMovegen();
-    }
+    Position(const std::string &fen = DEFAULT_FEN) { setFromFEN(fen); }
 
     void                      setFromFEN(const std::string &fen);
     [[nodiscard]] std::string toFEN() const;
