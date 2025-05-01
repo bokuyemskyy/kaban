@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "bitboards.hpp"
+#include "movegen.hpp"
 #include "piece.hpp"
 #include "square.hpp"
 
@@ -16,7 +17,7 @@ class Position {
    public:
     Position(const std::string &fen = DEFAULT_FEN) {
         setFromFEN(fen);
-        precompute();
+        initMovegen();
     }
 
     void                      setFromFEN(const std::string &fen);
