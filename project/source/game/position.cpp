@@ -13,6 +13,7 @@
 #include "bitboards.hpp"
 #include "piece.hpp"
 #include "square.hpp"
+#include "types.hpp"
 
 inline Square lsb(const Bitboard &x) { return static_cast<Square>(__builtin_ctzll(x)); }
 inline Square popLsb(Bitboard &x) {
@@ -179,25 +180,7 @@ void Position::generatePawnMoves(std::vector<Move> &moves, Square square) const 
         }
     }
 }
-void Position::generateKnightMoves(std::vector<Move> &moves, Square square) const {
-    static const std::vector<Direction> directions = {Directions::NORTH + Directions::NORTH + Directions::EAST,
-                                                      Directions::NORTH + Directions::NORTH + Directions::WEST,
-                                                      Directions::NORTH + Directions::EAST + Directions::EAST,
-                                                      Directions::NORTH + Directions::WEST + Directions::WEST,
-                                                      Directions::SOUTH + Directions::SOUTH + Directions::EAST,
-                                                      Directions::SOUTH + Directions::SOUTH + Directions::WEST,
-                                                      Directions::SOUTH + Directions::EAST + Directions::EAST,
-                                                      Directions::SOUTH + Directions::WEST + Directions::WEST};
-
-    for (const auto &direction : directions) {
-        Bitboard destBB     = destinationBB(square, direction);
-        Bitboard validMoves = destBB & ~m_colorBB[m_turn];
-
-        if (validMoves != BITBOARD_ZERO) {
-            moves.emplace_back(createMove(square, popLsb(validMoves), 0));
-        }
-    }
-}
+void Position::generateKnightMoves(std::vector<Move> &moves, Square square) const {}
 void Position::generateBishopMoves(std::vector<Move> &moves, Square square) const {
     static const std::vector<Direction> directions = {Directions::NORTH_EAST, Directions::NORTH_WEST,
                                                       Directions::SOUTH_EAST, Directions::SOUTH_WEST};
@@ -207,9 +190,9 @@ void Position::generateBishopMoves(std::vector<Move> &moves, Square square) cons
             Bitboard destination = destinationBB(square + (direction * (i - 1)), direction);
             if (destination == BITBOARD_ZERO) break;
 
-            if (m_colorBB[m_turn] & destination) break;
+            if ((m_colorBB[m_turn] & destination) != BITBOARD_ZERO) break;
             moves.emplace_back(createMove(square, lsb(destination), 0));
-            if (m_colorBB[!m_turn] & destination) break;
+            if ((m_colorBB[!m_turn] & destination) != BITBOARD_ZERO) break;
         }
     }
 }
@@ -248,12 +231,7 @@ void Position::generateQueenMoves(std::vector<Move> &moves, Square square) const
     }
 }
 
-void Position::generateKingMoves(std::vector<Move> &moves, Square square) const {
-    Bitboard attacks = pseudoAttacks[PieceTypes::KING][square] & ~m_colorBB[m_turn];
-    while (attacks != BITBOARD_ZERO) {
-        moves.emplace_back(createMove(square, popLsb(attacks), 0));
-    }
-}
+void Position::generateKingMoves(std::vector<Move> &moves, Square square) const {}
 
 void Position::generatePseudoLegalMoves(std::vector<Move> &moves) {
     Bitboard pawns = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::PAWN];
@@ -262,9 +240,12 @@ void Position::generatePseudoLegalMoves(std::vector<Move> &moves) {
         generatePawnMoves(moves, s);
     }
     Bitboard knights = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::KNIGHT];
-    while (knights != 0ULL) {
-        Square s = popLsb(knights);
-        generateKnightMoves(moves, s);
+    while (knights != BITBOARD_ZERO) {
+        Square   square    = popLsb(knights);
+        Bitboard attacksBB = pseudoAttacks[PieceTypes::KNIGHT][square] & ~m_colorBB[m_turn];
+        while (attacksBB != BITBOARD_ZERO) {
+            moves.emplace_back(createMove(square, popLsb(attacksBB), 0));
+        }
     }
     Bitboard bishops = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::BISHOP];
     while (bishops != 0ULL) {
@@ -283,8 +264,11 @@ void Position::generatePseudoLegalMoves(std::vector<Move> &moves) {
     }
     Bitboard kings = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::KING];
     while (kings != 0ULL) {
-        Square s = popLsb(kings);
-        generateKingMoves(moves, s);
+        Square   square    = popLsb(kings);
+        Bitboard attacksBB = pseudoAttacks[PieceTypes::KING][square] & ~m_colorBB[m_turn];
+        while (attacksBB != BITBOARD_ZERO) {
+            moves.emplace_back(createMove(square, popLsb(attacksBB), 0));
+        }
     }
 }
 
