@@ -102,8 +102,9 @@ void Position::unsetPiece(Square square) {
     m_board[square] = Pieces::NONE;
 }
 void Position::resetBoard() {
-    m_colorBB[Colors::WHITE] = BITBOARD_ZERO;
-    m_colorBB[Colors::BLACK] = BITBOARD_ZERO;
+    for (uint8_t i = 0; i < Colors::NB; ++i) {
+        m_colorBB[i] = BITBOARD_ZERO;
+    }
     for (uint8_t i = 0; i < PieceTypes::NB; ++i) {
         m_pieceTypeBB[i] = BITBOARD_ZERO;
     }
@@ -114,11 +115,25 @@ void Position::resetBoard() {
 }
 
 void Position::doMove(const Move move) {
-    m_deltas.emplace_back(createDelta(m_board[getTo(move)], m_castling, 0, m_halfmoves));
+    Square from = getFrom(move);
+    Square to   = getTo(move);
+
+    Bitboard moveBB = squareBB(from) | squareBB(to);
+
+    m_deltas.emplace_back(createDelta(m_board[to], m_castling, 0, m_halfmoves));
     m_moves.emplace_back(move);
 
-    setPiece(getTo(move), m_board[getFrom(move)]);
-    unsetPiece(getFrom(move));
+    if (m_board[to] != Pieces::NONE) {
+        Bitboard maskBB = ~squareBB(to);
+        m_colorBB[getColor(m_board[to])] &= maskBB;
+        m_pieceTypeBB[getPieceType(m_board[to])] &= maskBB;
+    }
+
+    m_colorBB[getColor(m_board[from])] ^= moveBB;
+    m_pieceTypeBB[getPieceType(m_board[from])] ^= moveBB;
+
+    m_board[to]   = m_board[from];
+    m_board[from] = Pieces::NONE;
 
     m_turn = !m_turn;
 }
@@ -128,18 +143,29 @@ void Position::undoMove() {
 
     Delta delta = m_deltas.back();
     Move  move  = m_moves.back();
+
     m_deltas.pop_back();
     m_moves.pop_back();
 
-    Square  from  = getFrom(move);
-    Square  to    = getTo(move);
-    uint8_t flags = getFlags(move);
+    Square from = getFrom(move);
+    Square to   = getTo(move);
 
-    setPiece(from, m_board[to]);
-    if (getCaptured(delta) != Pieces::NONE)
-        setPiece(to, getCaptured(delta));
-    else
-        unsetPiece(to);
+    Bitboard moveBB = squareBB(from) | squareBB(to);
+
+    Piece movedPiece    = m_board[to];
+    Piece capturedPiece = getCaptured(delta);
+
+    m_board[from] = movedPiece;
+    m_board[to]   = capturedPiece;
+
+    m_colorBB[getColor(movedPiece)] ^= moveBB;
+    m_pieceTypeBB[getPieceType(movedPiece)] ^= moveBB;
+
+    if (capturedPiece != Pieces::NONE) {
+        Bitboard toBB = squareBB(to);
+        m_colorBB[getColor(capturedPiece)] |= toBB;
+        m_pieceTypeBB[getPieceType(capturedPiece)] |= toBB;
+    }
 
     m_castling  = getCastling(delta);
     m_halfmoves = getHalfmoves(delta);
