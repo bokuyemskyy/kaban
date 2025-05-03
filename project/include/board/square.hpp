@@ -63,7 +63,7 @@ enum value : uint8_t {
 
 // clang-format on
 
-inline Square makeSquare(File file, Rank rank) { return rank << Files::SIZE | file; }
+inline Square createSquare(File file, Rank rank) { return rank << Files::SIZE | file; }
 inline File   getFile(Square square) { return square & Files::MASK; }
 inline Rank   getRank(Square square) { return square >> Files::SIZE; }
 

@@ -6,6 +6,5 @@
 inline void initEngine() {
     initSquares();
     initBitboards();
-    initMagics();
     initMovegen();
 }

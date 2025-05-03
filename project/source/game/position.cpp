@@ -16,13 +16,6 @@
 #include "square.hpp"
 #include "utils.hpp"
 
-inline Square lsb(const Bitboard &x) { return static_cast<Square>(__builtin_ctzll(x)); }
-inline Square popLsb(Bitboard &x) {
-    Square i = lsb(x);
-    x &= x - 1;
-    return i;
-}
-
 void Position::setFromFEN(const std::string &fen) {
     resetBoard();
 
@@ -43,7 +36,7 @@ void Position::setFromFEN(const std::string &fen) {
                         int num = c - '0';
                         current_file += num;
                     } else {
-                        Square s = makeSquare(current_file, current_rank);
+                        Square s = createSquare(current_file, current_rank);
                         setPiece(s, charToPiece(c));
                         ++current_file;
                     }
@@ -68,7 +61,7 @@ std::string Position::toFEN() const {
     for (int r = Ranks::NB - 1; r >= 0; r--) {
         int empty = 0;
         for (int f = 0; f < Files::NB; ++f) {
-            Square s = makeSquare(File(f), Rank(r));
+            Square s = createSquare(File(f), Rank(r));
             Piece  p = m_board[s];
 
             if (p == Pieces::NONE) {
@@ -245,8 +238,13 @@ void Position::generatePseudoLegalMoves(std::vector<Move> &moves) {
     }
     Bitboard rooks = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::ROOK];
     while (rooks != 0ULL) {
-        Square s = popLsb(rooks);
-        generateRookMoves(moves, s);
+        Square   square = popLsb(rooks);
+        Bitboard attacksBB =
+            rookAttacks[square][magicMap(square, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])] &
+            ~m_colorBB[m_turn];
+        while (attacksBB != BITBOARD_ZERO) {
+            moves.emplace_back(createMove(square, popLsb(attacksBB), 0));
+        }
     }
     Bitboard queens = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::QUEEN];
     while (queens != 0ULL) {
@@ -325,7 +323,7 @@ bool Position::isLegal() {
 
 int Position::perft(uint8_t depth, bool verbose) {
     std::vector<Move> moves;
-    moves.reserve(256);
+    moves.reserve(MAX_MOVES);
 
     int nodes = 0;
 
