@@ -19,7 +19,9 @@ Checks: >
   -readability-function-cognitive-complexity,
   -readability-identifier-length,
   -readability-enum-initial-value,
+  -readability-isolate-declaration,
   misc-*,
   -misc-non-private-member-variables-in-classes,
   -misc-use-internal-linkage,
+  -misc-no-recursion,
   portability-*
