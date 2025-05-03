@@ -7,7 +7,9 @@ Inspired by [Stockfish](https://stockfishchess.org/), this project aims to utili
 The draft of documentation you can find on here: [DOCUMENTATION](https://bokuyemskyy.github.io/kaban/docs/html/) (work in progress)
 
 ## Features roadmap
+
 ✅ **Build system**: convenient, agile and fast CMake-Ninja build system;
+
 ✅ **Additional configurations**: clang-family tools to ensure clean code, Doxygen documentation generator and VCPKG dependency manager;
 ✅ **Testing framework**: unit tests for the code;
 ✅ **Project structure**: modular code, split into Main, Renderer, Board and Movegen. The code combines different practices, e.g: object-oriented classes, functional-style code in namespaces;
