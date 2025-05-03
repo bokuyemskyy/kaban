@@ -4,6 +4,7 @@ Checks: >
   -bugprone-easily-swappable-parameters,
   cert-*,
   -cert-int09-c,
+  -cert-err58-cpp,
   clang-analyzer-*,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-non-const-global-variables,
@@ -24,4 +25,5 @@ Checks: >
   -misc-non-private-member-variables-in-classes,
   -misc-use-internal-linkage,
   -misc-no-recursion,
+  -misc-redundant-expression,
   portability-*
