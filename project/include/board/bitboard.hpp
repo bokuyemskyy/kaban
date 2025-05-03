@@ -14,6 +14,9 @@ constexpr Bitboard BITBOARD_ZERO = 0ULL;
 extern std::array<Bitboard, Ranks::NB> rankBB;
 extern std::array<Bitboard, Files::NB> fileBB;
 
+extern std::array<Bitboard, Squares::NB> diagBB;
+extern std::array<Bitboard, Squares::NB> antiDiagBB;
+
 void initBitboards();
 
 constexpr Bitboard squareBB(Square square) {
@@ -24,7 +27,5 @@ constexpr Bitboard destinationBB(Square square, Direction direction) {
     Square destination = square + direction;
     return (isValid(destination) && squareDistance[square][destination] <= 2) ? squareBB(destination) : BITBOARD_ZERO;
 };
-
-void initBitboards();
 
 #endif
