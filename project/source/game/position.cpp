@@ -11,6 +11,7 @@
 #include <string>
 
 #include "bitboard.hpp"
+#include "magic.hpp"
 #include "movegen.hpp"
 #include "piece.hpp"
 #include "square.hpp"
@@ -200,52 +201,10 @@ void Position::generatePawnMoves(std::vector<Move> &moves, Square square) const 
         }
     }
 }
-void Position::generateKnightMoves(std::vector<Move> &moves, Square square) const {}
-void Position::generateBishopMoves(std::vector<Move> &moves, Square square) const {
-    for (const auto &direction : bishopDirections) {
-        for (uint8_t i = 1;; ++i) {
-            Bitboard destination = destinationBB(square + (direction * (i - 1)), direction);
-            if (destination == BITBOARD_ZERO) break;
-
-            if ((m_colorBB[m_turn] & destination) != BITBOARD_ZERO) break;
-            moves.emplace_back(createMove(square, lsb(destination), 0));
-            if ((m_colorBB[!m_turn] & destination) != BITBOARD_ZERO) break;
-        }
-    }
-}
-
-void Position::generateRookMoves(std::vector<Move> &moves, Square square) const {
-    for (const auto &direction : rookDirections) {
-        Bitboard destination = destinationBB(square, direction);
-        for (uint8_t i = 1;; ++i) {
-            Bitboard destination = destinationBB(square + (direction * (i - 1)), direction);
-            if (destination == BITBOARD_ZERO) break;
-
-            if (m_colorBB[m_turn] & destination) break;
-            moves.emplace_back(createMove(square, lsb(destination), 0));
-            if (m_colorBB[!m_turn] & destination) break;
-        }
-    }
-}
-
-void Position::generateQueenMoves(std::vector<Move> &moves, Square square) const {
-    for (const auto &direction : queenDirections) {
-        for (uint8_t i = 1;; ++i) {
-            Bitboard destination = destinationBB(square + (direction * (i - 1)), direction);
-            if (destination == BITBOARD_ZERO) break;
-
-            if (m_colorBB[m_turn] & destination) break;
-            moves.emplace_back(createMove(square, lsb(destination), 0));
-            if (m_colorBB[!m_turn] & destination) break;
-        }
-    }
-}
-
-void Position::generateKingMoves(std::vector<Move> &moves, Square square) const {}
 
 void Position::generatePseudoLegalMoves(std::vector<Move> &moves) {
     Bitboard pawns = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::PAWN];
-    while (pawns != 0ULL) {
+    while (pawns != BITBOARD_ZERO) {
         Square s = popLsb(pawns);
         generatePawnMoves(moves, s);
     }
@@ -258,25 +217,39 @@ void Position::generatePseudoLegalMoves(std::vector<Move> &moves) {
         }
     }
     Bitboard bishops = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::BISHOP];
-    while (bishops != 0ULL) {
-        Square s = popLsb(bishops);
-        generateBishopMoves(moves, s);
-    }
-    Bitboard rooks = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::ROOK];
-    while (rooks != 0ULL) {
-        Square   square = popLsb(rooks);
-        Bitboard attacksBB =
-            rookAttacks[square][magicMap(square, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])] &
-            ~m_colorBB[m_turn];
+    while (bishops != BITBOARD_ZERO) {
+        Square   square    = popLsb(bishops);
+        Bitboard attacksBB = bishopAttacks[square][getIndexOfOccupancy<PieceTypes::BISHOP>(
+                                 square, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])] &
+                             ~m_colorBB[m_turn];
         while (attacksBB != BITBOARD_ZERO) {
             moves.emplace_back(createMove(square, popLsb(attacksBB), 0));
         }
     }
-    Bitboard queens = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::QUEEN];
-    while (queens != 0ULL) {
-        Square s = popLsb(queens);
-        generateQueenMoves(moves, s);
+    Bitboard rooks = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::ROOK];
+    while (rooks != BITBOARD_ZERO) {
+        Square   square    = popLsb(rooks);
+        Bitboard attacksBB = rookAttacks[square][getIndexOfOccupancy<PieceTypes::ROOK>(
+                                 square, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])] &
+                             ~m_colorBB[m_turn];
+        while (attacksBB != BITBOARD_ZERO) {
+            moves.emplace_back(createMove(square, popLsb(attacksBB), 0));
+        }
     }
+
+    Bitboard queens = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::QUEEN];
+    while (queens != BITBOARD_ZERO) {
+        Square   square    = popLsb(queens);
+        Bitboard attacksBB = (rookAttacks[square][getIndexOfOccupancy<PieceTypes::ROOK>(
+                                  square, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])] |
+                              bishopAttacks[square][getIndexOfOccupancy<PieceTypes::BISHOP>(
+                                  square, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])]) &
+                             ~m_colorBB[m_turn];
+        while (attacksBB != BITBOARD_ZERO) {
+            moves.emplace_back(createMove(square, popLsb(attacksBB), 0));
+        }
+    }
+
     Bitboard kings = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::KING];
     while (kings != 0ULL) {
         Square   square    = popLsb(kings);
@@ -291,60 +264,28 @@ bool Position::isLegal() {
     Color us   = !m_turn;
     Color them = m_turn;
 
-    Square king   = lsb(m_colorBB[us] & m_pieceTypeBB[PieceTypes::KING]);
-    Square opKing = lsb(m_colorBB[them] & m_pieceTypeBB[PieceTypes::KING]);
+    Square king = lsb(m_colorBB[us] & m_pieceTypeBB[PieceTypes::KING]);
 
-    Direction pawnLeft  = (us == Colors::WHITE) ? Directions::NW : Directions::SW;
-    Direction pawnRight = (us == Colors::WHITE) ? Directions::NE : Directions::SE;
+    Bitboard pawnThreats = pawnAttacks[us][king] & (m_colorBB[them] & m_pieceTypeBB[PieceTypes::PAWN]);
+    if (pawnThreats != BITBOARD_ZERO) return false;
 
-    if (m_board[king + pawnLeft] == createPiece(them, PieceTypes::PAWN) ||
-        m_board[king + pawnRight] == createPiece(them, PieceTypes::PAWN))
-        return false;
+    Bitboard kingThreats = pseudoAttacks[PieceTypes::KING][king] & (m_colorBB[them] & m_pieceTypeBB[PieceTypes::KING]);
+    if (kingThreats != BITBOARD_ZERO) return false;
 
-    if (abs(static_cast<int>(getRank(king)) - static_cast<int>(getRank(opKing))) <= 1 &&
-        abs(static_cast<int>(getFile(king)) - static_cast<int>(getFile(opKing))) <= 1)
-        return false;
+    Bitboard knightThreats =
+        pseudoAttacks[PieceTypes::KNIGHT][king] & (m_colorBB[them] & m_pieceTypeBB[PieceTypes::KNIGHT]);
+    if (knightThreats != BITBOARD_ZERO) return false;
 
-    for (const auto &dir : knightDirections) {
-        Bitboard destination = destinationBB(king, dir);
-        if (destination != BITBOARD_ZERO &&
-            (m_colorBB[them] & m_pieceTypeBB[PieceTypes::KNIGHT] & destination) != BITBOARD_ZERO)
-            return false;
-    }
+    Bitboard diagThreats = bishopAttacks[king][getIndexOfOccupancy<PieceTypes::BISHOP>(
+                               king, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])] &
+                           (m_colorBB[them] & (m_pieceTypeBB[PieceTypes::BISHOP] | m_pieceTypeBB[PieceTypes::QUEEN]));
 
-    for (const auto &dir : bishopDirections) {
-        Square current = king;
-        while (true) {
-            Bitboard destBB = destinationBB(current, dir);
-            if (destBB == BITBOARD_ZERO) break;
+    if (diagThreats != BITBOARD_ZERO) return false;
 
-            Square dst = lsb(destBB);
-
-            Piece p = m_board[dst];
-            if (p == createPiece(them, PieceTypes::QUEEN) || p == createPiece(them, PieceTypes::BISHOP)) return false;
-            if (p != Pieces::NONE) break;
-
-            current = dst;
-        }
-    }
-
-    for (const auto &dir : rookDirections) {
-        Square current = king;
-        while (true) {
-            Bitboard destBB = destinationBB(current, dir);
-            if (destBB == BITBOARD_ZERO) break;
-
-            Square dst = lsb(destBB);
-
-            Piece p = m_board[dst];
-            if (p == createPiece(them, PieceTypes::QUEEN) || p == createPiece(them, PieceTypes::ROOK)) return false;
-            if (p != Pieces::NONE) break;
-
-            current = dst;
-        }
-    }
-
-    return true;
+    Bitboard orthoThreats = rookAttacks[king][getIndexOfOccupancy<PieceTypes::ROOK>(
+                                king, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])] &
+                            (m_colorBB[them] & (m_pieceTypeBB[PieceTypes::ROOK] | m_pieceTypeBB[PieceTypes::QUEEN]));
+    return orthoThreats == BITBOARD_ZERO;
 }
 
 int Position::perft(uint8_t depth, bool verbose) {

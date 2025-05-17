@@ -10,9 +10,9 @@ constexpr uint8_t MAX_MOVES = 256;  // limit of possible number of moves that ca
 
 extern std::array<std::array<Bitboard, Squares::NB>, PieceTypes::NB> pseudoAttacks;
 
-extern std::array<std::array<Bitboard, Squares::NB>, Colors::NB>        pawnAttacks;
-extern std::array<std::array<Bitboard, ROOK_OCCUPANCY_NB>, Squares::NB> bishopAttacks;
-extern std::array<std::array<Bitboard, ROOK_OCCUPANCY_NB>, Squares::NB> rookAttacks;
+extern std::array<std::array<Bitboard, Squares::NB>, Colors::NB>              pawnAttacks;
+extern std::array<std::array<Bitboard, BISHOP_MAX_OCCUPANCY_NB>, Squares::NB> bishopAttacks;
+extern std::array<std::array<Bitboard, ROOK_MAX_OCCUPANCY_NB>, Squares::NB>   rookAttacks;
 
 void initMovegen();
 
