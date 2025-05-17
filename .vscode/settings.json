@@ -18,4 +18,11 @@
         "docs/**": true,
         "third_party/**": true
     },
+    "files.associations": {
+        "fstream": "cpp",
+        "iomanip": "cpp",
+        "chrono": "cpp",
+        "vector": "cpp",
+        "iostream": "cpp"
+    },
 }
