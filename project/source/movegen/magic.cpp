@@ -3,34 +3,32 @@
 #include <sys/types.h>
 
 #include <array>
+#include <cassert>
 #include <cstdint>
-#include <cstring>
 #include <random>
 #include <vector>
 
 #include "bitboard.hpp"
+#include "piece.hpp"
 #include "square.hpp"
 #include "utils.hpp"
 
-std::array<Magic, Squares::NB> bishopMagics{};
-std::array<Magic, Squares::NB> rookMagics{};
+std::array<std::array<Magic, Squares::NB>, 2> magics{};
 
-std::array<std::vector<Bitboard>, Squares::NB> bishopOccupancies{};
-std::array<std::vector<Bitboard>, Squares::NB> rookOccupancies{};
+// all possible blocker occupancy bitboards
+// within that square’s relevant premask
+std::array<std::array<std::vector<Bitboard>, Squares::NB>, 2> premaskOccupancies{};
 
-std::mt19937_64 rng(std::random_device{}());
+uint64_t seed = 0xdeadbeef12345678;
 
-inline uint64_t randomMagic() { return rng() & rng() & rng(); }
-
-Bitboard getRookPremask(Square square) {
-    return ((fileBB[getFile(square)] & ~(rankBB[Ranks::R1] | rankBB[Ranks::R8])) |
-            (rankBB[getRank(square)] & ~(fileBB[Files::FA] | fileBB[Files::FH]))) &
-           ~squareBB(square);
+uint64_t xorshift64(uint64_t& state) {
+    state ^= state >> 12;
+    state ^= state << 25;
+    state ^= state >> 27;
+    return state * 2685821657736338717ULL;
 }
-Bitboard getBishopPremask(Square square) {
-    return (diagBB[square] | antiDiagBB[square]) &
-           ~(fileBB[Files::FA] | fileBB[Files::FH] | rankBB[Ranks::R1] | rankBB[Ranks::R8]) & ~squareBB(square);
-}
+
+inline uint64_t randomMagic() { return xorshift64(seed) & xorshift64(seed) & xorshift64(seed); }
 
 Bitboard createOccupancy(int index, Bitboard premask) {
     Bitboard result = BITBOARD_ZERO;
@@ -45,49 +43,53 @@ Bitboard createOccupancy(int index, Bitboard premask) {
 
     return result;
 }
-void initOccupancies(Square square, Bitboard premask) {
+
+void initPremaskOccupancies(PieceType pieceType, Square square, Bitboard premask) {
     int bitsNB        = popcount(premask);
     int occupanciesNB = 1 << bitsNB;
 
-    rookOccupancies[square].reserve(occupanciesNB);
+    premaskOccupancies[pieceType - PieceTypes::BISHOP][square].reserve(occupanciesNB);
 
     for (int i = 0; i < occupanciesNB; ++i) {
-        rookOccupancies[square].emplace_back(createOccupancy(i, premask));
+        premaskOccupancies[pieceType - PieceTypes::BISHOP][square].emplace_back(createOccupancy(i, premask));
     }
 }
 
 void initMagics() {
-    for (Square square = Squares::FIRST; square <= Squares::LAST; ++square) {
-        Bitboard premask = getRookPremask(square);
+    for (PieceType pieceType = PieceTypes::BISHOP; pieceType <= PieceTypes::ROOK; pieceType++) {
+        for (Square square = Squares::FIRST; square <= Squares::LAST; ++square) {
+            Bitboard premask = getPremask(pieceType, square);
 
-        initOccupancies(square, premask);
+            initPremaskOccupancies(pieceType, square, premask);
 
-        uint8_t bitsNB = popcount(premask);
-        Shift   shift  = Squares::NB - bitsNB;
+            uint8_t bitsNB = popcount(premask);
+            Shift   shift  = Squares::NB - bitsNB;
 
-        int used[4096]{};
-        int epoch = 0;
+            uint16_t used[ROOK_MAX_OCCUPANCY_NB]{};
+            uint16_t epoch = 0;
 
-        while (true) {
-            Bitboard magic  = randomMagic();
-            bool     failed = false;
+            while (true) {
+                Bitboard magic  = randomMagic();
+                bool     failed = false;
 
-            ++epoch;
+                ++epoch;
 
-            for (const auto& occupancy : rookOccupancies[square]) {
-                int index = (occupancy * magic) >> shift;
+                auto premaskOccupancies = getPremaskOccupancies(pieceType, square);
+                for (const auto& occupancy : premaskOccupancies) {
+                    uint16_t index = (occupancy * magic) >> shift;
 
-                if (used[index] != epoch) {
-                    used[index] = epoch;
-                } else {
-                    failed = true;
+                    if (used[index] != epoch) {
+                        used[index] = epoch;
+                    } else {
+                        failed = true;
+                        break;
+                    }
+                }
+
+                if (!failed && (popcount((magic * premask) & 0xFF00000000000000ULL) < 6)) {
+                    setMagic(pieceType, square, {.magic = magic, .shift = shift, .premask = premask});
                     break;
                 }
-            }
-
-            if (!failed) {
-                rookMagics[square] = {.magic = magic, .shift = shift, .premask = premask};
-                break;
             }
         }
     }
