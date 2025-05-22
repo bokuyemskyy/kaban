@@ -102,4 +102,7 @@
         "valarray": "cpp",
         "variant": "cpp"
     },
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
 }
