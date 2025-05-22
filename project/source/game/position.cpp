@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
@@ -49,6 +50,7 @@ void Position::setFromFEN(const std::string &fen) {
                     m_turn = Colors::WHITE;
                 else
                     m_turn = Colors::BLACK;
+                break;
             default:
                 break;
         }
@@ -115,6 +117,16 @@ void Position::resetBoard() {
     m_turn = Colors::WHITE;
 }
 
+inline void Position::toggleTurn() { m_turn = !m_turn; }
+
+void Position::updateCachedState() {
+    m_wking     = lsb(m_colorBB[Colors::WHITE] & m_pieceTypeBB[PieceTypes::KING]);
+    m_bking     = lsb(m_colorBB[Colors::BLACK] & m_pieceTypeBB[PieceTypes::KING]);
+    m_occupancy = m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK];
+    m_us        = m_turn;
+    m_them      = !m_turn;
+}
+
 void Position::doMove(const Move move) {
     Square from = getFrom(move);
     Square to   = getTo(move);
@@ -136,7 +148,9 @@ void Position::doMove(const Move move) {
     m_board[to]   = m_board[from];
     m_board[from] = Pieces::NONE;
 
-    m_turn = !m_turn;
+    toggleTurn();
+
+    updateCachedState();
 }
 
 void Position::undoMove() {
@@ -171,134 +185,123 @@ void Position::undoMove() {
     m_castling  = getCastling(delta);
     m_halfmoves = getHalfmoves(delta);
 
-    m_turn = !m_turn;
+    toggleTurn();
+
+    updateCachedState();
 }
 
-void Position::generatePawnMoves(std::vector<Move> &moves, Square square) const {
-    Direction              moveDirection    = (m_turn == Colors::WHITE) ? Directions::N : Directions::S;
-    std::vector<Direction> attackDirections = (m_turn == Colors::WHITE)
-                                                  ? std::vector<Direction>{Directions::NE, Directions::NW}
-                                                  : std::vector<Direction>{Directions::SE, Directions::SW};
+size_t Position::generatePseudoLegalMoves(std::vector<Move> &moveBuffer) {
+    size_t prevBufferSize = moveBuffer.size();
 
-    Bitboard singlePush = destinationBB(square, moveDirection) & ~m_colorBB[Colors::WHITE] & ~m_colorBB[Colors::BLACK];
+    Bitboard pieces = BITBOARD_ZERO;
 
-    if (singlePush != BITBOARD_ZERO) {
-        if (isPawnStartingRank(getRank(square), m_turn)) {
-            Bitboard doublePush =
-                destinationBB(square, moveDirection * 2) & ~m_colorBB[Colors::WHITE] & ~m_colorBB[Colors::BLACK];
+    pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::PAWN];
+    while (pieces != BITBOARD_ZERO) {
+        Square   square     = popLsb(pieces);
+        Bitboard singlePush = pawnSinglePushes[m_turn][square];
 
-            if (doublePush != BITBOARD_ZERO) {
-                moves.emplace_back(createMove(square, popLsb(doublePush), 0));
+        if ((singlePush & m_occupancy) == BITBOARD_ZERO) {
+            if (isPawnStartingRank(getRank(square), m_turn)) {
+                Bitboard doublePush = m_turn == Colors::WHITE ? (singlePush << 8) : (singlePush >> 8);
+
+                if ((doublePush & m_occupancy) == BITBOARD_ZERO) {
+                    moveBuffer.emplace_back(createMove(square, popLsb(doublePush), 0));
+                }
             }
+            moveBuffer.emplace_back(createMove(square, popLsb(singlePush), 0));
         }
-        moves.emplace_back(createMove(square, popLsb(singlePush), 0));
+
+        Bitboard attacksBB = pawnAttacks[m_turn][square] & m_colorBB[!m_turn];
+
+        while (attacksBB != BITBOARD_ZERO) {
+            moveBuffer.emplace_back(createMove(square, popLsb(attacksBB), 0));
+        }
     }
 
-    for (const auto &direction : attackDirections) {
-        Bitboard attack = destinationBB(square, direction) & m_colorBB[!m_turn];
-        if (attack != BITBOARD_ZERO) {
-            moves.emplace_back(createMove(square, popLsb(attack), 0));
-        }
-    }
-}
-
-void Position::generatePseudoLegalMoves(std::vector<Move> &moves) {
-    Bitboard pawns = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::PAWN];
-    while (pawns != BITBOARD_ZERO) {
-        Square s = popLsb(pawns);
-        generatePawnMoves(moves, s);
-    }
-    Bitboard knights = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::KNIGHT];
-    while (knights != BITBOARD_ZERO) {
-        Square   square    = popLsb(knights);
+    pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::KNIGHT];
+    while (pieces != BITBOARD_ZERO) {
+        Square   square    = popLsb(pieces);
         Bitboard attacksBB = pseudoAttacks[PieceTypes::KNIGHT][square] & ~m_colorBB[m_turn];
         while (attacksBB != BITBOARD_ZERO) {
-            moves.emplace_back(createMove(square, popLsb(attacksBB), 0));
+            moveBuffer.emplace_back(createMove(square, popLsb(attacksBB), 0));
         }
     }
-    Bitboard bishops = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::BISHOP];
-    while (bishops != BITBOARD_ZERO) {
-        Square   square    = popLsb(bishops);
-        Bitboard attacksBB = bishopAttacks[square][getIndexOfOccupancy<PieceTypes::BISHOP>(
-                                 square, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])] &
-                             ~m_colorBB[m_turn];
+    pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::BISHOP];
+    while (pieces != BITBOARD_ZERO) {
+        Square   square = popLsb(pieces);
+        Bitboard attacksBB =
+            bishopAttacks[square][getIndexOfOccupancy<PieceTypes::BISHOP>(square, m_occupancy)] & ~m_colorBB[m_turn];
         while (attacksBB != BITBOARD_ZERO) {
-            moves.emplace_back(createMove(square, popLsb(attacksBB), 0));
+            moveBuffer.emplace_back(createMove(square, popLsb(attacksBB), 0));
         }
     }
-    Bitboard rooks = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::ROOK];
-    while (rooks != BITBOARD_ZERO) {
-        Square   square    = popLsb(rooks);
-        Bitboard attacksBB = rookAttacks[square][getIndexOfOccupancy<PieceTypes::ROOK>(
-                                 square, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])] &
-                             ~m_colorBB[m_turn];
+    pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::ROOK];
+    while (pieces != BITBOARD_ZERO) {
+        Square   square = popLsb(pieces);
+        Bitboard attacksBB =
+            rookAttacks[square][getIndexOfOccupancy<PieceTypes::ROOK>(square, m_occupancy)] & ~m_colorBB[m_turn];
         while (attacksBB != BITBOARD_ZERO) {
-            moves.emplace_back(createMove(square, popLsb(attacksBB), 0));
+            moveBuffer.emplace_back(createMove(square, popLsb(attacksBB), 0));
         }
     }
 
-    Bitboard queens = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::QUEEN];
-    while (queens != BITBOARD_ZERO) {
-        Square   square    = popLsb(queens);
-        Bitboard attacksBB = (rookAttacks[square][getIndexOfOccupancy<PieceTypes::ROOK>(
-                                  square, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])] |
-                              bishopAttacks[square][getIndexOfOccupancy<PieceTypes::BISHOP>(
-                                  square, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])]) &
+    pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::QUEEN];
+    while (pieces != BITBOARD_ZERO) {
+        Square   square    = popLsb(pieces);
+        Bitboard attacksBB = (rookAttacks[square][getIndexOfOccupancy<PieceTypes::ROOK>(square, m_occupancy)] |
+                              bishopAttacks[square][getIndexOfOccupancy<PieceTypes::BISHOP>(square, m_occupancy)]) &
                              ~m_colorBB[m_turn];
         while (attacksBB != BITBOARD_ZERO) {
-            moves.emplace_back(createMove(square, popLsb(attacksBB), 0));
+            moveBuffer.emplace_back(createMove(square, popLsb(attacksBB), 0));
         }
     }
 
-    Bitboard kings = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::KING];
-    while (kings != 0ULL) {
-        Square   square    = popLsb(kings);
+    pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceTypes::KING];
+    while (pieces != 0ULL) {
+        Square   square    = popLsb(pieces);
         Bitboard attacksBB = pseudoAttacks[PieceTypes::KING][square] & ~m_colorBB[m_turn];
         while (attacksBB != BITBOARD_ZERO) {
-            moves.emplace_back(createMove(square, popLsb(attacksBB), 0));
+            moveBuffer.emplace_back(createMove(square, popLsb(attacksBB), 0));
         }
     }
+    return moveBuffer.size() - prevBufferSize;
 }
 
 bool Position::isLegal() {
-    Color us   = !m_turn;
-    Color them = m_turn;
+    Square king = lsb(m_colorBB[m_us] & m_pieceTypeBB[PieceTypes::KING]);
 
-    Square king = lsb(m_colorBB[us] & m_pieceTypeBB[PieceTypes::KING]);
+    Bitboard enemyAttackers = BITBOARD_ZERO;
 
-    Bitboard pawnThreats = pawnAttacks[us][king] & (m_colorBB[them] & m_pieceTypeBB[PieceTypes::PAWN]);
-    if (pawnThreats != BITBOARD_ZERO) return false;
+    enemyAttackers |= pawnAttacks[m_us][king] & (m_colorBB[m_them] & m_pieceTypeBB[PieceTypes::PAWN]);
+    enemyAttackers |= pseudoAttacks[PieceTypes::KING][king] & (m_colorBB[m_them] & m_pieceTypeBB[PieceTypes::KING]);
+    enemyAttackers |= pseudoAttacks[PieceTypes::KNIGHT][king] & (m_colorBB[m_them] & m_pieceTypeBB[PieceTypes::KNIGHT]);
 
-    Bitboard kingThreats = pseudoAttacks[PieceTypes::KING][king] & (m_colorBB[them] & m_pieceTypeBB[PieceTypes::KING]);
-    if (kingThreats != BITBOARD_ZERO) return false;
+    enemyAttackers |= bishopAttacks[king][getIndexOfOccupancy<PieceTypes::BISHOP>(king, m_occupancy)] &
+                      (m_colorBB[m_them] & (m_pieceTypeBB[PieceTypes::BISHOP] | m_pieceTypeBB[PieceTypes::QUEEN]));
+    enemyAttackers |= rookAttacks[king][getIndexOfOccupancy<PieceTypes::ROOK>(king, m_occupancy)] &
+                      (m_colorBB[m_them] & (m_pieceTypeBB[PieceTypes::ROOK] | m_pieceTypeBB[PieceTypes::QUEEN]));
 
-    Bitboard knightThreats =
-        pseudoAttacks[PieceTypes::KNIGHT][king] & (m_colorBB[them] & m_pieceTypeBB[PieceTypes::KNIGHT]);
-    if (knightThreats != BITBOARD_ZERO) return false;
-
-    Bitboard diagThreats = bishopAttacks[king][getIndexOfOccupancy<PieceTypes::BISHOP>(
-                               king, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])] &
-                           (m_colorBB[them] & (m_pieceTypeBB[PieceTypes::BISHOP] | m_pieceTypeBB[PieceTypes::QUEEN]));
-
-    if (diagThreats != BITBOARD_ZERO) return false;
-
-    Bitboard orthoThreats = rookAttacks[king][getIndexOfOccupancy<PieceTypes::ROOK>(
-                                king, m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK])] &
-                            (m_colorBB[them] & (m_pieceTypeBB[PieceTypes::ROOK] | m_pieceTypeBB[PieceTypes::QUEEN]));
-    return orthoThreats == BITBOARD_ZERO;
+    return enemyAttackers == BITBOARD_ZERO;
 }
 
 int Position::perft(uint8_t depth, bool verbose) {
-    std::vector<Move> moves;
-    moves.reserve(MAX_MOVES);
+    size_t startPos  = m_moveBuffer.size();
+    size_t moveCount = generatePseudoLegalMoves(m_moveBuffer);
 
     int nodes = 0;
 
-    if (depth == 0) return 1ULL;
+    if (depth == 1) {
+        for (size_t i = 0; i < moveCount; ++i) {
+            doMove(m_moveBuffer[startPos + i]);
+            if (isLegal()) ++nodes;
+            undoMove();
+        }
+        m_moveBuffer.resize(m_moveBuffer.size() - moveCount);
+        return nodes;
+    }
 
-    generatePseudoLegalMoves(moves);
-
-    for (const auto &move : moves) {
+    for (size_t i = 0; i < moveCount; ++i) {
+        const Move &move = m_moveBuffer[startPos + i];
         doMove(move);
         if (isLegal()) {
             int toAdd = perft(depth - 1);
@@ -309,5 +312,6 @@ int Position::perft(uint8_t depth, bool verbose) {
         }
         undoMove();
     }
+    m_moveBuffer.resize(startPos);
     return nodes;
 }

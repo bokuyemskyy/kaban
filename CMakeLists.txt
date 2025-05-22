@@ -9,42 +9,57 @@ set(LIBS "imgui::imgui glfw OpenGL::GL rt pthread dl")
 set(Stb_INCLUDE_DIR "${sourceDir}/vcpkg_installed/x64-linux/include/")
 set(OpenGL_GL_PREFERENCE "GLVND")
 
-
 project(${PROJECT_NAME})
 
 
-#add_compile_options(
-#    -Wall
-#    -Werror
-#    -Wextra
-#    -Wundef
-#    -Wunused
-#    -Weffc++
-#    -Wshadow
-#    -Wformat
-#    -Wcomment
-#    -Wpedantic
-#    -Wnarrowing
-#    -Wconversion
-#    -Wcast-align
-#    -Wreturn-type
-#    -Winvalid-pch
-#    -Wunused-macros
-#    -Wunused-result
-#    -Wold-style-cast
-#    -Wsign-conversion
-#    -Wredundant-decls
-#    -Wnull-dereference
-#    -Wunused-parameter
-#    -Wnon-virtual-dtor
-#    -Wdouble-promotion
-#    -Woverloaded-virtual
-#    -Wimplicit-fallthrough
-#    -Wmissing-declarations
-#    -Wmissing-include-dirs
-#    -Wmisleading-indentation
-#    -Wmissing-format-attribute
-#)
+
+
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+
+foreach(var
+        CMAKE_C_FLAGS_RELEASE
+        CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_EXE_LINKER_FLAGS_RELEASE
+        CMAKE_SHARED_LINKER_FLAGS_RELEASE)
+    set(${var} "${${var}} -O3 -march=native -flto -DNDEBUG"
+        CACHE STRING "Tuned for performance" FORCE)
+endforeach()
+
+
+
+
+add_compile_options(
+    -Wall
+    -Werror
+    -Wextra
+    -Wundef
+    -Wunused
+    -Weffc++
+    -Wshadow
+    -Wformat
+    -Wcomment
+    -Wpedantic
+    -Wnarrowing
+    -Wcast-align
+    -Wreturn-type
+    -Winvalid-pch
+    -Wunused-macros
+    -Wunused-result
+    -Wold-style-cast
+    -Wsign-conversion
+    -Wredundant-decls
+    -Wnull-dereference
+    -Wunused-parameter
+    -Wnon-virtual-dtor
+    -Wdouble-promotion
+    -Woverloaded-virtual
+    -Wimplicit-fallthrough
+    -Wmissing-declarations
+    -Wmissing-include-dirs
+    -Wmisleading-indentation
+    -Wmissing-format-attribute
+    #    -Wconversion
+)
 
 
 file(GLOB MAIN_SOURCE "project/main.cpp")
