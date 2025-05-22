@@ -37,9 +37,10 @@ inline Flags  getFlags(Move move) { return move >> (Squares::SIZE << 2); }
 
 // ##### Delta #####
 
-inline Delta createDelta(Piece captured, Castling castling, uint8_t enpassant, uint8_t halfmoves) {
-    return (static_cast<uint8_t>(captured) & 0xF) | ((static_cast<uint8_t>(castling) & 0xF) << 4) |
-           ((enpassant & 0x3F) << 8) | ((halfmoves & 0xFF) << 14);
+inline Delta createDelta(Piece captured, Castling castling, uint8_t enpassant, uint8_t halfmoves,
+                         uint8_t extraFlags = 0) {
+    return static_cast<Delta>((captured & 0xF) | ((castling & 0xF) << 4) | ((enpassant & 0x3F) << 8) |
+                              ((halfmoves & 0xFF) << 14) | ((extraFlags & 0x3) << 22));
 }
 
 inline Piece getCaptured(Delta delta) { return Piece(delta & 0xF); }
@@ -49,5 +50,7 @@ inline Castling getCastling(Delta delta) { return Castling((delta >> 4) & 0xF); 
 inline uint8_t getEnpassant(Delta delta) { return (delta >> 8) & 0x3F; }
 
 inline uint8_t getHalfmoves(Delta delta) { return (delta >> 14) & 0xFF; }
+
+inline uint8_t getExtraFlags(Delta delta) { return (delta >> 22) & 0x3; }
 
 #endif

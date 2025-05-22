@@ -101,7 +101,6 @@ void Renderer::drawGame() {
 
             Piece piece = Pieces::WPAWN;
             if (piece != Pieces::NONE) {
-                int textureIndex = static_cast<int>(piece);
                 drawList->AddImage(
                     pieceTextures[piece], ImVec2(squarePos.x + PIECE_MARGIN, squarePos.y + PIECE_MARGIN),
                     ImVec2(squarePos.x + SQUARE_SIZE - PIECE_MARGIN, squarePos.y + SQUARE_SIZE - PIECE_MARGIN));
@@ -166,11 +165,11 @@ void Renderer::drawWorkspace() {
         ImGui::EndTabBar();
     }
 
-    ImVec2 availSpace       = ImGui::GetContentRegionAvail();
-    float  leftPanelWidth   = availSpace.x * LEFT_PANEL_RATIO;
-    float  rightPanelWidth  = availSpace.x - leftPanelWidth;
-    float  boardHeight      = availSpace.y * VERTICAL_BOARD_RATIO;
-    float  lostPiecesHeight = availSpace.y - boardHeight;
+    ImVec2 availSpace     = ImGui::GetContentRegionAvail();
+    float  leftPanelWidth = availSpace.x * LEFT_PANEL_RATIO;
+    // float  rightPanelWidth  = availSpace.x - leftPanelWidth;
+    float boardHeight = availSpace.y * VERTICAL_BOARD_RATIO;
+    // float  lostPiecesHeight = availSpace.y - boardHeight;
 
     ImGui::BeginChild("LeftPanel", ImVec2(leftPanelWidth, availSpace.y), 0);
     {

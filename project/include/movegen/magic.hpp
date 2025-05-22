@@ -4,6 +4,7 @@
 #include <array>
 #include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 
@@ -63,11 +64,11 @@ void     initPremaskOccupancies(Square square, Bitboard premask);
 void     initMagics();
 
 template <PieceType PIECE_TYPE>
-constexpr int getIndexOfOccupancy(Square square, Bitboard occupancy) {
+constexpr size_t getIndexOfOccupancy(Square square, Bitboard occupancy) {
     assert(PIECE_TYPE == PieceTypes::ROOK || PIECE_TYPE == PieceTypes::BISHOP);
     assert(square < Squares::NB);
     const auto& entry = getMagic<PIECE_TYPE>(square);
-    return static_cast<int>(((occupancy & entry.premask) * entry.magic) >> entry.shift);
+    return static_cast<size_t>((((occupancy & entry.premask) * entry.magic) >> entry.shift));
 }
 
 #endif

@@ -4,6 +4,7 @@
 
 #include <array>
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <random>
 #include <vector>
@@ -45,12 +46,12 @@ Bitboard createOccupancy(int index, Bitboard premask) {
 }
 
 void initPremaskOccupancies(PieceType pieceType, Square square, Bitboard premask) {
-    int bitsNB        = popcount(premask);
-    int occupanciesNB = 1 << bitsNB;
+    int    bitsNB        = popcount(premask);
+    size_t occupanciesNB = 1 << bitsNB;
 
     premaskOccupancies[pieceType - PieceTypes::BISHOP][square].reserve(occupanciesNB);
 
-    for (int i = 0; i < occupanciesNB; ++i) {
+    for (size_t i = 0; i < occupanciesNB; ++i) {
         premaskOccupancies[pieceType - PieceTypes::BISHOP][square].emplace_back(createOccupancy(i, premask));
     }
 }
@@ -74,8 +75,8 @@ void initMagics() {
 
                 ++epoch;
 
-                auto premaskOccupancies = getPremaskOccupancies(pieceType, square);
-                for (const auto& occupancy : premaskOccupancies) {
+                auto occupancies = getPremaskOccupancies(pieceType, square);
+                for (const auto& occupancy : occupancies) {
                     uint16_t index = (occupancy * magic) >> shift;
 
                     if (used[index] != epoch) {

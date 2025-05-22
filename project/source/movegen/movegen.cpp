@@ -9,7 +9,7 @@
 std::array<std::array<Bitboard, Squares::NB>, PieceTypes::NB> pseudoAttacks{};
 
 std::array<std::array<Bitboard, Squares::NB>, Colors::NB>              pawnAttacks{};
-std::array<std::array<Bitboard, Squares::NB>, Colors::NB>              pawnNonAttacks{};
+std::array<std::array<Bitboard, Squares::NB>, Colors::NB>              pawnSinglePushes{};
 std::array<std::array<Bitboard, BISHOP_MAX_OCCUPANCY_NB>, Squares::NB> bishopAttacks{};
 std::array<std::array<Bitboard, ROOK_MAX_OCCUPANCY_NB>, Squares::NB>   rookAttacks{};
 
@@ -47,28 +47,24 @@ void initMovegen() {
 
     for (Square square = Squares::FIRST; square <= Squares::LAST; ++square) {
         Bitboard pawnBB = BITBOARD_ZERO;
-        for (const auto& direction : pawnDirections[Colors::WHITE]) {
+        for (const auto& direction : whitePawnAttackDirections) {
             pawnBB |= destinationBB(square, direction);
         }
         pawnAttacks[Colors::WHITE][square] = pawnBB;
 
         pawnBB = BITBOARD_ZERO;
-        for (const auto& direction : pawnDirections[Colors::BLACK]) {
-            pawnBB |= destinationBB(square, direction);
+        for (const auto& direction : whitePawnAttackDirections) {
+            pawnBB |= destinationBB(square, -direction);
         }
         pawnAttacks[Colors::BLACK][square] = pawnBB;
 
         pawnBB = BITBOARD_ZERO;
-        pawnBB |= destinationBB(square, pawnNonAttackDirections[Colors::WHITE][0]);
-        if (isPawnStartingRank(getRank(square), Colors::WHITE))
-            pawnBB |= destinationBB(square, pawnNonAttackDirections[Colors::WHITE][1]);
-        pawnNonAttacks[Colors::WHITE][square] = pawnBB;
+        pawnBB |= destinationBB(square, whitePawnPushDirections[0]);
+        pawnSinglePushes[Colors::WHITE][square] = pawnBB;
 
         pawnBB = BITBOARD_ZERO;
-        pawnBB |= destinationBB(square, pawnNonAttackDirections[Colors::BLACK][0]);
-        if (isPawnStartingRank(getRank(square), Colors::BLACK))
-            pawnBB |= destinationBB(square, pawnNonAttackDirections[Colors::BLACK][1]);
-        pawnNonAttacks[Colors::BLACK][square] = pawnBB;
+        pawnBB |= destinationBB(square, -whitePawnPushDirections[0]);
+        pawnSinglePushes[Colors::BLACK][square] = pawnBB;
 
         Bitboard knightBB = BITBOARD_ZERO;
         for (const auto& direction : knightDirections) {

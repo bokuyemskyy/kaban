@@ -79,7 +79,7 @@ inline Color getColor(Piece piece) {
 inline Piece createPiece(Color color, PieceType pieceType) {
     assert(color < Colors::NB);
     assert(pieceType != PieceTypes::NONE);
-    return (color << PieceTypes::SIZE) | pieceType;
+    return static_cast<Piece>((color << PieceTypes::SIZE) | pieceType);
 }
 
 constexpr std::string_view charPieceMap = "PNBRQK  pnbrqk?";

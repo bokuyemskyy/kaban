@@ -13,6 +13,10 @@
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
+                },
+                {
+                    "description": "Ignore SIGUSR1",
+                    "text": "handle SIGUSR1 nostop noprint pass"
                 }
             ],
             "preLaunchTask": "build debug",
@@ -22,7 +26,7 @@
                 "trace": true,
                 "traceResponse": true,
                 "engineLogging": true
-            }
+            },
         },
         {
             "name": "(ctest) Launch",

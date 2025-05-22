@@ -1,7 +1,11 @@
+#include <unistd.h>
+
 #include <chrono>
+#include <csignal>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <thread>
 #include <vector>
 
 #include "game.hpp"
@@ -53,9 +57,12 @@ int main() {
     renderer.initialize(Dimensions(800, 600), "Kaban", true);
     renderer.attachGames(games);
 
-    games[0].position().setFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w");
-    testPerformance(games[0], 4, true);
+    // std::this_thread::sleep_for(std::chrono::seconds(3));
 
+    games[0].position().setFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w");
+
+    testPerformance(games[0], 4, true);
+    return 1;
     while (!renderer.windowShouldClose()) {
         renderer.render();
     }
