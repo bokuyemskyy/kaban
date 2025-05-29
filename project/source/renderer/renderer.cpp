@@ -99,7 +99,8 @@ void Renderer::drawGame() {
             drawList->AddRectFilled(squarePos, ImVec2(squarePos.x + SQUARE_SIZE, squarePos.y + SQUARE_SIZE),
                                     squareColor);
 
-            Piece piece = Pieces::WPAWN;
+            Piece piece = m_games->at(0).getPosition().pieceAt((7 - row) * 8 + col);
+
             if (piece != Pieces::NONE) {
                 drawList->AddImage(
                     pieceTextures[piece], ImVec2(squarePos.x + PIECE_MARGIN, squarePos.y + PIECE_MARGIN),
@@ -242,12 +243,13 @@ void Renderer::updateTime() {
 void Renderer::fillFrame(float r, float g, float b, float a) { m_glfw.fillFrame(r, g, b, a); }
 
 void Renderer::loadTextures() {
-    for (uint8_t i = 0; i < Pieces::NB; ++i) {
-        std::string name(1, pieceToChar(Piece(i)));
+    pieceTextures.reserve(Pieces::LAST);
+    for (uint8_t i = 0; i <= Pieces::LAST; ++i) {
+        std::string name(1, pieceToChar(i));
         if (name != " " && name != "?") {
             GLuint texture = loadTextureFromResources(name + ".png");
             if (texture == 0) throw std::runtime_error("Failed to load a texture");
-            pieceTextures.emplace(Piece(i), texture);
+            pieceTextures[i] = texture;
         }
     }
 }
