@@ -41,19 +41,19 @@ enum value : uint8_t {
 using Piece = uint8_t;
 namespace Pieces {
 enum value : uint8_t {
-    WPAWN   = static_cast<uint8_t>(Colors::WHITE) | static_cast<uint8_t>(PieceTypes::PAWN),
-    WKNIGHT = static_cast<uint8_t>(Colors::WHITE) | static_cast<uint8_t>(PieceTypes::KNIGHT),
-    WBISHOP = static_cast<uint8_t>(Colors::WHITE) | static_cast<uint8_t>(PieceTypes::BISHOP),
-    WROOK   = static_cast<uint8_t>(Colors::WHITE) | static_cast<uint8_t>(PieceTypes::ROOK),
-    WQUEEN  = static_cast<uint8_t>(Colors::WHITE) | static_cast<uint8_t>(PieceTypes::QUEEN),
-    WKING   = static_cast<uint8_t>(Colors::WHITE) | static_cast<uint8_t>(PieceTypes::KING),
+    WPAWN   = static_cast<uint8_t>(Colors::WHITE << 3) | static_cast<uint8_t>(PieceTypes::PAWN),
+    WKNIGHT = static_cast<uint8_t>(Colors::WHITE << 3) | static_cast<uint8_t>(PieceTypes::KNIGHT),
+    WBISHOP = static_cast<uint8_t>(Colors::WHITE << 3) | static_cast<uint8_t>(PieceTypes::BISHOP),
+    WROOK   = static_cast<uint8_t>(Colors::WHITE << 3) | static_cast<uint8_t>(PieceTypes::ROOK),
+    WQUEEN  = static_cast<uint8_t>(Colors::WHITE << 3) | static_cast<uint8_t>(PieceTypes::QUEEN),
+    WKING   = static_cast<uint8_t>(Colors::WHITE << 3) | static_cast<uint8_t>(PieceTypes::KING),
 
-    BPAWN   = static_cast<uint8_t>(Colors::BLACK) | static_cast<uint8_t>(PieceTypes::PAWN),
-    BKNIGHT = static_cast<uint8_t>(Colors::BLACK) | static_cast<uint8_t>(PieceTypes::KNIGHT),
-    BBISHOP = static_cast<uint8_t>(Colors::BLACK) | static_cast<uint8_t>(PieceTypes::BISHOP),
-    BROOK   = static_cast<uint8_t>(Colors::BLACK) | static_cast<uint8_t>(PieceTypes::ROOK),
-    BQUEEN  = static_cast<uint8_t>(Colors::BLACK) | static_cast<uint8_t>(PieceTypes::QUEEN),
-    BKING   = static_cast<uint8_t>(Colors::BLACK) | static_cast<uint8_t>(PieceTypes::KING),
+    BPAWN   = static_cast<uint8_t>(Colors::BLACK << 3) | static_cast<uint8_t>(PieceTypes::PAWN),
+    BKNIGHT = static_cast<uint8_t>(Colors::BLACK << 3) | static_cast<uint8_t>(PieceTypes::KNIGHT),
+    BBISHOP = static_cast<uint8_t>(Colors::BLACK << 3) | static_cast<uint8_t>(PieceTypes::BISHOP),
+    BROOK   = static_cast<uint8_t>(Colors::BLACK << 3) | static_cast<uint8_t>(PieceTypes::ROOK),
+    BQUEEN  = static_cast<uint8_t>(Colors::BLACK << 3) | static_cast<uint8_t>(PieceTypes::QUEEN),
+    BKING   = static_cast<uint8_t>(Colors::BLACK << 3) | static_cast<uint8_t>(PieceTypes::KING),
 
     FIRST = WPAWN,
     LAST  = BKING,

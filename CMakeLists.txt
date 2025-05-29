@@ -11,7 +11,7 @@ set(OpenGL_GL_PREFERENCE "GLVND")
 
 project(${PROJECT_NAME})
 
-
+add_subdirectory(scripts/perft_compare)
 
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)

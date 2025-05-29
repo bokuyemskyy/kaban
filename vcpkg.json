@@ -11,6 +11,7 @@
             ]
         },
         "stb",
-        "glad"
+        "glad",
+        "boost-process"
     ]
 }

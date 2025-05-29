@@ -3,7 +3,9 @@
 
 #include <array>
 #include <cstddef>
+#include <iostream>
 #include <list>
+#include <shared_mutex>
 #include <string>
 #include <vector>
 
@@ -11,6 +13,7 @@
 #include "move.hpp"
 #include "piece.hpp"
 #include "square.hpp"
+#include "utils.hpp"
 
 constexpr auto DEFAULT_FEN       = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 const int      MAX_DEPTH         = 64;  // Hard cap for recursion
@@ -31,7 +34,7 @@ class Position {
     void unsetPiece(Square square);
     void resetBoard();
 
-    [[nodiscard]] Piece pieceAt(Square square) const;
+    [[nodiscard]] Piece pieceAt(Square square) const { return m_board[square]; };
 
     void updateCachedState();
     void toggleTurn();
@@ -39,7 +42,33 @@ class Position {
     [[nodiscard]] bool isLegal();
 
     size_t generatePseudoLegalMoves(std::vector<Move> &moves);
-    int    perft(uint8_t depth, bool verbose = false);
+    template <bool Verbose = false>
+    int perft(uint8_t depth) {
+        if (depth == 0) return 1;
+
+        const size_t start = m_moveBuffer.size();
+        const size_t count = generatePseudoLegalMoves(m_moveBuffer);
+        int          nodes = 0;
+
+        for (size_t i = 0; i < count; ++i) {
+            const Move &move = m_moveBuffer[start + i];
+            doMove(move);
+            if (isLegal()) [[likely]] {
+                int child = perft(depth - 1);
+                if constexpr (Verbose) {
+                    std::cout << squareToString(getFrom(move)) << squareToString(getTo(move)) << ": " << child << '\n';
+                }
+                nodes += child;
+            }
+            undoMove();
+        }
+        m_moveBuffer.resize(start);
+        return nodes;
+    }
+    void makeMoveUci(std::string moveUci) {
+        Move move = createMove(stringToSquare(moveUci.substr(0, 2)), stringToSquare(moveUci.substr(2, 2)), 0);
+        doMove(move);
+    }
 
     void                doMove(Move move);
     void                undoMove();
