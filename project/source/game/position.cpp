@@ -268,50 +268,18 @@ size_t Position::generatePseudoLegalMoves(std::vector<Move> &moveBuffer) {
 }
 
 bool Position::isLegal() {
-    Square king = lsb(m_colorBB[m_us] & m_pieceTypeBB[PieceTypes::KING]);
+    Square king = lsb(m_colorBB[m_them] & m_pieceTypeBB[PieceTypes::KING]);
 
     Bitboard enemyAttackers = BITBOARD_ZERO;
 
-    enemyAttackers |= pawnAttacks[m_us][king] & (m_colorBB[m_them] & m_pieceTypeBB[PieceTypes::PAWN]);
-    enemyAttackers |= pseudoAttacks[PieceTypes::KING][king] & (m_colorBB[m_them] & m_pieceTypeBB[PieceTypes::KING]);
-    enemyAttackers |= pseudoAttacks[PieceTypes::KNIGHT][king] & (m_colorBB[m_them] & m_pieceTypeBB[PieceTypes::KNIGHT]);
+    enemyAttackers |= pawnAttacks[m_them][king] & (m_colorBB[m_us] & m_pieceTypeBB[PieceTypes::PAWN]);
+    enemyAttackers |= pseudoAttacks[PieceTypes::KING][king] & (m_colorBB[m_us] & m_pieceTypeBB[PieceTypes::KING]);
+    enemyAttackers |= pseudoAttacks[PieceTypes::KNIGHT][king] & (m_colorBB[m_us] & m_pieceTypeBB[PieceTypes::KNIGHT]);
 
     enemyAttackers |= bishopAttacks[king][getIndexOfOccupancy<PieceTypes::BISHOP>(king, m_occupancy)] &
-                      (m_colorBB[m_them] & (m_pieceTypeBB[PieceTypes::BISHOP] | m_pieceTypeBB[PieceTypes::QUEEN]));
+                      (m_colorBB[m_us] & (m_pieceTypeBB[PieceTypes::BISHOP] | m_pieceTypeBB[PieceTypes::QUEEN]));
     enemyAttackers |= rookAttacks[king][getIndexOfOccupancy<PieceTypes::ROOK>(king, m_occupancy)] &
-                      (m_colorBB[m_them] & (m_pieceTypeBB[PieceTypes::ROOK] | m_pieceTypeBB[PieceTypes::QUEEN]));
+                      (m_colorBB[m_us] & (m_pieceTypeBB[PieceTypes::ROOK] | m_pieceTypeBB[PieceTypes::QUEEN]));
 
     return enemyAttackers == BITBOARD_ZERO;
-}
-
-int Position::perft(uint8_t depth, bool verbose) {
-    size_t startPos  = m_moveBuffer.size();
-    size_t moveCount = generatePseudoLegalMoves(m_moveBuffer);
-
-    int nodes = 0;
-
-    if (depth == 1) {
-        for (size_t i = 0; i < moveCount; ++i) {
-            doMove(m_moveBuffer[startPos + i]);
-            if (isLegal()) ++nodes;
-            undoMove();
-        }
-        m_moveBuffer.resize(m_moveBuffer.size() - moveCount);
-        return nodes;
-    }
-
-    for (size_t i = 0; i < moveCount; ++i) {
-        const Move &move = m_moveBuffer[startPos + i];
-        doMove(move);
-        if (isLegal()) {
-            int toAdd = perft(depth - 1);
-            if (verbose) {
-                std::cout << squareToString(getFrom(move)) << squareToString(getTo(move)) << ": " << toAdd << "\n";
-            }
-            nodes += toAdd;
-        }
-        undoMove();
-    }
-    m_moveBuffer.resize(startPos);
-    return nodes;
 }

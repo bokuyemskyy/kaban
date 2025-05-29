@@ -5,11 +5,11 @@
 
 class Game {
    public:
-    [[nodiscard]] Position& position() { return m_position; }
+    [[nodiscard]] Position& getPosition() { return m_position; }
 
    private:
-    Position m_position;
-    std::string m_gameName;
+    Position                            m_position;
+    std::string                         m_gameName;
     std::pair<std::string, std::string> m_opponents;
 };
 
