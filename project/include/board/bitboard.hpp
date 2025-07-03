@@ -1,5 +1,5 @@
-#ifndef PRECOMPUTED_HPP
-#define PRECOMPUTED_HPP
+#ifndef BITBOARD_HPP
+#define BITBOARD_HPP
 
 #include <array>
 #include <cstdint>
@@ -9,15 +9,17 @@
 
 using Bitboard = uint64_t;
 
-constexpr Bitboard BITBOARD_ZERO = 0ULL;
+namespace Bitboards {
 
-extern std::array<Bitboard, Ranks::NB> rankBB;
-extern std::array<Bitboard, Files::NB> fileBB;
+void init();
 
-extern std::array<Bitboard, Squares::NB> diagBB;
-extern std::array<Bitboard, Squares::NB> antiDiagBB;
+constexpr Bitboard ZERO = 0ULL;
 
-void initBitboards();
+extern std::array<Bitboard, Ranks::NB> rankBBs;
+extern std::array<Bitboard, Files::NB> fileBBs;
+
+extern std::array<Bitboard, Squares::NB> diagBBs;
+extern std::array<Bitboard, Squares::NB> antiDiagBBs;
 
 constexpr Bitboard squareBB(Square square) {
     assert(isValid(square));
@@ -25,7 +27,14 @@ constexpr Bitboard squareBB(Square square) {
 }
 constexpr Bitboard destinationBB(Square square, Direction direction) {
     Square destination = square + direction;
-    return (isValid(destination) && squareDistance[square][destination] <= 2) ? squareBB(destination) : BITBOARD_ZERO;
+    return (isValid(destination) && Squares::distance(square, destination) <= 2) ? squareBB(destination) : ZERO;
 };
+
+constexpr Bitboard rankBB(Rank rank) { return rankBBs[rank]; }
+constexpr Bitboard fileBB(File file) { return fileBBs[file]; }
+constexpr Bitboard diagBB(Square square) { return diagBBs[square]; }
+constexpr Bitboard antiDiagBB(Square square) { return antiDiagBBs[square]; }
+
+}  // namespace Bitboards
 
 #endif

@@ -3,9 +3,7 @@
 
 #include <array>
 #include <cstddef>
-#include <iostream>
 #include <list>
-#include <shared_mutex>
 #include <string>
 #include <vector>
 
@@ -41,42 +39,17 @@ class Position {
 
     [[nodiscard]] bool isLegal();
 
-    size_t generatePseudoLegalMoves(std::vector<Move> &moves);
-    template <bool Verbose = false>
-    int perft(uint8_t depth) {
-        if (depth == 0) return 1;
-
-        const size_t start = m_moveBuffer.size();
-        const size_t count = generatePseudoLegalMoves(m_moveBuffer);
-        int          nodes = 0;
-
-        for (size_t i = 0; i < count; ++i) {
-            const Move &move = m_moveBuffer[start + i];
-            doMove(move);
-            if (isLegal()) [[likely]] {
-                int child = perft(depth - 1);
-                if constexpr (Verbose) {
-                    std::cout << squareToString(getFrom(move)) << squareToString(getTo(move)) << ": " << child << '\n';
-                }
-                nodes += child;
-            }
-            undoMove();
-        }
-        m_moveBuffer.resize(start);
-        return nodes;
-    }
     void makeMoveUci(std::string moveUci) {
         Move move = createMove(stringToSquare(moveUci.substr(0, 2)), stringToSquare(moveUci.substr(2, 2)), 0);
         doMove(move);
     }
 
-    void                doMove(Move move);
-    void                undoMove();
+    void doMove(Move move);
+    void undoMove();
+
     [[nodiscard]] Color turn() const { return m_turn; }
 
    private:
-    std::vector<Move> m_moveBuffer;
-
     std::array<Piece, Squares::NB>       m_board{};
     std::array<Bitboard, Colors::NB>     m_colorBB{BITBOARD_ZERO};
     std::array<Bitboard, PieceTypes::NB> m_pieceTypeBB{BITBOARD_ZERO};
@@ -87,12 +60,6 @@ class Position {
     Color    m_turn      = Colors::WHITE;
     Castling m_castling  = Castlings::ANY;
     uint8_t  m_halfmoves = 0;
-
-    Bitboard m_occupancy{};
-    Square   m_wking{};
-    Square   m_bking{};
-    Color    m_us{};
-    Color    m_them{};
 };
 
 #endif
