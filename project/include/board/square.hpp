@@ -11,6 +11,9 @@
 
 using Square    = uint8_t;
 namespace Squares {
+
+void init();
+    
 enum value : uint8_t {
     A1, B1, C1, D1, E1, F1, G1, H1,
     A2, B2, C2, D2, E2, F2, G2, H2,
@@ -20,7 +23,7 @@ enum value : uint8_t {
     A6, B6, C6, D6, E6, F6, G6, H6,
     A7, B7, C7, D7, E7, F7, G7, H7,
     A8, B8, C8, D8, E8, F8, G8, H8,
-
+    
     FIRST = A1,
     LAST = H8,
 
@@ -29,6 +32,11 @@ enum value : uint8_t {
     SIZE = 6,
     NB = 64
 };
+
+extern std::array<std::array<uint8_t, NB>, NB> distances;
+
+constexpr int distance(Square from, Square to) { return distances[from][to]; }
+
 }  // namespace Squares
 
 using File      = uint8_t;
@@ -46,7 +54,7 @@ enum value : uint8_t {
 };
 }  // namespace Files
 
-using Rank      = uint8_t;
+using   Rank      = uint8_t;
 namespace Ranks {
 enum value : uint8_t { 
     R1, R2, R3, R4, R5, R6, R7, R8,
@@ -75,9 +83,5 @@ inline bool isPawnPromotionRank(Rank rank, Color color) {
 }
 
 constexpr bool isValid(Square square) { return square <= Squares::LAST; }
-
-extern std::array<std::array<uint8_t, Squares::NB>, Squares::NB> squareDistance;
-
-void initSquares();
 
 #endif

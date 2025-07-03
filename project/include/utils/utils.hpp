@@ -27,11 +27,11 @@ std::string moveToString(Move move);
 Move        stringToMove(const std::string &s);
 
 constexpr Square lsb(const Bitboard &x) { return static_cast<Square>(__builtin_ctzll(x)); }
-constexpr Square popLsb(Bitboard &x) {
+constexpr Square popLSB(Bitboard &x) {
     Square i = lsb(x);
     x &= x - 1;
     return i;
 }
-constexpr uint8_t popcount(Bitboard x) { return __builtin_popcountll(x); }
+constexpr uint8_t popCount(Bitboard x) { return __builtin_popcountll(x); }
 
 #endif
