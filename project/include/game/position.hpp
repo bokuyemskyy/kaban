@@ -22,7 +22,6 @@ class Position {
     Position(const std::string &fen = DEFAULT_FEN) {
         setFromFEN(fen);
         updateCachedState();
-        m_moveBuffer.reserve(MAX_MOVES_PER_POS * MAX_DEPTH);
     }
 
     void                      setFromFEN(const std::string &fen);
@@ -51,8 +50,8 @@ class Position {
 
    private:
     std::array<Piece, Squares::NB>       m_board{};
-    std::array<Bitboard, Colors::NB>     m_colorBB{BITBOARD_ZERO};
-    std::array<Bitboard, PieceTypes::NB> m_pieceTypeBB{BITBOARD_ZERO};
+    std::array<Bitboard, Colors::NB>     m_colorBB{Bitboards::ZERO};
+    std::array<Bitboard, PieceTypes::NB> m_pieceTypeBB{Bitboards::ZERO};
 
     std::list<Delta> m_deltas;
     std::list<Move>  m_moves;

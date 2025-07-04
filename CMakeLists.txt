@@ -1,21 +1,19 @@
 cmake_minimum_required(VERSION 3.20)
 
 
-set(PROJECT_NAME "main")
-set(EXECUTABLE_NAME "main")
-set(LIBRARY_NAME "main_lib")
 
-set(LIBS "imgui::imgui glfw OpenGL::GL rt pthread dl")
-set(Stb_INCLUDE_DIR "${sourceDir}/vcpkg_installed/x64-linux/include/")
-set(OpenGL_GL_PREFERENCE "GLVND")
+set(PROJECT_NAME "kaban")
+set(EXECUTABLE_NAME "kaban")
+set(LIBRARY_NAME "kaban_lib")
+
+
 
 project(${PROJECT_NAME})
-
 add_subdirectory(scripts/perft_compare)
 
 
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 foreach(var
         CMAKE_C_FLAGS_RELEASE
         CMAKE_CXX_FLAGS_RELEASE
@@ -24,7 +22,6 @@ foreach(var
     set(${var} "${${var}} -O3 -march=native -flto -DNDEBUG"
         CACHE STRING "Tuned for performance" FORCE)
 endforeach()
-
 
 
 
@@ -62,12 +59,18 @@ add_compile_options(
 )
 
 
+
 file(GLOB MAIN_SOURCE "project/main.cpp")
 file(GLOB_RECURSE LIB_SOURCES "project/source/*.cpp")
 file(GLOB_RECURSE TEST_SOURCES "project/tests/*.cpp")
 
-separate_arguments(LIBS)
 
+
+
+set(LIBS "imgui::imgui glfw OpenGL::GL rt pthread dl")
+set(Stb_INCLUDE_DIR "${sourceDir}/vcpkg_installed/x64-linux/include/")
+set(OpenGL_GL_PREFERENCE "GLVND")
+separate_arguments(LIBS)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(imgui CONFIG REQUIRED)
