@@ -6,7 +6,7 @@
 #include <cstdint>
 
 #include "castling.hpp"
-#include "square.hpp"
+#include "navigation.hpp"
 
 using Move  = uint16_t;
 using Delta = uint32_t;
