@@ -8,34 +8,52 @@
 #include "castling.hpp"
 #include "navigation.hpp"
 
-using Move  = uint16_t;
 using Delta = uint32_t;
-using Flags = uint8_t;
 
 /*
-0	Quiet move	No capture, no special move
-1	Double pawn push	Pawn moves two squares forward
-2	King castle	Kingside castling
-3	Queen castle	Queenside castling
-4	Capture (non-special)	Regular capture, piece on to-square
-5	En passant capture	Capture via en passant, no piece on to-square initially
-8	Knight promotion	Pawn promotes to knight
-9	Bishop promotion	Pawn promotes to bishop
-10	Rook promotion	Pawn promotes to rook
-11	Queen promotion	Pawn promotes to queen
-12	Knight promotion capture	Promotion with capture, to knight
-13	Bishop promotion capture	Promotion with capture, to bishop
-14	Rook promotion capture	Promotion with capture, to rook
-15	Queen promotion capture	Promotion with capture, to queen
+Move encoding:
+Bits    Data
+0-5	    Origin square
+6-11    Destination square
+12-13   Special flag (0 = usual move, 1 = promotion, 2 = double pawn push, 3 = castling)
+14-15   Promotion piece (0 = knight, 1 = bishop, 2 = rook, 3 = queen) (if any)
 */
 
-constexpr Move createMove(Square from, Square to, Flags flags) {
-    return from | (to << Squares::SIZE) | (flags << (Squares::SIZE << 2));
-}
+using Flag      = uint8_t;
+using Promotion = uint8_t;
 
-constexpr Square getFrom(Move move) { return move & Squares::MASK; }
-constexpr Square getTo(Move move) { return (move >> Squares::SIZE) & Squares::MASK; }
-constexpr Flags  getFlags(Move move) { return move >> (Squares::SIZE << 2); }
+struct Move {
+   private:
+    uint16_t m_val;
+
+    static constexpr int FROM_SHIFT  = 0;
+    static constexpr int TO_SHIFT    = 6;
+    static constexpr int FLAG_SHIFT  = 12;
+    static constexpr int PROMO_SHIFT = 14;
+
+    static constexpr uint16_t MASK_6BITS = 0x3F;
+    static constexpr uint16_t MASK_2BITS = 0x3;
+
+   public:
+    constexpr Move(uint16_t val = 0) : m_val(val) {};
+
+    constexpr operator uint16_t() const { return m_val; }
+
+    [[nodiscard]] constexpr Square from() const { return Square((m_val >> FROM_SHIFT) & MASK_6BITS); }
+
+    [[nodiscard]] constexpr Square to() const { return Square((m_val >> TO_SHIFT) & MASK_6BITS); }
+
+    [[nodiscard]] constexpr Flag flag() const { return static_cast<Flag>((m_val >> FLAG_SHIFT) & MASK_2BITS); }
+
+    [[nodiscard]] constexpr Promotion promotion() const {
+        return static_cast<Promotion>((m_val >> PROMO_SHIFT) & MASK_2BITS);
+    }
+
+    static constexpr Move create(Square from, Square to, Flag flag = Flag(0), Promotion promo = Promotion(0)) {
+        return (static_cast<uint16_t>(from) << FROM_SHIFT) | (static_cast<uint16_t>(to) << TO_SHIFT) |
+               (static_cast<uint16_t>(flag) << FLAG_SHIFT) | (static_cast<uint16_t>(promo) << PROMO_SHIFT);
+    }
+};
 
 constexpr Delta createDelta(Piece captured, Castling castling, uint8_t enpassant, uint8_t halfmoves,
                             uint8_t extraFlags = 0) {
