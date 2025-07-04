@@ -51,9 +51,9 @@ uint64_t xorshift64(uint64_t& state) {
 inline uint64_t randomMagic() { return xorshift64(seed) & xorshift64(seed) & xorshift64(seed); }
 
 Bitboard createOccupancy(size_t index, Bitboard premask) {
-    Bitboard result = BITBOARD_ZERO;
+    Bitboard result = Bitboards::ZERO;
 
-    while (premask != BITBOARD_ZERO) {
+    while (premask != Bitboards::ZERO) {
         int bitPosition = popLSB(premask);
         if ((index & 0b1) != 0) {
             result |= squareBB(bitPosition);

@@ -3,13 +3,13 @@
   "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "documentNamespace": "https://spdx.org/spdxdocs/stb-x64-linux-2024-07-29#1-b54d3c11-83ef-46be-9317-f3b361530989",
-  "name": "stb:x64-linux@2024-07-29#1 711a684f3000fb99aee6857a191dbeb6e7efc4b727103dbbd1102dea28fb536c",
+  "documentNamespace": "https://spdx.org/spdxdocs/stb-x64-linux-2024-07-29#1-cec9ebaa-9908-4eef-a84f-88b5fcdf6fff",
+  "name": "stb:x64-linux@2024-07-29#1 6388bb9548c9a54a86a3cf42085364744281610ff0e8d7664d3e6f6a12882336",
   "creationInfo": {
     "creators": [
-      "Tool: vcpkg-2025-03-22-d4dd14112c2026ee57e59f966ecfa3b9137bd143"
+      "Tool: vcpkg-2025-06-20-ef7c0d541124bbdd334a03467e7edb6c3364d199"
     ],
-    "created": "2025-05-17T08:04:46Z"
+    "created": "2025-07-04T09:41:46Z"
   },
   "relationships": [
     {
@@ -68,6 +68,11 @@
       "relatedSpdxElement": "SPDXRef-port"
     },
     {
+      "spdxElementId": "SPDXRef-file-3",
+      "relationshipType": "DEPENDENCY_MANIFEST_OF",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
       "spdxElementId": "SPDXRef-file-4",
       "relationshipType": "CONTAINED_BY",
       "relatedSpdxElement": "SPDXRef-port"
@@ -78,9 +83,9 @@
       "name": "stb",
       "SPDXID": "SPDXRef-port",
       "versionInfo": "2024-07-29#1",
-      "downloadLocation": "NOASSERTION",
+      "downloadLocation": "git+https://github.com/Microsoft/vcpkg#ports/stb",
       "homepage": "https://github.com/nothings/stb",
-      "licenseConcluded": "MIT OR CC-PDDC",
+      "licenseConcluded": "(MIT OR CC-PDDC)",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "description": "public domain header-only libraries",
@@ -89,9 +94,9 @@
     {
       "name": "stb:x64-linux",
       "SPDXID": "SPDXRef-binary",
-      "versionInfo": "711a684f3000fb99aee6857a191dbeb6e7efc4b727103dbbd1102dea28fb536c",
+      "versionInfo": "6388bb9548c9a54a86a3cf42085364744281610ff0e8d7664d3e6f6a12882336",
       "downloadLocation": "NONE",
-      "licenseConcluded": "MIT OR CC-PDDC",
+      "licenseConcluded": "(MIT OR CC-PDDC)",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "comment": "This is a binary package built by vcpkg."
@@ -113,7 +118,7 @@
   ],
   "files": [
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/stb/vcpkg-cmake-wrapper.cmake",
+      "fileName": "./vcpkg-cmake-wrapper.cmake",
       "SPDXID": "SPDXRef-file-0",
       "checksums": [
         {
@@ -125,7 +130,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/stb/usage",
+      "fileName": "./usage",
       "SPDXID": "SPDXRef-file-1",
       "checksums": [
         {
@@ -137,7 +142,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/stb/FindStb.cmake",
+      "fileName": "./FindStb.cmake",
       "SPDXID": "SPDXRef-file-2",
       "checksums": [
         {
@@ -149,7 +154,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/stb/vcpkg.json",
+      "fileName": "./vcpkg.json",
       "SPDXID": "SPDXRef-file-3",
       "checksums": [
         {
@@ -161,7 +166,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/stb/portfile.cmake",
+      "fileName": "./portfile.cmake",
       "SPDXID": "SPDXRef-file-4",
       "checksums": [
         {

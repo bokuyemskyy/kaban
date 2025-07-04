@@ -3,13 +3,13 @@
   "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "documentNamespace": "https://spdx.org/spdxdocs/glfw3-x64-linux-3.4#1-7ffdfc94-725c-49f9-a250-d29992f7661c",
-  "name": "glfw3:x64-linux@3.4#1 466aa0dd92d9467991f91777a203f0be12a16606d4bba9148faa192922fc004a",
+  "documentNamespace": "https://spdx.org/spdxdocs/glfw3-x64-linux-3.4#1-1e58c177-3dc0-4bd9-a61c-8ba3bd7231c4",
+  "name": "glfw3:x64-linux@3.4#1 268f5f9c3126a3cedfd7355a5faccf73df6211151f543463a752957996726f44",
   "creationInfo": {
     "creators": [
-      "Tool: vcpkg-2025-03-22-d4dd14112c2026ee57e59f966ecfa3b9137bd143"
+      "Tool: vcpkg-2025-06-20-ef7c0d541124bbdd334a03467e7edb6c3364d199"
     ],
-    "created": "2025-05-17T08:04:16Z"
+    "created": "2025-07-04T09:41:16Z"
   },
   "relationships": [
     {
@@ -48,6 +48,11 @@
       "relatedSpdxElement": "SPDXRef-port"
     },
     {
+      "spdxElementId": "SPDXRef-file-1",
+      "relationshipType": "DEPENDENCY_MANIFEST_OF",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
       "spdxElementId": "SPDXRef-file-2",
       "relationshipType": "CONTAINED_BY",
       "relatedSpdxElement": "SPDXRef-port"
@@ -58,7 +63,7 @@
       "name": "glfw3",
       "SPDXID": "SPDXRef-port",
       "versionInfo": "3.4#1",
-      "downloadLocation": "NOASSERTION",
+      "downloadLocation": "git+https://github.com/Microsoft/vcpkg#ports/glfw3",
       "homepage": "https://github.com/glfw/glfw",
       "licenseConcluded": "Zlib",
       "licenseDeclared": "NOASSERTION",
@@ -69,7 +74,7 @@
     {
       "name": "glfw3:x64-linux",
       "SPDXID": "SPDXRef-binary",
-      "versionInfo": "466aa0dd92d9467991f91777a203f0be12a16606d4bba9148faa192922fc004a",
+      "versionInfo": "268f5f9c3126a3cedfd7355a5faccf73df6211151f543463a752957996726f44",
       "downloadLocation": "NONE",
       "licenseConcluded": "Zlib",
       "licenseDeclared": "NOASSERTION",
@@ -93,7 +98,7 @@
   ],
   "files": [
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/glfw3/glfw3Config.cmake",
+      "fileName": "./glfw3Config.cmake",
       "SPDXID": "SPDXRef-file-0",
       "checksums": [
         {
@@ -105,7 +110,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/glfw3/vcpkg.json",
+      "fileName": "./vcpkg.json",
       "SPDXID": "SPDXRef-file-1",
       "checksums": [
         {
@@ -117,7 +122,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/glfw3/portfile.cmake",
+      "fileName": "./portfile.cmake",
       "SPDXID": "SPDXRef-file-2",
       "checksums": [
         {

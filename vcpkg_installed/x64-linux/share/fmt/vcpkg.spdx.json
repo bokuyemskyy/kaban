@@ -3,13 +3,13 @@
   "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "documentNamespace": "https://spdx.org/spdxdocs/fmt-x64-linux-11.0.2#1-f513aa9b-ad9c-445b-aa67-1177ebd262c6",
-  "name": "fmt:x64-linux@11.0.2#1 dfe2c6336366672c9480e88054ac9af3bc2566964bab8abcb79d1f0197f57de6",
+  "documentNamespace": "https://spdx.org/spdxdocs/fmt-x64-linux-11.0.2#1-8109c374-a70e-4465-9960-ee272ed9e9b4",
+  "name": "fmt:x64-linux@11.0.2#1 48a0e97af537d2131bd72608ca0355da2b78183d18f8352663b299ea29922be5",
   "creationInfo": {
     "creators": [
-      "Tool: vcpkg-2025-03-22-d4dd14112c2026ee57e59f966ecfa3b9137bd143"
+      "Tool: vcpkg-2025-06-20-ef7c0d541124bbdd334a03467e7edb6c3364d199"
     ],
-    "created": "2025-05-17T07:49:28Z"
+    "created": "2025-07-04T09:40:44Z"
   },
   "relationships": [
     {
@@ -63,6 +63,11 @@
       "relatedSpdxElement": "SPDXRef-port"
     },
     {
+      "spdxElementId": "SPDXRef-file-2",
+      "relationshipType": "DEPENDENCY_MANIFEST_OF",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
       "spdxElementId": "SPDXRef-file-3",
       "relationshipType": "CONTAINED_BY",
       "relatedSpdxElement": "SPDXRef-port"
@@ -78,7 +83,7 @@
       "name": "fmt",
       "SPDXID": "SPDXRef-port",
       "versionInfo": "11.0.2#1",
-      "downloadLocation": "NOASSERTION",
+      "downloadLocation": "git+https://github.com/Microsoft/vcpkg#ports/fmt",
       "homepage": "https://github.com/fmtlib/fmt",
       "licenseConcluded": "MIT",
       "licenseDeclared": "NOASSERTION",
@@ -89,7 +94,7 @@
     {
       "name": "fmt:x64-linux",
       "SPDXID": "SPDXRef-binary",
-      "versionInfo": "dfe2c6336366672c9480e88054ac9af3bc2566964bab8abcb79d1f0197f57de6",
+      "versionInfo": "48a0e97af537d2131bd72608ca0355da2b78183d18f8352663b299ea29922be5",
       "downloadLocation": "NONE",
       "licenseConcluded": "MIT",
       "licenseDeclared": "NOASSERTION",
@@ -113,7 +118,7 @@
   ],
   "files": [
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/fmt/fix-pass-utf-8-only-if-the-compiler-is-MSVC-at-build.patch",
+      "fileName": "./fix-pass-utf-8-only-if-the-compiler-is-MSVC-at-build.patch",
       "SPDXID": "SPDXRef-file-0",
       "checksums": [
         {
@@ -125,7 +130,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/fmt/usage",
+      "fileName": "./usage",
       "SPDXID": "SPDXRef-file-1",
       "checksums": [
         {
@@ -137,7 +142,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/fmt/vcpkg.json",
+      "fileName": "./vcpkg.json",
       "SPDXID": "SPDXRef-file-2",
       "checksums": [
         {
@@ -149,7 +154,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/fmt/fix-write-batch.patch",
+      "fileName": "./fix-write-batch.patch",
       "SPDXID": "SPDXRef-file-3",
       "checksums": [
         {
@@ -161,7 +166,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/fmt/portfile.cmake",
+      "fileName": "./portfile.cmake",
       "SPDXID": "SPDXRef-file-4",
       "checksums": [
         {
