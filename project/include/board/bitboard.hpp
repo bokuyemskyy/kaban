@@ -5,35 +5,38 @@
 #include <cstdint>
 
 #include "direction.hpp"
-#include "square.hpp"
+#include "navigation.hpp"
 
-using Bitboard = uint64_t;
+class Bitboard {
+   private:
+    uint64_t m_val;
 
-namespace Bitboards {
+   public:
+    constexpr Bitboard(uint64_t val) : m_val(val) {};
 
-void init();
+    constexpr operator uint64_t() const { return m_val; }
 
-constexpr Bitboard ZERO = 0ULL;
+    static constexpr uint64_t zero() { return 0ULL; }
 
-extern std::array<Bitboard, Ranks::NB> rankBBs;
-extern std::array<Bitboard, Files::NB> fileBBs;
+    extern std::array<Bitboard, Ranks::NB> rankBBs;
+    extern std::array<Bitboard, Files::NB> fileBBs;
 
-extern std::array<Bitboard, Squares::NB> diagBBs;
-extern std::array<Bitboard, Squares::NB> antiDiagBBs;
+    extern std::array<Bitboard, Squares::NB> diagBBs;
+    extern std::array<Bitboard, Squares::NB> antiDiagBBs;
 
-constexpr Bitboard squareBB(Square square) {
-    assert(isValid(square));
-    return (1ULL << square);
-}
-constexpr Bitboard destinationBB(Square square, Direction direction) {
-    Square destination = square + direction;
-    return (isValid(destination) && Squares::distance(square, destination) <= 2) ? squareBB(destination) : ZERO;
-};
+    static constexpr Bitboard squareBB(Square square) {
+        assert(square.isValid());
+        return 1ULL << square;
+    }
+    constexpr Bitboard destinationBB(Square square, Direction direction) {
+        Square destination = square + direction;
+        return (isValid(destination) && Squares::distance(square, destination) <= 2) ? squareBB(destination) : ZERO;
+    };
 
-constexpr Bitboard rankBB(Rank rank) { return rankBBs[rank]; }
-constexpr Bitboard fileBB(File file) { return fileBBs[file]; }
-constexpr Bitboard diagBB(Square square) { return diagBBs[square]; }
-constexpr Bitboard antiDiagBB(Square square) { return antiDiagBBs[square]; }
+    constexpr Bitboard rankBB(Rank rank) { return rankBBs[rank]; }
+    constexpr Bitboard fileBB(File file) { return fileBBs[file]; }
+    constexpr Bitboard diagBB(Square square) { return diagBBs[square]; }
+    constexpr Bitboard antiDiagBB(Square square) { return antiDiagBBs[square]; }
 
 }  // namespace Bitboards
 
