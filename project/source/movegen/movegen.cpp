@@ -1,5 +1,6 @@
 #include "movegen.hpp"
 
+#include <cstddef>
 #include <vector>
 
 #include "bitboard.hpp"
@@ -17,6 +18,22 @@ std::array<std::array<Bitboard, Squares::NB>, Colors::NB> pawnSinglePushes{};
 
 std::vector<Bitboard> bishopAttacks(BISHOP_ATTACK_NB);
 std::vector<Bitboard> rookAttacks(ROOK_ATTACK_NB);
+
+template <GenerationType T, Color US>
+size_t generateMovesByColor(const Position& position, std::array<Move, MAX_MOVES>& moveList) {}
+
+template <GenerationType T>
+size_t generateMoves(const Position& position, std::array<Move, MAX_MOVES>& moveList) {
+    Color us = position.turn();
+
+    return us == Colors::WHITE ? generateMovesByColor<T, Colors::WHITE>(position, moveList)
+                               : generateMovesByColor<T, Colors::BLACK>(position, moveList);
+}
+
+template size_t generateMoves<CAPTURE>(const Position&, std::array<Move, MAX_MOVES>&);
+template size_t generateMoves<NON_CAPTURE>(const Position&, std::array<Move, MAX_MOVES>&);
+template size_t generateMoves<EVASION>(const Position&, std::array<Move, MAX_MOVES>&);
+template size_t generateMoves<NON_EVASION>(const Position&, std::array<Move, MAX_MOVES>&);
 
 Bitboard getRookAttacks(Square square, Bitboard occupancy) {
     Bitboard attackBB = Bitboards::ZERO;
