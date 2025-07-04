@@ -1,6 +1,8 @@
 #ifndef SQUARE_HPP
 #define SQUARE_HPP
 
+#include <netinet/in.h>
+
 #include <array>
 #include <cstdint>
 #include <cstdlib>
@@ -8,8 +10,10 @@
 #include "piece.hpp"
 
 struct File {
+   private:
     uint8_t m_val;
 
+   public:
     // clang-format off
     enum value : uint8_t { 
         FA, FB, FC, FD, FE, FF, FG, FH, 
@@ -42,8 +46,10 @@ struct File {
 };
 
 struct Rank {
+   private:
     uint8_t m_val;
 
+   public:
     // clang-format off
     enum : uint8_t { 
         R1, R2, R3, R4, R5, R6, R7, R8,
@@ -83,8 +89,10 @@ struct Rank {
 };
 
 struct Square {
+   private:
     uint8_t m_val;
 
+   public:
     // clang-format off
     enum : uint8_t {
         A1, B1, C1, D1, E1, F1, G1, H1,
