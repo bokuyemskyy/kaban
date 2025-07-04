@@ -19,10 +19,7 @@ const int      MAX_MOVES_PER_POS = 256;
 
 class Position {
    public:
-    Position(const std::string &fen = DEFAULT_FEN) {
-        setFromFEN(fen);
-        updateCachedState();
-    }
+    Position(const std::string &fen = DEFAULT_FEN) { setFromFEN(fen); }
 
     void                      setFromFEN(const std::string &fen);
     [[nodiscard]] std::string toFEN() const;
@@ -33,7 +30,6 @@ class Position {
 
     [[nodiscard]] Piece pieceAt(Square square) const { return m_board[square]; };
 
-    void updateCachedState();
     void toggleTurn();
 
     [[nodiscard]] bool isLegal();

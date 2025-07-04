@@ -3,15 +3,27 @@
 !*.*
 !*/
 
-########## CMAKE AND CLANG ##########
+########## CMAKE ##########
 
 /build/
 /out/
+
+########## CLANG ##########
+
 /.cache/
 
-########## PROJECT-SPECIFIC ##########
+########## IMGUI ##########
 
 imgui.ini
+
+########## DOXYGEN ##########
+
+!Doxyfile
+
+########## VCPKG ##########
+
+/vcpkg_installed/
+/vcpkg/
 
 ########## C++ GENERAL ##########
 
@@ -45,7 +57,3 @@ imgui.ini
 
 !README
 !LICENSE
-
-########## OTHER ##########
-
-!Doxyfile
