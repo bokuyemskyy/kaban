@@ -3,13 +3,13 @@
   "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "documentNamespace": "https://spdx.org/spdxdocs/gtest-x64-linux-1.16.0#1-9efadf41-3ba0-4674-8b08-399598ca210e",
-  "name": "gtest:x64-linux@1.16.0#1 94fc882da384073c5fcd83288aa770b33a15ed019c1605bb3a9d6ab65ea8039d",
+  "documentNamespace": "https://spdx.org/spdxdocs/gtest-x64-linux-1.17.0#1-b2cf4d06-d4a6-4164-b224-8d019e98546a",
+  "name": "gtest:x64-linux@1.17.0#1 915d99896b365ad2377dcd05ce8edd473c2d42ac17399e393f93d8effb005098",
   "creationInfo": {
     "creators": [
-      "Tool: vcpkg-2025-03-22-d4dd14112c2026ee57e59f966ecfa3b9137bd143"
+      "Tool: vcpkg-2025-06-20-ef7c0d541124bbdd334a03467e7edb6c3364d199"
     ],
-    "created": "2025-05-17T08:04:32Z"
+    "created": "2025-07-04T09:41:32Z"
   },
   "relationships": [
     {
@@ -68,6 +68,11 @@
       "relatedSpdxElement": "SPDXRef-port"
     },
     {
+      "spdxElementId": "SPDXRef-file-2",
+      "relationshipType": "DEPENDENCY_MANIFEST_OF",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
       "spdxElementId": "SPDXRef-file-3",
       "relationshipType": "CONTAINED_BY",
       "relatedSpdxElement": "SPDXRef-port"
@@ -87,8 +92,8 @@
     {
       "name": "gtest",
       "SPDXID": "SPDXRef-port",
-      "versionInfo": "1.16.0#1",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "1.17.0#1",
+      "downloadLocation": "git+https://github.com/Microsoft/vcpkg#ports/gtest",
       "homepage": "https://github.com/google/googletest",
       "licenseConcluded": "BSD-3-Clause",
       "licenseDeclared": "NOASSERTION",
@@ -99,7 +104,7 @@
     {
       "name": "gtest:x64-linux",
       "SPDXID": "SPDXRef-binary",
-      "versionInfo": "94fc882da384073c5fcd83288aa770b33a15ed019c1605bb3a9d6ab65ea8039d",
+      "versionInfo": "915d99896b365ad2377dcd05ce8edd473c2d42ac17399e393f93d8effb005098",
       "downloadLocation": "NONE",
       "licenseConcluded": "BSD-3-Clause",
       "licenseDeclared": "NOASSERTION",
@@ -109,21 +114,21 @@
     {
       "SPDXID": "SPDXRef-resource-0",
       "name": "google/googletest",
-      "downloadLocation": "git+https://github.com/google/googletest@v1.16.0",
+      "downloadLocation": "git+https://github.com/google/googletest@v1.17.0",
       "licenseConcluded": "NOASSERTION",
       "licenseDeclared": "NOASSERTION",
       "copyrightText": "NOASSERTION",
       "checksums": [
         {
           "algorithm": "SHA512",
-          "checksumValue": "bec8dad2a5abbea8e9e5f0ceedd8c9dbdb8939e9f74785476b0948f21f5db5901018157e78387e106c6717326558d6642fc0e39379c62af57bf1205a9df8a18b"
+          "checksumValue": "0f57e9ef06925e5b7722df1eb92ef5850e8dce79220ea16a8aaff586a71c0b01460ef1713649ee24ffedb2e6ad5a51e9198c5a5ae1b2789e43feb1f494e7d45c"
         }
       ]
     }
   ],
   "files": [
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/gtest/fix-main-lib-path.patch",
+      "fileName": "./fix-main-lib-path.patch",
       "SPDXID": "SPDXRef-file-0",
       "checksums": [
         {
@@ -135,7 +140,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/gtest/usage",
+      "fileName": "./usage",
       "SPDXID": "SPDXRef-file-1",
       "checksums": [
         {
@@ -147,31 +152,31 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/gtest/vcpkg.json",
+      "fileName": "./vcpkg.json",
       "SPDXID": "SPDXRef-file-2",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "91dcdf645f7523338fa7d74332ed5f140837ad5bc99d7952e3a55a817bab31c4"
+          "checksumValue": "9fa95846e919ec6c0dc1c92f16bac1131822f63cf6645861bc9727f63c58ed6e"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/gtest/portfile.cmake",
+      "fileName": "./portfile.cmake",
       "SPDXID": "SPDXRef-file-3",
       "checksums": [
         {
           "algorithm": "SHA256",
-          "checksumValue": "91e9824300769d9362f91dca62ef253f0d354769d19f6432d80f9321a8401788"
+          "checksumValue": "11d3a2bd842617a753197a21f56888823a58121f23322b0b06b820b1f430cc5c"
         }
       ],
       "licenseConcluded": "NOASSERTION",
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/gtest/001-fix-UWP-death-test.patch",
+      "fileName": "./001-fix-UWP-death-test.patch",
       "SPDXID": "SPDXRef-file-4",
       "checksums": [
         {
@@ -183,7 +188,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/gtest/clang-tidy-no-lint.patch",
+      "fileName": "./clang-tidy-no-lint.patch",
       "SPDXID": "SPDXRef-file-5",
       "checksums": [
         {

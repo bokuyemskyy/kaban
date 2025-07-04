@@ -103,10 +103,10 @@ void Position::unsetPiece(Square square) {
 }
 void Position::resetBoard() {
     for (uint8_t i = 0; i < Colors::NB; ++i) {
-        m_colorBB[i] = BITBOARD_ZERO;
+        m_colorBB[i] = Bitboards::ZERO;
     }
     for (uint8_t i = 0; i < PieceTypes::NB; ++i) {
-        m_pieceTypeBB[i] = BITBOARD_ZERO;
+        m_pieceTypeBB[i] = Bitboards::ZERO;
     }
     for (uint8_t i = 0; i < Squares::NB; ++i) {
         m_board[i] = Pieces::NONE;

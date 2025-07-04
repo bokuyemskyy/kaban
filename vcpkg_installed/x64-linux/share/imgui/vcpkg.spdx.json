@@ -3,13 +3,13 @@
   "spdxVersion": "SPDX-2.2",
   "dataLicense": "CC0-1.0",
   "SPDXID": "SPDXRef-DOCUMENT",
-  "documentNamespace": "https://spdx.org/spdxdocs/imgui-x64-linux-1.91.9-4ce4d8c1-20f5-4e49-a660-5ae462dc4936",
-  "name": "imgui:x64-linux@1.91.9 2990cb6833f9f24714ded033b9f66daed4bebb8aeb67b3dbc66869c86ca68b3b",
+  "documentNamespace": "https://spdx.org/spdxdocs/imgui-x64-linux-1.91.9-ca4f32de-15a2-4025-8a9b-c245dd891fec",
+  "name": "imgui:x64-linux@1.91.9 3b31b8d6b1a768c154e11f465367b29f8d9fcb8d9f0fdb93f4fea2fb5a357e38",
   "creationInfo": {
     "creators": [
-      "Tool: vcpkg-2025-03-22-d4dd14112c2026ee57e59f966ecfa3b9137bd143"
+      "Tool: vcpkg-2025-06-20-ef7c0d541124bbdd334a03467e7edb6c3364d199"
     ],
-    "created": "2025-05-17T08:04:44Z"
+    "created": "2025-07-04T09:41:44Z"
   },
   "relationships": [
     {
@@ -58,6 +58,11 @@
       "relatedSpdxElement": "SPDXRef-port"
     },
     {
+      "spdxElementId": "SPDXRef-file-2",
+      "relationshipType": "DEPENDENCY_MANIFEST_OF",
+      "relatedSpdxElement": "SPDXRef-port"
+    },
+    {
       "spdxElementId": "SPDXRef-file-3",
       "relationshipType": "CONTAINED_BY",
       "relatedSpdxElement": "SPDXRef-port"
@@ -68,7 +73,7 @@
       "name": "imgui",
       "SPDXID": "SPDXRef-port",
       "versionInfo": "1.91.9",
-      "downloadLocation": "NOASSERTION",
+      "downloadLocation": "git+https://github.com/Microsoft/vcpkg#ports/imgui",
       "homepage": "https://github.com/ocornut/imgui",
       "licenseConcluded": "MIT",
       "licenseDeclared": "NOASSERTION",
@@ -79,7 +84,7 @@
     {
       "name": "imgui:x64-linux",
       "SPDXID": "SPDXRef-binary",
-      "versionInfo": "2990cb6833f9f24714ded033b9f66daed4bebb8aeb67b3dbc66869c86ca68b3b",
+      "versionInfo": "3b31b8d6b1a768c154e11f465367b29f8d9fcb8d9f0fdb93f4fea2fb5a357e38",
       "downloadLocation": "NONE",
       "licenseConcluded": "MIT",
       "licenseDeclared": "NOASSERTION",
@@ -146,7 +151,7 @@
   ],
   "files": [
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/imgui/CMakeLists.txt",
+      "fileName": "./CMakeLists.txt",
       "SPDXID": "SPDXRef-file-0",
       "checksums": [
         {
@@ -158,7 +163,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/imgui/imgui-config.cmake.in",
+      "fileName": "./imgui-config.cmake.in",
       "SPDXID": "SPDXRef-file-1",
       "checksums": [
         {
@@ -170,7 +175,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/imgui/vcpkg.json",
+      "fileName": "./vcpkg.json",
       "SPDXID": "SPDXRef-file-2",
       "checksums": [
         {
@@ -182,7 +187,7 @@
       "copyrightText": "NOASSERTION"
     },
     {
-      "fileName": ".//home/amon/Code/kaban/third_party/vcpkg/ports/imgui/portfile.cmake",
+      "fileName": "./portfile.cmake",
       "SPDXID": "SPDXRef-file-3",
       "checksums": [
         {
