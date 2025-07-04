@@ -2,14 +2,24 @@
 #define MOVEGEN_HPP
 
 #include <array>
+#include <cstddef>
 #include <iostream>
+#include <vector>
 
 #include "bitboard.hpp"
 #include "position.hpp"
 
 namespace Movegen {
 
-constexpr uint8_t MAX_MOVES = 256;  // limit of possible number of moves that can be performed from any position
+constexpr int MAX_MOVES = 256;  // limit of possible number of moves that can be performed from any position
+
+enum GenerationType {
+    CAPTURE,
+    NON_CAPTURE,
+    EVASION,
+    NON_EVASION,
+    LEGAL
+};
 
 extern std::array<std::array<Bitboard, Squares::NB>, PieceTypes::NB> pseudoAttacks;
 
@@ -22,12 +32,20 @@ const int ROOK_ATTACK_NB   = 0x19000;
 extern std::vector<Bitboard> bishopAttacks;
 extern std::vector<Bitboard> rookAttacks;
 
-template <PieceType PieceType>
-Bitboard getMovesBB(Square square);
-
 void init();
 
-size_t generatePseudoLegalMoves(std::vector<Move>& moveStack);
+template <GenerationType T>
+class MoveList {
+   private:
+    std::array<Move, MAX_MOVES> moveList;
+    size_t                      size;
+
+   public:
+    explicit MoveList(const Position& position) : size(generateMoves<T>(position, moveList)) {}
+};
+
+template <GenerationType>
+size_t generateMoves(const Position& position, std::array<Move, MAX_MOVES>& moveList);
 
 template <bool Root>
 int perft(Position& position, int depth, std::vector<Move>& moveStack) {

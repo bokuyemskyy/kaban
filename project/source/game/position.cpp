@@ -116,14 +116,6 @@ void Position::resetBoard() {
 
 inline void Position::toggleTurn() { m_turn = !m_turn; }
 
-void Position::updateCachedState() {
-    m_wking     = lsb(m_colorBB[Colors::WHITE] & m_pieceTypeBB[PieceTypes::KING]);
-    m_bking     = lsb(m_colorBB[Colors::BLACK] & m_pieceTypeBB[PieceTypes::KING]);
-    m_occupancy = m_colorBB[Colors::WHITE] | m_colorBB[Colors::BLACK];
-    m_us        = m_turn;
-    m_them      = !m_turn;
-}
-
 void Position::doMove(const Move move) {
     Square from = getFrom(move);
     Square to   = getTo(move);
