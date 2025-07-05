@@ -4,8 +4,8 @@
 #include <array>
 #include <cstdint>
 
+#include "coordinate.hpp"
 #include "direction.hpp"
-#include "navigation.hpp"
 
 class Bitboard {
    private:
