@@ -12,32 +12,97 @@ class Bitboard {
     uint64_t m_val;
 
    public:
-    constexpr Bitboard(uint64_t val) : m_val(val) {};
+    constexpr Bitboard(uint64_t val = zero()) : m_val(val) {};
 
     constexpr operator uint64_t() const { return m_val; }
 
     static constexpr uint64_t zero() { return 0ULL; }
 
-    extern std::array<Bitboard, Ranks::NB> rankBBs;
-    extern std::array<Bitboard, Files::NB> fileBBs;
+    static Bitboard rankBB(Rank rank) {
+        static auto table = [] {
+            std::array<Bitboard, Rank::NB> t{};
 
-    extern std::array<Bitboard, Squares::NB> diagBBs;
-    extern std::array<Bitboard, Squares::NB> antiDiagBBs;
+            Bitboard RANK_A = 0xFFULL;
 
-    static constexpr Bitboard squareBB(Square square) {
-        assert(square.isValid());
-        return 1ULL << square;
+            for (Rank i = Rank::FIRST; i <= Rank::LAST; ++i) {
+                t[i] = (RANK_A << (i * File::NB));
+            }
+            return t;
+        }();
+
+        return table[rank];
     }
+
+    static Bitboard fileBB(File file) {
+        static auto table = [] {
+            std::array<Bitboard, File::NB> t{};
+
+            Bitboard FILE_A = 0x0101010101010101ULL;
+
+            for (File i = File::FIRST; i <= File::LAST; ++i) {
+                t[i] = (FILE_A << i);
+            }
+            return t;
+        }();
+
+        return table[file];
+    }
+
+    static constexpr Bitboard squareBB(Square sq) { return Bitboard(1ULL << uint8_t(sq)); }
+
     constexpr Bitboard destinationBB(Square square, Direction direction) {
         Square destination = square + direction;
         return (isValid(destination) && Squares::distance(square, destination) <= 2) ? squareBB(destination) : ZERO;
     };
 
-    constexpr Bitboard rankBB(Rank rank) { return rankBBs[rank]; }
-    constexpr Bitboard fileBB(File file) { return fileBBs[file]; }
-    constexpr Bitboard diagBB(Square square) { return diagBBs[square]; }
-    constexpr Bitboard antiDiagBB(Square square) { return antiDiagBBs[square]; }
+    static Bitboard diagBB(Square square) {
+        static auto table = [] {
+            std::array<Bitboard, Square::NB> t{};
+            for (Square sq = Square::FIRST; sq <= Square::LAST; ++sq) {
+                Bitboard diag   = zero();
+                File     sqFile = sq.file();
+                Rank     sqRank = sq.rank();
 
-}  // namespace Bitboards
+                for (Rank r = Rank::FIRST; r <= Rank::LAST; ++r) {
+                    for (File f = File::FIRST; f <= File::LAST; ++f) {
+                        Square possibleSq = Square::create(f, r);
+                        // same diagonal if file - rank == sqFile - sqRank
+                        if ((int)f - (int)r == (int)sqFile - (int)sqRank) {
+                            diag = diag | squareBB(possibleSq);
+                        }
+                    }
+                }
+                t[sq] = diag;
+            }
+            return t;
+        }();
+        return table[square];
+    }
+
+    // Anti-diagonal bitboards (top-right to bottom-left)
+    static Bitboard antiDiagBB(Square square) {
+        static auto table = [] {
+            std::array<Bitboard, Square::NB> t{};
+            for (Square sq = Square::FIRST; sq <= Square::LAST; ++sq) {
+                Bitboard antiDiag = zero();
+                File     sqFile   = sq.file();
+                Rank     sqRank   = sq.rank();
+
+                for (Rank r = Rank::FIRST; r <= Rank::LAST; ++r) {
+                    for (File f = File::FIRST; f <= File::LAST; ++f) {
+                        Square possibleSq = Square::create(f, r);
+                        // same anti-diagonal if file + rank == sqFile + sqRank
+                        if ((int)f + (int)r == (int)sqFile + (int)sqRank) {
+                            antiDiag = antiDiag | squareBB(possibleSq);
+                        }
+                    }
+                }
+                t[sq] = antiDiag;
+            }
+            return t;
+        }();
+        return table[square];
+    }
+};
 
 #endif
