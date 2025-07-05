@@ -3,19 +3,18 @@
 
 #include <array>
 #include <cstdint>
-#include <cstdlib>
 #include <iostream>
 #include <string_view>
 
 #include "piece.hpp"
 
 template <typename Derived>
-struct BoardCoordinate {
+struct Coordinate {
    protected:
     uint8_t m_val;
 
    private:
-    constexpr BoardCoordinate(uint8_t val) : m_val(val) {}
+    constexpr Coordinate(uint8_t val) : m_val(val) {}
 
    public:
     constexpr operator uint8_t() const { return m_val; }
@@ -24,21 +23,32 @@ struct BoardCoordinate {
 
     constexpr Derived& operator++() {
         ++m_val;
-        return *this;
+        return static_cast<Derived&>(*this);
     }
+
     constexpr Derived operator++(int) {
-        Derived old = *this;
+        Derived old = static_cast<Derived&>(*this);
         ++(*this);
         return old;
     }
+
+    constexpr bool operator<(const Derived& other) const { return m_val < other.m_val; }
+    constexpr bool operator>(const Derived& other) const { return m_val > other.m_val; }
+    constexpr bool operator<=(const Derived& other) const { return m_val <= other.m_val; }
+    constexpr bool operator>=(const Derived& other) const { return m_val >= other.m_val; }
+    constexpr bool operator==(const Derived& other) const { return m_val == other.m_val; };
 
     friend std::ostream& operator<<(std::ostream& os, const Derived& obj) {
         obj.print(os);
         return os;
     };
     friend Derived;
+
+    static constexpr Derived first() noexcept { return Derived(Derived::FIRST); }
+    static constexpr Derived last() noexcept { return Derived(Derived::LAST); }
+    static constexpr Derived none() noexcept { return Derived(Derived::NONE); }
 };
-struct File : BoardCoordinate<File> {
+struct File : Coordinate<File> {
    public:
     // clang-format off
     enum : uint8_t { 
@@ -54,7 +64,7 @@ struct File : BoardCoordinate<File> {
     };
     // clang-format on
 
-    constexpr File(uint8_t val = NONE) : BoardCoordinate(val) {}
+    constexpr File(uint8_t val = NONE) : Coordinate(val) {}
 
     static constexpr uint8_t distance(File from, File to) { return from > to ? from - to : to - from; }
 
@@ -67,7 +77,7 @@ struct File : BoardCoordinate<File> {
     }
 };
 
-struct Rank : BoardCoordinate<Rank> {
+struct Rank : Coordinate<Rank> {
    public:
     // clang-format off
     enum : uint8_t { 
@@ -83,7 +93,7 @@ struct Rank : BoardCoordinate<Rank> {
     };
     // clang-format on
 
-    constexpr Rank(uint8_t val = NONE) : BoardCoordinate(val) {}
+    constexpr Rank(uint8_t val = NONE) : Coordinate(val) {}
 
     static constexpr uint8_t distance(Rank from, Rank to) { return from > to ? from - to : to - from; }
 
@@ -95,15 +105,15 @@ struct Rank : BoardCoordinate<Rank> {
     }
 
     void print(std::ostream& os) const {
-        static constexpr std::string_view fileToChar = "12345678";
+        static constexpr std::string_view rankToChar = "12345678";
         if (isValid()) {
-            os << fileToChar[m_val];
+            os << rankToChar[m_val];
         } else
             os << '?';
     }
 };
 
-struct Square : BoardCoordinate<Square> {
+struct Square : Coordinate<Square> {
    public:
     // clang-format off
     enum : uint8_t {
@@ -126,7 +136,7 @@ struct Square : BoardCoordinate<Square> {
     };
     // clang-format on
 
-    constexpr Square(uint8_t val = NONE) : BoardCoordinate(val) {}
+    constexpr Square(uint8_t val = NONE) : Coordinate(val) {}
 
     [[nodiscard]] constexpr File file() const { return m_val & File::MASK; }
     [[nodiscard]] constexpr Rank rank() const { return m_val >> File::SIZE; }
@@ -136,15 +146,19 @@ struct Square : BoardCoordinate<Square> {
     static constexpr uint8_t distance(Square from, Square to) {
         static constexpr auto table = []() constexpr {
             std::array<std::array<uint8_t, NB>, NB> t{};
-            for (uint8_t i = FIRST; i <= LAST; ++i) {
-                for (uint8_t j = FIRST; j <= LAST; ++j) {
-                    auto from = Square(i), to = Square(j);
-                    t[i][j] = std::max(File::distance(from.file(), to.file()), Rank::distance(from.rank(), to.rank()));
+            for (Square i = Square::first(); i <= Square::last(); ++i) {
+                for (Square j = Square::first(); j <= Square::last(); ++j) {
+                    t[i][j] = std::max(File::distance(i.file(), j.file()), Rank::distance(i.rank(), j.rank()));
                 }
             }
             return t;
         }();
         return table[from][to];
+    }
+
+    void print(std::ostream& os) const {
+        file().print(os);
+        rank().print(os);
     }
 };
 
