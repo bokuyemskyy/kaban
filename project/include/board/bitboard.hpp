@@ -16,7 +16,14 @@ class Bitboard {
 
     constexpr operator uint64_t() const { return m_val; }
 
-    static constexpr uint64_t zero() { return 0ULL; }
+    static constexpr Bitboard zero() { return 0ULL; }
+
+    static constexpr Bitboard squareBB(Square sq) { return (1ULL << uint8_t(sq)); }
+
+    static constexpr Bitboard destinationBB(Square square, Direction direction) {
+        Square destination = square + direction;
+        return (destination.isValid() && Square::distance(square, destination) <= 2) ? squareBB(destination) : zero();
+    };
 
     static Bitboard rankBB(Rank rank) {
         static auto table = [] {
@@ -47,14 +54,6 @@ class Bitboard {
 
         return table[file];
     }
-
-    static constexpr Bitboard squareBB(Square sq) { return Bitboard(1ULL << uint8_t(sq)); }
-
-    constexpr Bitboard destinationBB(Square square, Direction direction) {
-        Square destination = square + direction;
-        return (isValid(destination) && Squares::distance(square, destination) <= 2) ? squareBB(destination) : ZERO;
-    };
-
     static Bitboard diagBB(Square square) {
         static auto table = [] {
             std::array<Bitboard, Square::NB> t{};
@@ -66,8 +65,7 @@ class Bitboard {
                 for (Rank r = Rank::FIRST; r <= Rank::LAST; ++r) {
                     for (File f = File::FIRST; f <= File::LAST; ++f) {
                         Square possibleSq = Square::create(f, r);
-                        // same diagonal if file - rank == sqFile - sqRank
-                        if ((int)f - (int)r == (int)sqFile - (int)sqRank) {
+                        if (f - r == sqFile - sqRank) {
                             diag = diag | squareBB(possibleSq);
                         }
                     }
@@ -78,8 +76,6 @@ class Bitboard {
         }();
         return table[square];
     }
-
-    // Anti-diagonal bitboards (top-right to bottom-left)
     static Bitboard antiDiagBB(Square square) {
         static auto table = [] {
             std::array<Bitboard, Square::NB> t{};
@@ -91,8 +87,7 @@ class Bitboard {
                 for (Rank r = Rank::FIRST; r <= Rank::LAST; ++r) {
                     for (File f = File::FIRST; f <= File::LAST; ++f) {
                         Square possibleSq = Square::create(f, r);
-                        // same anti-diagonal if file + rank == sqFile + sqRank
-                        if ((int)f + (int)r == (int)sqFile + (int)sqRank) {
+                        if (f + r == sqFile + sqRank) {
                             antiDiag = antiDiag | squareBB(possibleSq);
                         }
                     }
