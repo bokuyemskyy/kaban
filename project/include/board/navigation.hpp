@@ -6,6 +6,8 @@
 #include <array>
 #include <cstdint>
 #include <cstdlib>
+#include <iostream>
+#include <string_view>
 
 #include "piece.hpp"
 
@@ -15,7 +17,7 @@ struct File {
 
    public:
     // clang-format off
-    enum value : uint8_t { 
+    enum : uint8_t { 
         FA, FB, FC, FD, FE, FF, FG, FH, 
         
         FIRST = FA,
@@ -43,6 +45,15 @@ struct File {
     }
 
     static constexpr uint8_t distance(File from, File to) { return abs(from - to); }
+
+    friend std::ostream& operator<<(std::ostream& os, const File& file) {
+        static constexpr std::string_view fileToChar = "ABCDEFGH";
+        if (file <= File::LAST) {
+            os << fileToChar[file];
+        } else
+            os << '?';
+        return os;
+    }
 };
 
 struct Rank {
@@ -85,6 +96,15 @@ struct Rank {
     }
     [[nodiscard]] constexpr bool pawnPromoting(Color color) const {
         return (color == Colors::WHITE && m_val == R8) || (color == Colors::BLACK && m_val == R1);
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Rank& rank) {
+        static constexpr std::string_view fileToChar = "12345678";
+        if (rank <= Rank::LAST) {
+            os << fileToChar[rank];
+        } else
+            os << '?';
+        return os;
     }
 };
 
@@ -147,6 +167,11 @@ struct Square {
     }
 
     [[nodiscard]] constexpr bool isValid() const { return m_val <= Square::LAST; }
+
+    friend std::ostream& operator<<(std::ostream& os, const Square& square) {
+        os << square.file() << square.rank();
+        return os;
+    }
 };
 
 #endif
