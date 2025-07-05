@@ -6,6 +6,7 @@
 
 #include "coordinate.hpp"
 #include "direction.hpp"
+#include "piece.hpp"
 
 class Bitboard {
    private:
@@ -31,7 +32,7 @@ class Bitboard {
 
             Bitboard RANK_A = 0xFFULL;
 
-            for (Rank i = Rank::FIRST; i <= Rank::LAST; ++i) {
+            for (Rank i = Rank::first(); i <= Rank::last(); ++i) {
                 t[i] = (RANK_A << (i * File::NB));
             }
             return t;
@@ -46,7 +47,7 @@ class Bitboard {
 
             Bitboard FILE_A = 0x0101010101010101ULL;
 
-            for (File i = File::FIRST; i <= File::LAST; ++i) {
+            for (File i = File::first(); i <= File::last(); ++i) {
                 t[i] = (FILE_A << i);
             }
             return t;
@@ -57,20 +58,20 @@ class Bitboard {
     static Bitboard diagBB(Square square) {
         static auto table = [] {
             std::array<Bitboard, Square::NB> t{};
-            for (Square sq = Square::FIRST; sq <= Square::LAST; ++sq) {
-                Bitboard diag   = zero();
-                File     sqFile = sq.file();
-                Rank     sqRank = sq.rank();
+            for (Square i = Square::first(); i <= Square::last(); ++i) {
+                Bitboard diag       = zero();
+                File     squareFile = i.file();
+                Rank     squareRank = i.rank();
 
-                for (Rank r = Rank::FIRST; r <= Rank::LAST; ++r) {
-                    for (File f = File::FIRST; f <= File::LAST; ++f) {
-                        Square possibleSq = Square::create(f, r);
-                        if (f - r == sqFile - sqRank) {
-                            diag = diag | squareBB(possibleSq);
+                for (Rank r = Rank::FIRST; r <= Rank::last(); ++r) {
+                    for (File f = File::FIRST; f <= File::last(); ++f) {
+                        Square possibleSquare = Square::create(f, r);
+                        if (f - r == squareFile - squareRank) {
+                            diag = diag | squareBB(possibleSquare);
                         }
                     }
                 }
-                t[sq] = diag;
+                t[i] = diag;
             }
             return t;
         }();
@@ -79,24 +80,28 @@ class Bitboard {
     static Bitboard antiDiagBB(Square square) {
         static auto table = [] {
             std::array<Bitboard, Square::NB> t{};
-            for (Square sq = Square::FIRST; sq <= Square::LAST; ++sq) {
-                Bitboard antiDiag = zero();
-                File     sqFile   = sq.file();
-                Rank     sqRank   = sq.rank();
+            for (Square i = Square::first(); i <= Square::last(); ++i) {
+                Bitboard antiDiag   = zero();
+                File     squareFile = i.file();
+                Rank     squareRank = i.rank();
 
-                for (Rank r = Rank::FIRST; r <= Rank::LAST; ++r) {
-                    for (File f = File::FIRST; f <= File::LAST; ++f) {
-                        Square possibleSq = Square::create(f, r);
-                        if (f + r == sqFile + sqRank) {
-                            antiDiag = antiDiag | squareBB(possibleSq);
+                for (Rank r = Rank::first(); r <= Rank::last(); ++r) {
+                    for (File f = File::first(); f <= File::last(); ++f) {
+                        Square possibleSquare = Square::create(f, r);
+                        if (f + r == squareFile + squareRank) {
+                            antiDiag = antiDiag | squareBB(possibleSquare);
                         }
                     }
                 }
-                t[sq] = antiDiag;
+                t[i] = antiDiag;
             }
             return t;
         }();
         return table[square];
+    }
+    template <PieceType PT>
+    static constexpr Bitboard attacksBB(Square square, Bitboard occupied) {
+        switch (PT) { case  }
     }
 };
 
