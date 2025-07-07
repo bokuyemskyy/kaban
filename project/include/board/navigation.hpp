@@ -11,7 +11,7 @@
 #include "iterator.hpp"
 
 template <typename Derived>
-struct Coordinate : Iteratable<Derived> {
+struct Coordinate : Iterable<Derived> {
    public:
     constexpr void                  set(uint8_t value) { m_value = value; }
     [[nodiscard]] constexpr uint8_t value() const { return m_value; }
