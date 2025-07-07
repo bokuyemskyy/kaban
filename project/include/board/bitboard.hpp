@@ -32,8 +32,8 @@ class Bitboard {
 
             Bitboard RANK_A = 0xFFULL;
 
-            for (Rank i = Rank::first(); i <= Rank::last(); ++i) {
-                t[i] = (RANK_A << (i * File::NB));
+            for (auto rank : Rank::all()) {
+                t[rank.value()] = (RANK_A << (rank.value() * File::number()));
             }
             return t;
         }();
