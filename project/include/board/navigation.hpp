@@ -4,7 +4,6 @@
 #include <sys/types.h>
 
 #include <array>
-#include <cctype>
 #include <cstdint>
 #include <iostream>
 #include <string_view>
