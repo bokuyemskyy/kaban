@@ -6,31 +6,34 @@
 
 #include "piece.hpp"
 
-using Direction = int8_t;
-namespace Directions {
-enum value : int8_t {
-    E = 1,
-    N = 8,
-    W = -1,
-    S = -8,
+struct Direction {
+   public:
+    enum Value : int8_t {
+        E = 1,
+        N = 8,
+        W = -1,
+        S = -8,
 
-    NE = N + E,
-    SE = S + E,
-    NW = N + W,
-    SW = S + W,
+        NE = N + E,
+        SE = S + E,
+        NW = N + W,
+        SW = S + W,
 
-    NNE = N + N + E,
-    ENE = E + E + N,
-    ESE = E + E + S,
-    SSE = S + S + E,
-    SSW = S + S + W,
-    WSW = W + W + S,
-    WNW = W + W + N,
-    NNW = N + N + W,
+        NNE = N + N + E,
+        ENE = E + E + N,
+        ESE = E + E + S,
+        SSE = S + S + E,
+        SSW = S + S + W,
+        WSW = W + W + S,
+        WNW = W + W + N,
+        NNW = N + N + W,
 
-    NONE = 0
+        NONE = 0
+    };
+
+   private:
+    uint8_t m_val;
 };
-}  // namespace Directions
 
 constexpr int PAWN_DIRECTIONS_NB        = 1;
 constexpr int PAWN_ATTACK_DIRECTIONS_NB = 2;
