@@ -19,15 +19,17 @@ struct Coordinate {
     [[nodiscard]] constexpr uint8_t& value() { return m_val; }
     [[nodiscard]] constexpr uint8_t  value() const { return m_val; }
 
-    [[nodiscard]] constexpr bool ok() const { return m_val <= static_cast<uint8_t>(Derived::Value::LAST); }
+    [[nodiscard]] constexpr bool ok() const { return m_val <= Derived::LAST; }
 
-    [[nodiscard]] static constexpr Derived first() { return Derived(Derived::Value::FIRST); }
-    [[nodiscard]] static constexpr Derived last() { return Derived(Derived::Value::LAST); }
-    [[nodiscard]] static constexpr Derived none() { return Derived(Derived::Value::NONE); }
+    [[nodiscard]] static constexpr Derived first() { return Derived::FIRST; }
+    [[nodiscard]] static constexpr Derived last() { return Derived::LAST; }
+    [[nodiscard]] static constexpr Derived none() { return Derived::NONE; }
 
-    [[nodiscard]] static constexpr uint8_t number() { return static_cast<uint8_t>(Derived::Value::NB); }
-    [[nodiscard]] static constexpr uint8_t mask() { return static_cast<uint8_t>(Derived::Value::MASK); }
-    [[nodiscard]] static constexpr uint8_t size() { return static_cast<uint8_t>(Derived::Value::SIZE); }
+    [[nodiscard]] static constexpr uint8_t number() { return Derived::NB; }
+    [[nodiscard]] static constexpr uint8_t mask() { return Derived::MASK; }
+    [[nodiscard]] static constexpr uint8_t size() { return Derived::SIZE; }
+
+    constexpr operator uint8_t() { return m_val; }
 
     class iterator {
        public:
@@ -43,7 +45,7 @@ struct Coordinate {
         constexpr pointer   operator->() const { return &current_; }
 
         constexpr iterator& operator++() {
-            ++current_.value();
+            ++current_;
             return *this;
         }
 
@@ -53,7 +55,7 @@ struct Coordinate {
             return tmp;
         }
 
-        constexpr bool operator==(const iterator& other) const { return current_.value() == other.current_.value(); }
+        constexpr bool operator==(const iterator& other) const { return current_ == other.current_; }
 
         constexpr bool operator!=(const iterator& other) const { return !(*this == other); }
 
@@ -63,61 +65,48 @@ struct Coordinate {
 
     class range {
        public:
-        constexpr iterator begin() const { return iterator(static_cast<uint8_t>(Derived::Value::FIRST)); }
-        constexpr iterator end() const { return iterator(static_cast<uint8_t>(Derived::Value::LAST) + 1); }
+        constexpr iterator begin() const { return iterator(Derived::FIRST); }
+        constexpr iterator end() const { return iterator(Derived::LAST + 1); }
     };
 
     [[nodiscard]] static constexpr range all() { return range{}; }
-    constexpr Derived                    operator-(const Derived& other) const {
-        return Derived(static_cast<const Derived*>(this)->value() - other.value());
-    }
+
+    constexpr Derived operator-(const Derived& other) const { return Derived(m_val - other.m_val); }
 
     constexpr Derived& operator+=(const Derived& other) {
-        static_cast<Derived*>(this)->value() += other.value();
+        m_val += other.m_val;
         return static_cast<Derived&>(*this);
     }
 
     constexpr Derived& operator-=(const Derived& other) {
-        static_cast<Derived*>(this)->value() -= other.value();
+        m_val -= other.m_val;
         return static_cast<Derived&>(*this);
     }
 
     template <typename T>
     constexpr Derived operator+(T offset) const {
-        return Derived(static_cast<const Derived*>(this)->value() + offset);
+        return Derived(m_val + offset);
     }
 
     template <typename T>
     constexpr Derived operator-(T offset) const {
-        return Derived(static_cast<const Derived*>(this)->value() - offset);
+        return Derived(m_val - offset);
     }
 
-    constexpr bool operator<(const Derived& other) const {
-        return static_cast<const Derived*>(this)->value() < other.value();
-    }
+    constexpr bool operator<(const Derived& other) const { return m_val < other.m_val; }
 
-    constexpr bool operator>(const Derived& other) const {
-        return static_cast<const Derived*>(this)->value() > other.value();
-    }
+    constexpr bool operator>(const Derived& other) const { return m_val > other.m_val; }
 
-    constexpr bool operator<=(const Derived& other) const {
-        return static_cast<const Derived*>(this)->value() <= other.value();
-    }
+    constexpr bool operator<=(const Derived& other) const { return m_val <= other.m_val; }
 
-    constexpr bool operator>=(const Derived& other) const {
-        return static_cast<const Derived*>(this)->value() >= other.value();
-    }
+    constexpr bool operator>=(const Derived& other) const { return m_val >= other.m_val; }
 
-    constexpr bool operator==(const Derived& other) const {
-        return static_cast<const Derived*>(this)->value() == other.value();
-    }
+    constexpr bool operator==(const Derived& other) const { return m_val == other.m_val; }
 
-    constexpr bool operator!=(const Derived& other) const {
-        return static_cast<const Derived*>(this)->value() != other.value();
-    }
+    constexpr bool operator!=(const Derived& other) const { return m_val != other.m_val; }
 
     constexpr Derived& operator++() {
-        ++static_cast<Derived*>(this)->value();
+        ++m_val;
         return static_cast<Derived&>(*this);
     }
 
@@ -128,7 +117,7 @@ struct Coordinate {
     }
 
     constexpr Derived& operator--() {
-        --static_cast<Derived*>(this)->value();
+        --m_val;
         return static_cast<Derived&>(*this);
     }
 
@@ -148,12 +137,12 @@ struct Coordinate {
    private:
     uint8_t m_val;
 
-    constexpr Coordinate(uint8_t val) : m_val(val) {}
+    constexpr Coordinate(uint8_t val = none()) : m_val(val) {}
 };
 
 struct File : Coordinate<File> {
     // clang-format off
-    enum class Value : uint8_t { 
+    enum : uint8_t { 
         FA, FB, FC, FD, FE, FF, FG, FH, 
 
         FIRST = FA,
@@ -168,10 +157,9 @@ struct File : Coordinate<File> {
 
     static constexpr std::string_view fileToChar = "abcdefgh";
 
-    explicit constexpr File(uint8_t val = none().value()) : Coordinate(val) {}
-    explicit constexpr File(int val = none().value()) : Coordinate(val) {}
-    constexpr File(Value val = static_cast<Value>(none().value())) : Coordinate(static_cast<uint8_t>(val)) {}
-    explicit constexpr File(char c) : Coordinate(none().value()) {
+    constexpr File(uint8_t val = none()) : Coordinate(val) {}
+    constexpr File(int val = none()) : Coordinate(val) {}
+    explicit constexpr File(char c) {
         if (c >= 'a' && c <= 'h') {
             m_val = static_cast<uint8_t>(c - 'a');
         } else if (c >= 'A' && c <= 'H') {
@@ -179,9 +167,7 @@ struct File : Coordinate<File> {
         }
     }
 
-    static constexpr uint8_t distance(File from, File to) {
-        return from > to ? from.value() - to.value() : to.value() - from.value();
-    }
+    static constexpr uint8_t distance(File from, File to) { return from > to ? from - to : to - from; }
 
     void print(std::ostream& os) const {
         if (ok()) {
@@ -194,7 +180,7 @@ struct File : Coordinate<File> {
 struct Rank : Coordinate<Rank> {
    public:
     // clang-format off
-    enum Value : uint8_t { 
+    enum : uint8_t { 
         R1, R2, R3, R4, R5, R6, R7, R8,
         
         FIRST = R1,
@@ -209,14 +195,11 @@ struct Rank : Coordinate<Rank> {
 
     static constexpr std::string_view rankToChar = "12345678";
 
-    explicit constexpr Rank(uint8_t val = none().value()) : Coordinate(val) {}
-    explicit constexpr Rank(int val = none().value()) : Coordinate(val) {}
-    constexpr Rank(Value val = static_cast<Value>(none().value())) : Coordinate(static_cast<uint8_t>(val)) {}
-    explicit constexpr Rank(char c) : Coordinate(none().value()) { m_val = static_cast<uint8_t>(c - '1'); }
+    constexpr Rank(uint8_t val = none()) : Coordinate(val) {}
+    constexpr Rank(int val = none()) : Coordinate(val) {}
+    explicit constexpr Rank(char c) { m_val = static_cast<uint8_t>(c - '1'); }
 
-    static constexpr uint8_t distance(Rank from, Rank to) {
-        return from > to ? from.value() - to.value() : to.value() - from.value();
-    }
+    static constexpr uint8_t distance(Rank from, Rank to) { return from > to ? from - to : to - from; }
 
     [[nodiscard]] constexpr bool pawnStarting(Color color) const {
         return (color == Colors::WHITE && m_val == R2) || (color == Colors::BLACK && m_val == R7);
@@ -236,7 +219,7 @@ struct Rank : Coordinate<Rank> {
 struct Square : Coordinate<Square> {
    public:
     // clang-format off
-    enum Value : uint8_t {
+    enum : uint8_t {
         A1, B1, C1, D1, E1, F1, G1, H1,
         A2, B2, C2, D2, E2, F2, G2, H2,
         A3, B3, C3, D3, E3, F3, G3, H3,
@@ -256,11 +239,10 @@ struct Square : Coordinate<Square> {
     };
     // clang-format on
 
-    explicit constexpr Square(uint8_t val = none().value()) : Coordinate(val) {}
-    explicit constexpr Square(int val = none().value()) : Coordinate(val) {}
-    constexpr Square(Value val = static_cast<Value>(none().value())) : Coordinate(static_cast<uint8_t>(val)) {}
-    explicit constexpr Square(File file, Rank rank) : Coordinate((rank.value() << File::size()) | file.value()) {}
-    explicit constexpr Square(std::string_view str) : Coordinate(none().value()) {
+    constexpr Square(uint8_t val = none()) : Coordinate(val) {}
+    constexpr Square(int val = none()) : Coordinate(val) {}
+    explicit constexpr Square(File file, Rank rank) : Coordinate((rank << File::size()) | file) {}
+    explicit constexpr Square(std::string_view str) : Coordinate() {
         if (str.size() == 2) {
             File file(str[0]);
             Rank rank(str[1]);
@@ -270,21 +252,20 @@ struct Square : Coordinate<Square> {
         }
     }
 
-    [[nodiscard]] constexpr File file() const { return File(m_val & File::mask()); }
-    [[nodiscard]] constexpr Rank rank() const { return Rank(m_val >> File::size()); }
+    [[nodiscard]] constexpr File file() const { return m_val & File::mask(); }
+    [[nodiscard]] constexpr Rank rank() const { return m_val >> File::size(); }
 
     static constexpr uint8_t distance(Square from, Square to) {
         static constexpr auto table = []() constexpr {
             std::array<std::array<uint8_t, NB>, NB> t{};
-            for (Square i = Square::first(); i <= Square::last(); ++i) {
-                for (Square j = Square::first(); j <= Square::last(); ++j) {
-                    t[i.value()][j.value()] =
-                        std::max(File::distance(i.file(), j.file()), Rank::distance(i.rank(), j.rank()));
+            for (auto i : Square::all()) {
+                for (auto j : Square::all()) {
+                    t[i][j] = std::max(File::distance(i.file(), j.file()), Rank::distance(i.rank(), j.rank()));
                 }
             }
             return t;
         }();
-        return table[from.value()][to.value()];
+        return table[from][to];
     }
 
     void print(std::ostream& os) const {
