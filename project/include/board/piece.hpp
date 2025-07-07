@@ -1,104 +1,176 @@
 #ifndef PIECE_HPP
 #define PIECE_HPP
 
+#include <sys/types.h>
+
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
+#include <ostream>
 #include <string_view>
 
-using PieceType = uint8_t;
-namespace PieceTypes {
-enum value : PieceType {
-    PAWN   = 0b000,
-    KNIGHT = 0b001,
-    BISHOP = 0b010,
-    ROOK   = 0b011,
-    QUEEN  = 0b100,
-    KING   = 0b101,
+#include "iterator.hpp"
 
-    FIRST = PAWN,
-    LAST  = KING,
+struct PieceType : Iterable<PieceType> {
+   public:
+    enum : uint8_t {
+        PAWN   = 0b000,
+        KNIGHT = 0b001,
+        BISHOP = 0b010,
+        ROOK   = 0b011,
+        QUEEN  = 0b100,
+        KING   = 0b101,
 
-    NONE = 0b111,
-    MASK = 0b111,
-    SIZE = 3,
-    NB   = 6
+        FIRST = PAWN,
+        LAST  = KING,
+
+        MASK = 0b111,
+        SIZE = 3,
+        NB   = 6
+    };
+
+    constexpr PieceType(uint8_t value) : m_value(value) {}
+
+    [[nodiscard]] static constexpr uint8_t number() { return NB; }
+    [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
+    [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
+
+    constexpr operator uint8_t() { return m_value; }
+
+   private:
+    uint8_t m_value;
 };
-}  // namespace PieceTypes
 
-using Color = uint8_t;
-namespace Colors {
-enum value : uint8_t {
-    WHITE = 0,
-    BLACK = 1,
+struct Color : Iterable<Color> {
+   public:
+    enum : uint8_t {
+        WHITE = 0,
+        BLACK = 1,
 
-    MASK = 0b1,
-    SIZE = 1,
-    NB   = 2
+        MASK = 0b1,
+        SIZE = 1,
+        NB   = 2
+    };
+
+    constexpr Color(uint8_t value) : m_value(value) {}
+
+    [[nodiscard]] static constexpr uint8_t number() { return NB; }
+    [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
+    [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
+
+    constexpr operator uint8_t() { return m_value; }
+
+   private:
+    uint8_t m_value;
 };
-}  // namespace Colors
 
-using Piece = uint8_t;
-namespace Pieces {
-enum value : uint8_t {
-    WPAWN   = static_cast<uint8_t>(Colors::WHITE << 3) | static_cast<uint8_t>(PieceTypes::PAWN),
-    WKNIGHT = static_cast<uint8_t>(Colors::WHITE << 3) | static_cast<uint8_t>(PieceTypes::KNIGHT),
-    WBISHOP = static_cast<uint8_t>(Colors::WHITE << 3) | static_cast<uint8_t>(PieceTypes::BISHOP),
-    WROOK   = static_cast<uint8_t>(Colors::WHITE << 3) | static_cast<uint8_t>(PieceTypes::ROOK),
-    WQUEEN  = static_cast<uint8_t>(Colors::WHITE << 3) | static_cast<uint8_t>(PieceTypes::QUEEN),
-    WKING   = static_cast<uint8_t>(Colors::WHITE << 3) | static_cast<uint8_t>(PieceTypes::KING),
+struct Piece {
+    enum : uint8_t {
+        WPAWN   = (Color::WHITE << PieceType::size()) | PieceType::PAWN,
+        WKNIGHT = (Color::WHITE << PieceType::size()) | PieceType::KNIGHT,
+        WBISHOP = (Color::WHITE << PieceType::size()) | PieceType::BISHOP,
+        WROOK   = (Color::WHITE << PieceType::size()) | PieceType::ROOK,
+        WQUEEN  = (Color::WHITE << PieceType::size()) | PieceType::QUEEN,
+        WKING   = (Color::WHITE << PieceType::size()) | PieceType::KING,
 
-    BPAWN   = static_cast<uint8_t>(Colors::BLACK << 3) | static_cast<uint8_t>(PieceTypes::PAWN),
-    BKNIGHT = static_cast<uint8_t>(Colors::BLACK << 3) | static_cast<uint8_t>(PieceTypes::KNIGHT),
-    BBISHOP = static_cast<uint8_t>(Colors::BLACK << 3) | static_cast<uint8_t>(PieceTypes::BISHOP),
-    BROOK   = static_cast<uint8_t>(Colors::BLACK << 3) | static_cast<uint8_t>(PieceTypes::ROOK),
-    BQUEEN  = static_cast<uint8_t>(Colors::BLACK << 3) | static_cast<uint8_t>(PieceTypes::QUEEN),
-    BKING   = static_cast<uint8_t>(Colors::BLACK << 3) | static_cast<uint8_t>(PieceTypes::KING),
+        BPAWN   = (Color::BLACK << PieceType::size()) | PieceType::PAWN,
+        BKNIGHT = (Color::BLACK << PieceType::size()) | PieceType::KNIGHT,
+        BBISHOP = (Color::BLACK << PieceType::size()) | PieceType::BISHOP,
+        BROOK   = (Color::BLACK << PieceType::size()) | PieceType::ROOK,
+        BQUEEN  = (Color::BLACK << PieceType::size()) | PieceType::QUEEN,
+        BKING   = (Color::BLACK << PieceType::size()) | PieceType::KING,
 
-    FIRST = WPAWN,
-    LAST  = BKING,
+        FIRST = WPAWN,
+        LAST  = BKING,
 
-    NONE = 0b1111,
-    MASK = 0b1111,
-    SIZE = 4,
-    NB   = 12
+        MASK = 0b1111,
+        SIZE = 4,
+        NB   = 12
+    };
+
+    static constexpr std::string_view pieceToChar = "PNBRQK  pnbrqk";
+
+    constexpr Piece(uint8_t value) : m_value(value) {}
+    explicit constexpr Piece(PieceType pieceType, Color color) : m_value((color << PieceType::size()) | pieceType) {}
+    explicit constexpr Piece(char c) {
+        size_t index = pieceToChar.find(c);
+        m_value      = (index != std::string_view::npos) ? static_cast<uint8_t>(index) : 0;
+    }
+
+    [[nodiscard]] constexpr bool ok() const { return m_value <= LAST && m_value != 6 && m_value != 7; }
+
+    [[nodiscard]] constexpr Color color() const { return m_value >> PieceType::size(); }
+    [[nodiscard]] constexpr Color pieceType() const { return m_value & PieceType::mask(); }
+
+    [[nodiscard]] static constexpr uint8_t number() { return NB; }
+    [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
+    [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
+
+    [[nodiscard]] static constexpr Piece first() { return Piece::FIRST; }
+    [[nodiscard]] static constexpr Piece last() { return Piece::LAST; }
+
+    class Iterator {
+       private:
+        uint8_t        m_current;
+        constexpr void skipInvalid() {
+            while (m_current <= Piece::LAST && !Piece(m_current).ok()) {
+                ++m_current;
+            }
+        }
+
+       public:
+        using iterator_category = std::forward_iterator_tag;
+        using value_type        = Piece;
+        using difference_type   = std::ptrdiff_t;
+        using pointer           = const Piece*;
+        using reference         = const Piece&;
+
+        constexpr Iterator(uint8_t value) : m_current(value) { skipInvalid(); }
+
+        constexpr Piece operator*() const { return m_current; }
+
+        constexpr Iterator& operator++() {
+            ++m_current;
+            skipInvalid();
+            return *this;
+        }
+
+        constexpr Iterator operator++(int) {
+            Iterator tmp = *this;
+            ++m_current;
+            skipInvalid();
+            return tmp;
+        }
+
+        constexpr bool operator==(const Iterator& other) const { return m_current == other.m_current; }
+
+        constexpr bool operator!=(const Iterator& other) const { return m_current != other.m_current; }
+    };
+
+    class Range {
+       public:
+        [[nodiscard]] constexpr Iterator begin() const { return Piece::FIRST; }
+        [[nodiscard]] constexpr Iterator end() const { return Piece::LAST + 1; }
+    };
+
+    [[nodiscard]] static constexpr Range all() { return Range{}; }
+
+    constexpr operator uint8_t() { return m_value; }
+
+    friend std::ostream& operator<<(std::ostream& os, const Piece& obj) {
+        obj.print(os);
+        return os;
+    }
+
+    void print(std::ostream& os) const {
+        if (ok()) {
+            os << pieceToChar[m_value];
+        } else
+            os << '?';
+    }
+
+   private:
+    uint8_t m_value;
 };
-}  // namespace Pieces
-
-// ############### Helpers ###############
-
-// ##### Color #####
-
-inline Color getColor(Piece piece) {
-    assert(piece != Pieces::NONE);
-    return (piece >> PieceTypes::SIZE) & Colors::MASK;
-}
-
-// ##### Piece #####
-
-inline Piece createPiece(Color color, PieceType pieceType) {
-    assert(color < Colors::NB);
-    assert(pieceType != PieceTypes::NONE);
-    return static_cast<Piece>((color << PieceTypes::SIZE) | pieceType);
-}
-
-constexpr std::string_view charPieceMap = "PNBRQK  pnbrqk?";
-
-constexpr Piece charToPiece(char c) {
-    const auto *it = std::ranges::find(charPieceMap, c);
-    return it != charPieceMap.end() ? Pieces::value(it - charPieceMap.begin()) : Pieces::NONE;
-}
-
-constexpr char pieceToChar(Piece p) {
-    assert(p != Pieces::NONE);
-    return charPieceMap[p];
-}
-
-// ##### Piece Type #####
-
-inline PieceType getPieceType(Piece piece) {
-    assert(piece != Pieces::NONE);
-    return piece & PieceTypes::MASK;
-}
 
 #endif

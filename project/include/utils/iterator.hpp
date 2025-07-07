@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <iterator>
 template <typename Derived>
-struct Iteratable {
+struct Iterable {
     [[nodiscard]] static constexpr Derived first() { return Derived::FIRST; }
     [[nodiscard]] static constexpr Derived last() { return Derived::LAST; }
 
@@ -16,7 +16,7 @@ struct Iteratable {
         using pointer           = const Derived*;
         using reference         = const Derived&;
 
-        constexpr Iterator(uint8_t val) : m_current(val) {}
+        constexpr Iterator(uint8_t value) : m_current(value) {}
 
         constexpr Derived operator*() const { return m_current; }
 
