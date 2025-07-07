@@ -14,10 +14,8 @@
 template <typename Derived>
 struct Coordinate {
    public:
-    constexpr void set(uint8_t v) { m_val = v; }
-
-    [[nodiscard]] constexpr uint8_t& value() { return m_val; }
-    [[nodiscard]] constexpr uint8_t  value() const { return m_val; }
+    constexpr void                  set(uint8_t val) { m_val = val; }
+    [[nodiscard]] constexpr uint8_t value() const { return m_val; }
 
     [[nodiscard]] constexpr bool ok() const { return m_val <= Derived::LAST; }
 
@@ -65,8 +63,8 @@ struct Coordinate {
 
     class range {
        public:
-        constexpr iterator begin() const { return iterator(Derived::FIRST); }
-        constexpr iterator end() const { return iterator(Derived::LAST + 1); }
+        [[nodiscard]] constexpr iterator begin() const { return iterator(Derived::FIRST); }
+        [[nodiscard]] constexpr iterator end() const { return iterator(Derived::LAST + 1); }
     };
 
     [[nodiscard]] static constexpr range all() { return range{}; }
@@ -273,5 +271,58 @@ struct Square : Coordinate<Square> {
         rank().print(os);
     }
 };
+
+struct Direction {
+   public:
+    enum : int8_t {
+        E = 1,
+        N = 8,
+        W = -1,
+        S = -8,
+
+        NE = N + E,
+        SE = S + E,
+        NW = N + W,
+        SW = S + W,
+
+        NNE = N + N + E,
+        ENE = E + E + N,
+        ESE = E + E + S,
+        SSE = S + S + E,
+        SSW = S + S + W,
+        WSW = W + W + S,
+        WNW = W + W + N,
+        NNW = N + N + W,
+
+        NONE = 0
+    };
+
+    constexpr Direction(int8_t val) : m_val(val) {};
+
+    constexpr void                 set(int8_t val) { m_val = val; }
+    [[nodiscard]] constexpr int8_t value() const { return m_val; }
+
+    constexpr operator int8_t() const { return m_val; }
+
+   private:
+    int8_t m_val;
+};
+
+constexpr std::array<Direction, 1> whitePawnPushDirections = {Direction::N};
+
+constexpr std::array<Direction, 2> whitePawnAttackDirections = {Direction::NE, Direction::NW};
+
+constexpr std::array<Direction, 8> knightDirections = {Direction::NNE, Direction::NNW, Direction::ENE, Direction::WNW,
+                                                       Direction::SSE, Direction::SSW, Direction::ESE, Direction::WSW};
+
+constexpr std::array<Direction, 4> bishopDirections = {Direction::NE, Direction::NW, Direction::SE, Direction::SW};
+
+constexpr std::array<Direction, 4> rookDirections = {Direction::N, Direction::S, Direction::E, Direction::W};
+
+constexpr std::array<Direction, 8> queenDirections = {Direction::NE, Direction::NW, Direction::SE, Direction::SW,
+                                                      Direction::N,  Direction::S,  Direction::E,  Direction::W};
+
+constexpr std::array<Direction, 8> kingDirections = {Direction::E,  Direction::N,  Direction::W,  Direction::S,
+                                                     Direction::NE, Direction::NW, Direction::SE, Direction::SW};
 
 #endif
