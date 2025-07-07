@@ -8,12 +8,12 @@
 
 class Bitboard {
    public:
-    constexpr Bitboard(uint64_t val = zero()) : m_val(val) {};
+    constexpr Bitboard(uint64_t value = zero()) : m_value(value) {};
 
-    constexpr void                   set(uint64_t val) { m_val = val; }
-    [[nodiscard]] constexpr uint64_t value() const { return m_val; }
+    constexpr void                   set(uint64_t value) { m_value = value; }
+    [[nodiscard]] constexpr uint64_t value() const { return m_value; }
 
-    constexpr operator uint64_t() const { return m_val; }
+    constexpr operator uint64_t() const { return m_value; }
 
     static constexpr Bitboard zero() { return 0ULL; }
 
@@ -30,8 +30,8 @@ class Bitboard {
 
             constexpr Bitboard RANK_A = 0xFFULL;
 
-            for (auto i : Rank::all()) {
-                t[i] = (RANK_A << (i * File::number()));
+            for (auto rank : Rank::all()) {
+                t[rank] = (RANK_A << (rank * File::number()));
             }
             return t;
         }();
@@ -45,8 +45,8 @@ class Bitboard {
 
             constexpr Bitboard FILE_A = 0x0101010101010101ULL;
 
-            for (auto i : File::all()) {
-                t[i] = (FILE_A << i);
+            for (auto file : File::all()) {
+                t[file] = (FILE_A << file);
             }
             return t;
         }();
@@ -103,7 +103,7 @@ class Bitboard {
     // };
 
    private:
-    uint64_t m_val;
+    uint64_t m_value;
 };
 
 #endif

@@ -1,3 +1,5 @@
+#ifndef ITERATOR_HPP
+#define ITERATOR_HPP
 #include <cstdint>
 #include <iterator>
 template <typename Derived>
@@ -44,3 +46,4 @@ struct Iterable {
 
     [[nodiscard]] static constexpr Range all() { return Range{}; }
 };
+#endif

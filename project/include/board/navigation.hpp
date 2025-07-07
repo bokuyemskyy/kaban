@@ -9,6 +9,7 @@
 #include <string_view>
 
 #include "iterator.hpp"
+#include "piece.hpp"
 
 template <typename Derived>
 struct Coordinate : Iterable<Derived> {
