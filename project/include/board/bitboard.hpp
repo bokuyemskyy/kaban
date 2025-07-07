@@ -9,11 +9,11 @@
 #include "piece.hpp"
 
 class Bitboard {
-   private:
-    uint64_t m_val;
-
    public:
     constexpr Bitboard(uint64_t val = zero()) : m_val(val) {};
+
+    constexpr void                   set(uint64_t val) { m_val = val; }
+    [[nodiscard]] constexpr uint64_t value() const { return m_val; }
 
     constexpr operator uint64_t() const { return m_val; }
 
@@ -33,7 +33,7 @@ class Bitboard {
             Bitboard RANK_A = 0xFFULL;
 
             for (auto rank : Rank::all()) {
-                t[rank.value()] = (RANK_A << (rank.value() * File::number()));
+                t[rank] = (RANK_A << (rank * File::number()));
             }
             return t;
         }();
@@ -102,7 +102,10 @@ class Bitboard {
     template <PieceType PT>
     static constexpr Bitboard attacksBB(Square square, Bitboard occupied) {
         switch (PT) { case  }
-    }
-};
+    };
+    
+   private:
+                uint64_t m_val;
+        };
 
 #endif
