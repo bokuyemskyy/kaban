@@ -7,7 +7,7 @@
 #include "navigation.hpp"
 #include "piece.hpp"
 
-class Bitboard {
+struct Bitboard {
    public:
     constexpr Bitboard(uint64_t value = zero()) : m_value(value) {};
 
@@ -24,6 +24,26 @@ class Bitboard {
         Square destination = square + direction;
         return (destination.ok() && Square::distance(square, destination) <= 2) ? squareBB(destination) : zero();
     };
+    [[nodiscard]] constexpr Bitboard shift(Direction direction) const {
+        switch (direction) {
+            case Direction::N:
+            case Direction::NN:
+                return m_value << direction;
+            case Direction::S:
+            case Direction::SS:
+                return m_value >> -direction;
+            case Direction::E:
+            case Direction::NE:
+            case Direction::SE:
+                return (m_value & ~fileBB(File::FH)) << direction;
+            case Direction::W:
+            case Direction::NW:
+            case Direction::SW:
+                return (m_value & ~fileBB(File::FA)) >> -direction;
+            default:
+                return zero();
+        }
+    }
 
     static Bitboard rankBB(Rank rank) {
         static constexpr auto table = []() constexpr {
