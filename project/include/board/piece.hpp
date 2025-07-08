@@ -1,9 +1,6 @@
 #ifndef PIECE_HPP
 #define PIECE_HPP
 
-#include <sys/types.h>
-
-#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <ostream>

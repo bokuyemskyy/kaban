@@ -5,6 +5,7 @@
 #include <cstdint>
 
 #include "navigation.hpp"
+#include "piece.hpp"
 
 class Bitboard {
    public:
@@ -97,10 +98,25 @@ class Bitboard {
         }();
         return table[square];
     }
-    // template <PieceType PT>
-    // static constexpr Bitboard attacksBB(Square square, Bitboard occupied) {
-    //     switch (PT) { case  }
-    // };
+    template <PieceType PT>
+    static constexpr Bitboard attacksBB(Square square, Bitboard occupied) {
+        switch (PT) {
+            case PieceType::PAWN:
+                break;
+            case PieceType::KNIGHT:
+                break;
+            case PieceType::BISHOP:
+                break;
+            case PieceType::ROOK:
+                break;
+            case PieceType::QUEEN:
+                break;
+            case PieceType::KING:
+                break;
+            default:
+                break;
+        }
+    };
 
    private:
     uint64_t m_value;
