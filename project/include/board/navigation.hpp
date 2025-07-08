@@ -27,62 +27,6 @@ struct Coordinate : Iterable<Derived> {
 
     constexpr operator uint8_t() { return m_value; }
 
-    constexpr Derived operator-(const Derived& other) const { return Derived(m_value - other.m_value); }
-
-    constexpr Derived& operator+=(const Derived& other) {
-        m_value += other.m_value;
-        return static_cast<Derived&>(*this);
-    }
-
-    constexpr Derived& operator-=(const Derived& other) {
-        m_value -= other.m_value;
-        return static_cast<Derived&>(*this);
-    }
-
-    template <typename T>
-    constexpr Derived operator+(T offset) const {
-        return Derived(m_value + offset);
-    }
-
-    template <typename T>
-    constexpr Derived operator-(T offset) const {
-        return Derived(m_value - offset);
-    }
-
-    constexpr bool operator<(const Derived& other) const { return m_value < other.m_value; }
-
-    constexpr bool operator>(const Derived& other) const { return m_value > other.m_value; }
-
-    constexpr bool operator<=(const Derived& other) const { return m_value <= other.m_value; }
-
-    constexpr bool operator>=(const Derived& other) const { return m_value >= other.m_value; }
-
-    constexpr bool operator==(const Derived& other) const { return m_value == other.m_value; }
-
-    constexpr bool operator!=(const Derived& other) const { return m_value != other.m_value; }
-
-    constexpr Derived& operator++() {
-        ++m_value;
-        return static_cast<Derived&>(*this);
-    }
-
-    constexpr Derived operator++(int) {
-        Derived old = static_cast<Derived&>(*this);
-        ++(*this);
-        return old;
-    }
-
-    constexpr Derived& operator--() {
-        --m_value;
-        return static_cast<Derived&>(*this);
-    }
-
-    constexpr Derived operator--(int) {
-        Derived old = static_cast<Derived&>(*this);
-        --(*this);
-        return old;
-    }
-
     friend std::ostream& operator<<(std::ostream& os, const Derived& obj) {
         obj.print(os);
         return os;
