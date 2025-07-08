@@ -238,6 +238,9 @@ struct Direction {
         W = -1,
         S = -8,
 
+        NN = N + N,
+        SS = S + S,
+
         NE = N + E,
         SE = S + E,
         NW = N + W,
