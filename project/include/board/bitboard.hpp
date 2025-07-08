@@ -19,12 +19,12 @@ struct Bitboard {
     static constexpr Bitboard zero() { return 0ULL; }
 
     static constexpr Bitboard squareBB(Square square) { return (1ULL << square); }
-
     static constexpr Bitboard destinationBB(Square square, Direction direction) {
         Square destination = square + direction;
         return (destination.ok() && Square::distance(square, destination) <= 2) ? squareBB(destination) : zero();
     };
-    [[nodiscard]] constexpr Bitboard shift(Direction direction) const {
+
+    [[nodiscard]] constexpr Bitboard shifted(Direction direction) const {
         switch (direction) {
             case Direction::N:
             case Direction::NN:
