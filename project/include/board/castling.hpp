@@ -3,26 +3,37 @@
 
 #include <cstdint>
 
-using Castling = uint8_t;
-namespace Castlings {
-enum value : std::uint8_t {
-    WKINGSIDE  = 0b0001,
-    WQUEENSIDE = 0b0010,
-    BKINGSIDE  = 0b0100,
-    BQUEENSIDE = 0b1000,
+class Castling {
+    enum : std::uint8_t {
+        W_KING_SIDE  = 0b0001,
+        W_QUEEN_SIDE = 0b0010,
+        B_KING_SIDE  = 0b0100,
+        B_QUEEN_SIDE = 0b1000,
 
-    KINGSIDE  = WKINGSIDE | BKINGSIDE,    // 0b0101
-    QUEENSIDE = WQUEENSIDE | BQUEENSIDE,  // 0b1010
-    WSIDE     = WKINGSIDE | WQUEENSIDE,   // 0b0011
-    BSIDE     = BKINGSIDE | BQUEENSIDE,   // 0b1100
-    ANY       = WSIDE | BSIDE,            // 0b1111
+        KING_SIDE  = W_KING_SIDE | B_KING_SIDE,    // 0b0101
+        QUEEN_SIDE = W_QUEEN_SIDE | B_QUEEN_SIDE,  // 0b1010
+        W_SIDE     = W_KING_SIDE | W_QUEEN_SIDE,   // 0b0011
+        B_SIDE     = B_KING_SIDE | B_QUEEN_SIDE,   // 0b1100
+        ANY        = W_SIDE | B_SIDE,              // 0b1111
 
-    NONE = 0b0000,
+        NONE = 0b0000,
 
-    MASK = 0b1111,
-    SIZE = 4,
-    NB   = 4
+        MASK = 0b1111,
+        SIZE = 4,
+        NB   = 4
+    };
+
+    constexpr Castling(uint8_t value) : m_value(value) {}
+
+    [[nodiscard]] static constexpr uint8_t none() { return NONE; }
+
+    [[nodiscard]] static constexpr uint8_t number() { return NB; }
+    [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
+    [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
+
+    constexpr operator uint8_t() { return m_value; }
+
+   private:
+    uint8_t m_value;
 };
-}  // namespace Castlings
-
 #endif
