@@ -63,22 +63,22 @@ struct Color : Iterable<Color> {
 
 struct Piece {
     enum : uint8_t {
-        WPAWN   = (Color::WHITE << PieceType::size()) | PieceType::PAWN,
-        WKNIGHT = (Color::WHITE << PieceType::size()) | PieceType::KNIGHT,
-        WBISHOP = (Color::WHITE << PieceType::size()) | PieceType::BISHOP,
-        WROOK   = (Color::WHITE << PieceType::size()) | PieceType::ROOK,
-        WQUEEN  = (Color::WHITE << PieceType::size()) | PieceType::QUEEN,
-        WKING   = (Color::WHITE << PieceType::size()) | PieceType::KING,
+        W_PAWN   = (Color::WHITE << PieceType::size()) | PieceType::PAWN,
+        W_KNIGHT = (Color::WHITE << PieceType::size()) | PieceType::KNIGHT,
+        W_BISHOP = (Color::WHITE << PieceType::size()) | PieceType::BISHOP,
+        W_ROOK   = (Color::WHITE << PieceType::size()) | PieceType::ROOK,
+        W_QUEEN  = (Color::WHITE << PieceType::size()) | PieceType::QUEEN,
+        W_KING   = (Color::WHITE << PieceType::size()) | PieceType::KING,
 
-        BPAWN   = (Color::BLACK << PieceType::size()) | PieceType::PAWN,
-        BKNIGHT = (Color::BLACK << PieceType::size()) | PieceType::KNIGHT,
-        BBISHOP = (Color::BLACK << PieceType::size()) | PieceType::BISHOP,
-        BROOK   = (Color::BLACK << PieceType::size()) | PieceType::ROOK,
-        BQUEEN  = (Color::BLACK << PieceType::size()) | PieceType::QUEEN,
-        BKING   = (Color::BLACK << PieceType::size()) | PieceType::KING,
+        B_PAWN   = (Color::BLACK << PieceType::size()) | PieceType::PAWN,
+        B_KNIGHT = (Color::BLACK << PieceType::size()) | PieceType::KNIGHT,
+        B_BISHOP = (Color::BLACK << PieceType::size()) | PieceType::BISHOP,
+        B_ROOK   = (Color::BLACK << PieceType::size()) | PieceType::ROOK,
+        B_QUEEN  = (Color::BLACK << PieceType::size()) | PieceType::QUEEN,
+        B_KING   = (Color::BLACK << PieceType::size()) | PieceType::KING,
 
-        FIRST = WPAWN,
-        LAST  = BKING,
+        FIRST = W_PAWN,
+        LAST  = B_KING,
 
         MASK = 0b1111,
         SIZE = 4,
