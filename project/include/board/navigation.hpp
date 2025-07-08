@@ -198,7 +198,7 @@ struct Square : Coordinate<Square> {
     constexpr Square(uint8_t value = none()) : Coordinate(value) {}
     constexpr Square(int value = none()) : Coordinate(value) {}
     explicit constexpr Square(File file, Rank rank) : Coordinate((rank << File::size()) | file) {}
-    explicit constexpr Square(std::string_view str) : Coordinate() {
+    explicit constexpr Square(std::string_view str) {
         if (str.size() == 2) {
             File file(str[0]);
             Rank rank(str[1]);
