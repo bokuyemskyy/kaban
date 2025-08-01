@@ -26,6 +26,7 @@ endforeach()
 
 
 add_compile_options(
+    -fconstexpr-steps=10000000
     -Wall
     -Werror
     -Wextra

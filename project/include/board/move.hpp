@@ -57,7 +57,7 @@ struct Promotion {
 };
 struct Move {
    public:
-    constexpr Move(uint16_t value) : m_value(value) {};
+    constexpr Move(uint16_t value = 0) : m_value(value) {};
     constexpr Move(Square from, Square to, Flag flag, Promotion promotion)
         : m_value((promotion << (2 * Square::size() + Flag::size())) | (flag << (2 * Square::size())) |
                   (to << Square::size()) | from) {};

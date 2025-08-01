@@ -4,9 +4,9 @@
 #include <stdexcept>
 #include <string>
 
+#include "navigation.hpp"
 #include "piece.hpp"
 #include "resource_manager.hpp"
-#include "square.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -77,7 +77,7 @@ void Renderer::drawGame() {
 
     const float PX_FILE_NB =
         std::min(availSize.x, availSize.y) - static_cast<float>(2 * (FONT_SIZE + WINDOW_PADDING + BOARD_MARGIN));
-    const float  SQUARE_SIZE = PX_FILE_NB / static_cast<float>(Files::NB);
+    const float  SQUARE_SIZE = PX_FILE_NB / static_cast<float>(File::NB);
     const ImVec2 CHAR_SIZE   = ImGui::CalcTextSize("A");
 
     drawList->AddText(ImVec2(gameStartPos.x, gameStartPos.y), IM_WHITE, "Player Black");
@@ -87,8 +87,8 @@ void Renderer::drawGame() {
     ImVec2 boardStartPos =
         ImVec2(gameStartPos.x + ((availSize.x - PX_FILE_NB) / 2), gameStartPos.y + ((availSize.y - PX_FILE_NB) / 2));
 
-    for (int row = 0; row < Files::NB; ++row) {
-        for (int col = 0; col < Files::NB; ++col) {
+    for (int row = 0; row < File::NB; ++row) {
+        for (int col = 0; col < File::NB; ++col) {
             ImVec2 squarePos = boardStartPos;
             squarePos.x += col * SQUARE_SIZE;
             squarePos.y += row * SQUARE_SIZE;
@@ -101,7 +101,7 @@ void Renderer::drawGame() {
 
             Piece piece = m_games->at(0).getPosition().pieceAt((7 - row) * 8 + col);
 
-            if (piece != Pieces::NONE) {
+            if (piece != Piece::NONE) {
                 drawList->AddImage(
                     pieceTextures[piece], ImVec2(squarePos.x + PIECE_MARGIN, squarePos.y + PIECE_MARGIN),
                     ImVec2(squarePos.x + SQUARE_SIZE - PIECE_MARGIN, squarePos.y + SQUARE_SIZE - PIECE_MARGIN));
@@ -109,8 +109,8 @@ void Renderer::drawGame() {
         }
     }
 
-    for (int row = 0; row < Files::NB; ++row) {
-        std::string label = std::to_string(Files::NB - row);
+    for (int row = 0; row < File::NB; ++row) {
+        std::string label = std::to_string(File::NB - row);
 
         drawList->AddText(ImVec2(boardStartPos.x - CHAR_SIZE.x - PIECE_MARGIN,
                                  boardStartPos.y + (row * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.y / 2)),
@@ -119,7 +119,7 @@ void Renderer::drawGame() {
                                  boardStartPos.y + (row * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.y / 2)),
                           IM_WHITE, label.c_str());
     }
-    for (int col = 0; col < Files::NB; ++col) {
+    for (int col = 0; col < File::NB; ++col) {
         std::string label(1, static_cast<char>(a_CHAR + col));
 
         drawList->AddText(ImVec2(boardStartPos.x + (col * SQUARE_SIZE) + (SQUARE_SIZE / 2) - (CHAR_SIZE.x / 2),
@@ -243,14 +243,11 @@ void Renderer::updateTime() {
 void Renderer::fillFrame(float r, float g, float b, float a) { m_glfw.fillFrame(r, g, b, a); }
 
 void Renderer::loadTextures() {
-    pieceTextures.reserve(Pieces::LAST);
-    for (uint8_t i = 0; i <= Pieces::LAST; ++i) {
-        std::string name(1, pieceToChar(i));
-        if (name != " " && name != "?") {
-            GLuint texture = loadTextureFromResources(name + ".png");
-            if (texture == 0) throw std::runtime_error("Failed to load a texture");
-            pieceTextures[i] = texture;
-        }
+    for (Piece i : Piece::all()) {
+        std::string name(1, i.to_char());
+        GLuint      texture = loadTextureFromResources(name + ".png");
+        if (texture == 0) throw std::runtime_error("Failed to load a texture");
+        pieceTextures[i] = texture;
     }
 }
 

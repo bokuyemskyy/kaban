@@ -21,10 +21,10 @@ enum GenerationType {
     LEGAL
 };
 
-extern std::array<std::array<Bitboard, Squares::NB>, PieceTypes::NB> pseudoAttacks;
+extern std::array<std::array<Bitboard, Square::NB>, PieceType::NB> pseudoAttacks;
 
-extern std::array<std::array<Bitboard, Squares::NB>, Colors::NB> pawnAttacks;
-extern std::array<std::array<Bitboard, Squares::NB>, Colors::NB> pawnSinglePushes;
+extern std::array<std::array<Bitboard, Square::NB>, Color::NB> pawnAttacks;
+extern std::array<std::array<Bitboard, Square::NB>, Color::NB> pawnSinglePushes;
 
 const int BISHOP_ATTACK_NB = 0x1480;
 const int ROOK_ATTACK_NB   = 0x19000;
@@ -63,8 +63,7 @@ int perft(Position& position, int depth, std::vector<Move>& moveStack) {
             } else {
                 int subnodes = perft<false>(position, depth - 1, moveStack);
                 if constexpr (Root) {
-                    std::cout << squareToString(getFrom(move)) << squareToString(getTo(move)) << ": " << subnodes
-                              << '\n';
+                    std::cout << move.from() << move.to() << ": " << subnodes << '\n';
                 }
                 nodes += subnodes;
             }

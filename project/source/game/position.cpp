@@ -24,7 +24,7 @@ void Position::setFromFEN(const std::string &fen) {
     while (std::getline(ss, argument, ' ')) {
         switch (argument_index) {
             case 0: {
-                int current_rank = Files::NB - 1;
+                int current_rank = File::NB - 1;
                 int current_file = 0;
 
                 for (char c : argument) {
@@ -44,9 +44,9 @@ void Position::setFromFEN(const std::string &fen) {
             }
             case 1:
                 if (argument == "w")
-                    m_turn = Colors::WHITE;
+                    m_turn = Color::WHITE;
                 else
-                    m_turn = Colors::BLACK;
+                    m_turn = Color::BLACK;
                 break;
             default:
                 break;
@@ -58,13 +58,13 @@ void Position::setFromFEN(const std::string &fen) {
 std::string Position::toFEN() const {
     std::stringstream fen;
 
-    for (int r = Ranks::NB - 1; r >= 0; r--) {
+    for (int r = Rank::NB - 1; r >= 0; r--) {
         int empty = 0;
-        for (int f = 0; f < Files::NB; ++f) {
+        for (int f = 0; f < File::NB; ++f) {
             Square s = createSquare(File(f), Rank(r));
             Piece  p = m_board[s];
 
-            if (p == Pieces::NONE) {
+            if (p == Piece::NONE) {
                 ++empty;
             } else {
                 if (empty > 0) {
@@ -84,8 +84,8 @@ std::string Position::toFEN() const {
 }
 
 void Position::setPiece(Square square, Piece piece) {
-    assert(square != Squares::NONE);
-    assert(piece != Pieces::NONE);
+    assert(square != Square::NONE);
+    assert(piece != Piece::NONE);
 
     unsetPiece(square);
     m_colorBB[getColor(piece)] |= squareBB(square);
@@ -94,24 +94,24 @@ void Position::setPiece(Square square, Piece piece) {
 }
 
 void Position::unsetPiece(Square square) {
-    assert(square != Squares::NONE);
+    assert(square != Square::NONE);
 
-    if (m_board[square] == Pieces::NONE) return;
+    if (m_board[square] == Piece::NONE) return;
     m_colorBB[getColor(m_board[square])] &= ~squareBB(square);
     m_pieceTypeBB[getPieceType(m_board[square])] &= ~squareBB(square);
-    m_board[square] = Pieces::NONE;
+    m_board[square] = Piece::NONE;
 }
 void Position::resetBoard() {
-    for (uint8_t i = 0; i < Colors::NB; ++i) {
-        m_colorBB[i] = Bitboards::ZERO;
+    for (uint8_t i = 0; i < Color::NB; ++i) {
+        m_colorBB[i] = Bitboard::zero();
     }
-    for (uint8_t i = 0; i < PieceTypes::NB; ++i) {
-        m_pieceTypeBB[i] = Bitboards::ZERO;
+    for (uint8_t i = 0; i < PieceType::NB; ++i) {
+        m_pieceTypeBB[i] = Bitboard::zero();
     }
-    for (uint8_t i = 0; i < Squares::NB; ++i) {
-        m_board[i] = Pieces::NONE;
+    for (uint8_t i = 0; i < Square::NB; ++i) {
+        m_board[i] = Piece::NONE;
     }
-    m_turn = Colors::WHITE;
+    m_turn = Color::WHITE;
 }
 
 inline void Position::toggleTurn() { m_turn = !m_turn; }
@@ -125,7 +125,7 @@ void Position::doMove(const Move move) {
     m_deltas.emplace_back(createDelta(m_board[to], m_castling, 0, m_halfmoves));
     m_moves.emplace_back(move);
 
-    if (m_board[to] != Pieces::NONE) {
+    if (m_board[to] != Piece::NONE) {
         Bitboard maskBB = ~squareBB(to);
         m_colorBB[getColor(m_board[to])] &= maskBB;
         m_pieceTypeBB[getPieceType(m_board[to])] &= maskBB;
@@ -135,7 +135,7 @@ void Position::doMove(const Move move) {
     m_pieceTypeBB[getPieceType(m_board[from])] ^= moveBB;
 
     m_board[to]   = m_board[from];
-    m_board[from] = Pieces::NONE;
+    m_board[from] = Piece::NONE;
 
     toggleTurn();
 
@@ -165,7 +165,7 @@ void Position::undoMove() {
     m_colorBB[getColor(movedPiece)] ^= moveBB;
     m_pieceTypeBB[getPieceType(movedPiece)] ^= moveBB;
 
-    if (capturedPiece != Pieces::NONE) {
+    if (capturedPiece != Piece::NONE) {
         Bitboard toBB = squareBB(to);
         m_colorBB[getColor(capturedPiece)] |= toBB;
         m_pieceTypeBB[getPieceType(capturedPiece)] |= toBB;

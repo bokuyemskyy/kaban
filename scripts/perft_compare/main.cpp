@@ -9,7 +9,9 @@
 #include <unordered_map>
 #include <vector>
 
-namespace bp = boost::process;
+/// BOOST NO LONGER HAS IPSTREAM/OPSTREAM. NEEDS REFACTOR
+
+/*namespace bp = boost::process;
 
 std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w";
 int         depth;
@@ -189,4 +191,6 @@ int main(int argc, char* argv[]) {
     kbReader.join();
 
     return 0;
-}
+}*/
+
+int main() {}

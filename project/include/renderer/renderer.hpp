@@ -1,7 +1,6 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
 
-#include <unordered_map>
 #include <vector>
 
 #include "game.hpp"
@@ -10,7 +9,7 @@
 
 class Renderer {
    public:
-    Renderer() = default;
+    Renderer()  = default;
     ~Renderer() = default;
 
     void initialize(Dimensions dimensions, const char *title, bool useVsync);
@@ -25,38 +24,38 @@ class Renderer {
     void toggleDemoWindow();
     bool windowShouldClose();
     void updateMousePosition() {
-        m_mousePos.first = ImGui::GetMousePos().x;
+        m_mousePos.first  = ImGui::GetMousePos().x;
         m_mousePos.second = ImGui::GetMousePos().y;
     }
     const std::pair<float, float> &getMousePosition() const { return m_mousePos; }
-    ImTextureID loadTextureFromResources(const std::string &filename);
-    void loadTextures();
-    void drawMainMenuBar();
-    void drawDemoWindow();
-    void drawLostPieces();
-    void drawGameInfo();
-    void drawWorkspace();
-    void drawGame();
+    ImTextureID                    loadTextureFromResources(const std::string &filename);
+    void                           loadTextures();
+    void                           drawMainMenuBar();
+    void                           drawDemoWindow();
+    void                           drawLostPieces();
+    void                           drawGameInfo();
+    void                           drawWorkspace();
+    void                           drawGame();
 
    private:
     std::vector<Game> *m_games;
-    int m_gameIndex = 0;
-    bool m_justCreatedGame = false;
+    int                m_gameIndex       = 0;
+    bool               m_justCreatedGame = false;
 
-    GLFWWrapper m_glfw;
+    GLFWWrapper  m_glfw;
     IMGUIWrapper m_imgui;
 
-    std::unordered_map<Piece, ImTextureID> pieceTextures;
+    std::array<ImTextureID, Piece::mask()> pieceTextures;
 
     std::pair<float, float> m_mousePos;
 
-    bool m_wasHoldingPiece = false;
+    // bool m_wasHoldingPiece = false;
     std::pair<float, float> m_lastHoldedPiecePosition = {0, 0};
 
-    double m_lastTime = 0;
-    double m_deltaTime = 0;
-    double m_currentTime = 0;
-    bool m_showDemoWindow = false;
+    double m_lastTime       = 0;
+    double m_deltaTime      = 0;
+    double m_currentTime    = 0;
+    bool   m_showDemoWindow = false;
 };
 
 #endif

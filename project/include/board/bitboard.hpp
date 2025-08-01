@@ -2,10 +2,10 @@
 #define BITBOARD_HPP
 
 #include <array>
+#include <cassert>
 #include <cstdint>
 
 #include "navigation.hpp"
-#include "piece.hpp"
 
 struct Bitboard {
    public:
@@ -14,7 +14,19 @@ struct Bitboard {
     constexpr void                   set(uint64_t value) { m_value = value; }
     [[nodiscard]] constexpr uint64_t value() const { return m_value; }
 
+    constexpr Bitboard& operator|=(const Bitboard& other) {
+        m_value |= other.m_value;
+        return *this;
+    }
+    constexpr Bitboard& operator&=(const Bitboard& other) {
+        m_value &= other.m_value;
+        return *this;
+    }
+
     constexpr operator uint64_t() const { return m_value; }
+
+    constexpr bool operator==(const Bitboard& other) const { return m_value == other.m_value; }
+    constexpr bool operator!=(const Bitboard& other) const { return m_value != other.m_value; }
 
     static constexpr Bitboard zero() { return 0ULL; }
 
@@ -24,28 +36,27 @@ struct Bitboard {
         return (destination.ok() && Square::distance(square, destination) <= 2) ? squareBB(destination) : zero();
     };
 
-    [[nodiscard]] constexpr Bitboard shifted(Direction direction) const {
-        switch (direction) {
+    template <int8_t D>
+    [[nodiscard]] constexpr Bitboard pushed() const {
+        switch (D) {
             case Direction::N:
             case Direction::NN:
-                return m_value << direction;
+                return m_value << D;
             case Direction::S:
             case Direction::SS:
-                return m_value >> -direction;
-            case Direction::E:
+                return m_value >> -D;
             case Direction::NE:
             case Direction::SE:
-                return (m_value & ~fileBB(File::FH)) << direction;
-            case Direction::W:
+                return (m_value & ~fileBB(File::FH)) << D;
             case Direction::NW:
             case Direction::SW:
-                return (m_value & ~fileBB(File::FA)) >> -direction;
+                return (m_value & ~fileBB(File::FA)) >> -D;
             default:
                 return zero();
         }
     }
 
-    static Bitboard rankBB(Rank rank) {
+    static constexpr Bitboard rankBB(Rank rank) {
         static constexpr auto table = []() constexpr {
             std::array<Bitboard, Rank::number()> t{};
 
@@ -60,7 +71,7 @@ struct Bitboard {
         return table[rank];
     }
 
-    static Bitboard fileBB(File file) {
+    static constexpr Bitboard fileBB(File file) {
         static constexpr auto table = []() constexpr {
             std::array<Bitboard, File::NB> t{};
 
@@ -74,7 +85,8 @@ struct Bitboard {
 
         return table[file];
     }
-    static Bitboard diagBB(Square square) {
+
+    static constexpr Bitboard diagBB(Square square) {
         static constexpr auto table = []() constexpr {
             std::array<Bitboard, Square::NB> t{};
             for (auto square : Square::all()) {
@@ -96,7 +108,8 @@ struct Bitboard {
         }();
         return table[square];
     }
-    static Bitboard antiDiagBB(Square square) {
+
+    static constexpr Bitboard antiDiagBB(Square square) {
         static constexpr auto table = []() constexpr {
             std::array<Bitboard, Square::NB> t{};
             for (auto square : Square::all()) {
@@ -118,28 +131,8 @@ struct Bitboard {
         }();
         return table[square];
     }
-    template <PieceType PT>
-    static constexpr Bitboard attacksBB(Square square, Bitboard occupied) {
-        switch (PT) {
-            case PieceType::PAWN:
-                break;
-            case PieceType::KNIGHT:
-                break;
-            case PieceType::BISHOP:
-                break;
-            case PieceType::ROOK:
-                break;
-            case PieceType::QUEEN:
-                break;
-            case PieceType::KING:
-                break;
-            default:
-                break;
-        }
-    };
 
    private:
     uint64_t m_value;
 };
-
 #endif

@@ -3,12 +3,12 @@
 #include "piece.hpp"
 
 TEST(Pieces, CreateGet) {
-    EXPECT_EQ(createPiece(Colors::BLACK, PieceTypes::ROOK), Pieces::BROOK);
-    EXPECT_EQ(createPiece(Colors::WHITE, PieceTypes::PAWN), Pieces::WPAWN);
+    EXPECT_EQ(Piece(Color::BLACK, PieceType::ROOK), Piece::B_ROOK);
+    EXPECT_EQ(Piece(Color::WHITE, PieceType::PAWN), Piece::W_PAWN);
 
-    EXPECT_EQ(getColor(createPiece(Colors::WHITE, PieceTypes::PAWN)), Colors::WHITE);
-    EXPECT_EQ(getColor(createPiece(Colors::BLACK, PieceTypes::PAWN)), Colors::BLACK);
+    EXPECT_EQ(Piece(Color::WHITE, PieceType::PAWN).color(), Color::WHITE);
+    EXPECT_EQ(Piece(Color::BLACK, PieceType::PAWN).color(), Color::BLACK);
 
-    EXPECT_EQ(getPieceType(createPiece(Colors::WHITE, PieceTypes::KING)), PieceTypes::KING);
-    EXPECT_EQ(getPieceType(createPiece(Colors::BLACK, PieceTypes::QUEEN)), PieceTypes::QUEEN);
+    EXPECT_EQ(Piece(Color::WHITE, PieceType::KING).pieceType(), PieceType::KING);
+    EXPECT_EQ(Piece(Color::BLACK, PieceType::QUEEN).pieceType(), PieceType::QUEEN);
 }

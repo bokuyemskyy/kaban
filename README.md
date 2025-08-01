@@ -4,7 +4,7 @@ A project, aimed to be a high-performance chess engine that uses bitboard techni
 Inspired by [Stockfish](https://stockfishchess.org/), this project aims to utilize efficient board representation, move generation and modern C++ practices to achieve high perft (performance test) results.
 
 ## Documentation
-The draft of documentation you can find on here: [DOCUMENTATION](https://bokuyemskyy.github.io/kaban/docs/html/) (work in progress)
+The projects future documentation you will be able to find on here: [DOCUMENTATION](https://bokuyemskyy.github.io/kaban/docs/html/) (empty by now)
 
 ## Features roadmap
 ### Implemented
@@ -26,17 +26,19 @@ The draft of documentation you can find on here: [DOCUMENTATION](https://bokuyem
 - **Transformation into an engine**: the project initially was aimed to be an engine, not a movegen. But the development takes too much time.
 - **Evaluation function**: a scalable evaluation function with tuning capabilities.
 - **Search algorithms**: Implementation of minimax, alpha-beta pruning, and potentially more advanced techniques like Principal Variation Search (PVS) and Monte Carlo Tree Search (MCTS).
+- **Inline ASM**: Hot paths may work faster if specific processor instructions are used (such ones that a compiler does not utilize)
 
 ## Motivation
 This project is a learning endeavor to deepen my understanding of chess engine development and improve my skills in C++ programming, problem-solving, algorithms, and optimization.
 
 ## Installation
+
+1) Have VCPKG installed on your machine
+2) Set VCPKG_ROOT variable in your shell
 ```bash
 git clone https://github.com/bokuyemskyy/kaban.git
 cd kaban
 
-# IMPORTANT: initialize and update all submodules recursively
-git submodule update --init --recursive
 
 # Run cmake build as usual
 cmake --preset release -B build

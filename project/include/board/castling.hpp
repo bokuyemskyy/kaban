@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-class Castling {
+struct Castling {
     enum : std::uint8_t {
         W_KING_SIDE  = 0b0001,
         W_QUEEN_SIDE = 0b0010,
