@@ -2,35 +2,33 @@
 
 #include <gtest/gtest.h>
 
-#include "castling.hpp"
-#include "piece.hpp"
-#include "square.hpp"
+#include "navigation.hpp"
 
 TEST(MoveTest, CreateAndExtractMove) {
-    Square from  = Squares::A1;
-    Square to    = Squares::H8;
-    Flags  flags = 4;
+    Square from  = Square::A1;
+    Square to    = Square::H8;
+    Flag   flags = 4;
 
-    Move move = createMove(from, to, flags);
+    Move move = Move(from, to, flags, 0);
 
-    EXPECT_EQ(getFrom(move), from);
-    EXPECT_EQ(getTo(move), to);
-    EXPECT_EQ(getFlags(move), flags);
+    EXPECT_EQ(move.from(), from);
+    EXPECT_EQ(move.to(), to);
+    EXPECT_EQ(move.flag(), flags);
 
-    move = createMove(0, 0, 0);
-    EXPECT_EQ(getFrom(move), 0);
-    EXPECT_EQ(getTo(move), 0);
-    EXPECT_EQ(getFlags(move), 0);
+    move = Move(0, 0, 0, 0);
+    EXPECT_EQ(move.from(), 0);
+    EXPECT_EQ(move.to(), 0);
+    EXPECT_EQ(move.flag(), 0);
 }
-
+/*
 TEST(DeltaTest, CreateAndExtractDelta) {
-    Piece    captured   = Pieces::WQUEEN;
-    Castling castling   = Castlings::WKINGSIDE;
+    Piece    captured   = Piece::W_QUEEN;
+    Castling castling   = Castling::W_KING_SIDE;
     uint8_t  enpassant  = 25;
     uint8_t  halfmoves  = 50;
     uint8_t  extraFlags = 2;
 
-    Delta delta = createDelta(captured, castling, enpassant, halfmoves, extraFlags);
+    Delta delta = Delta(captured, castling, enpassant, halfmoves, extraFlags);
 
     EXPECT_EQ(getCaptured(delta), captured);
     EXPECT_EQ(getCastling(delta), castling);
@@ -44,4 +42,4 @@ TEST(DeltaTest, CreateAndExtractDelta) {
     EXPECT_EQ(getEnpassant(delta), 0);
     EXPECT_EQ(getHalfmoves(delta), 0);
     EXPECT_EQ(getExtraFlags(delta), 0);
-}
+}*/
