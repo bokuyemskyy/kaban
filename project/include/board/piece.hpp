@@ -80,6 +80,7 @@ struct Piece {
         FIRST = W_PAWN,
         LAST  = B_KING,
 
+        NONE = 0b1111,
         MASK = 0b1111,
         SIZE = 4,
         NB   = 12
@@ -87,14 +88,17 @@ struct Piece {
 
     static constexpr std::string_view pieceToChar = "PNBRQK  pnbrqk";
 
-    constexpr Piece(uint8_t value) : m_value(value) {}
+    constexpr Piece(uint8_t value = none()) : m_value(value) {}
     explicit constexpr Piece(PieceType pieceType, Color color) : m_value((color << PieceType::size()) | pieceType) {}
+
     explicit constexpr Piece(char c) {
         size_t index = pieceToChar.find(c);
         m_value      = (index != std::string_view::npos) ? static_cast<uint8_t>(index) : 0;
     }
 
     [[nodiscard]] constexpr bool ok() const { return m_value <= LAST && m_value != 6 && m_value != 7; }
+
+    [[nodiscard]] static constexpr Piece none() { return Piece::NONE; }
 
     [[nodiscard]] constexpr Color color() const { return m_value >> PieceType::size(); }
     [[nodiscard]] constexpr Color pieceType() const { return m_value & PieceType::mask(); }
@@ -159,12 +163,9 @@ struct Piece {
         return os;
     }
 
-    void print(std::ostream& os) const {
-        if (ok()) {
-            os << pieceToChar[m_value];
-        } else
-            os << '?';
-    }
+    void print(std::ostream& os) const { os << to_char(); }
+
+    [[nodiscard]] char constexpr to_char() const { return ok() ? pieceToChar[m_value] : '?'; }
 
    private:
     uint8_t m_value;
