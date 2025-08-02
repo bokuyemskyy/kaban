@@ -1,5 +1,8 @@
 # kaban - chess movegen
 
+<img width="800" height="628" alt="Screenshot_20250802_202233" src="https://github.com/user-attachments/assets/3c259921-91bd-434e-a7a7-cfaeab1585f3" />
+
+
 A project, aimed to be a high-performance chess engine that uses bitboard techniques. 
 Inspired by [Stockfish](https://stockfishchess.org/), this project aims to utilize efficient board representation, move generation and modern C++ practices to achieve high perft (performance test) results.
 
