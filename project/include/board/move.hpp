@@ -1,94 +1,126 @@
-// HAS TESTS
-
-#ifndef MOVE_HPP
-#define MOVE_HPP
+#pragma once
 
 #include <cstdint>
-#include <string>
 
+#include "castling.hpp"
 #include "navigation.hpp"
+
+#pragma once
+#include <cassert>
+#include <cstdint>
 
 struct Flag {
    public:
-    enum : uint8_t {
-        USUAL,      // not a promotion, not a double pawn push, not a castling
-        PROMOTION,  // pawn reached the last rank
-        DOUBLE,     // double pawn push
-        CASTLING,   // castling
+    enum Value : uint8_t {
+        USUAL,
+        PROMOTION,
+        DOUBLE_PUSH,
+        CASTLING,
 
-        MASK = 0b11,
+        NB   = 4,
         SIZE = 2,
-        NB   = 4
+        MASK = (1 << SIZE) - 1
     };
 
-    constexpr Flag(uint8_t value) : m_value(value) {}
+    constexpr Flag(Value value) : m_value(value) {}
+    constexpr Flag(uint8_t value) : m_value(static_cast<Value>(value)) {}
 
-    [[nodiscard]] static constexpr uint8_t number() { return NB; }
-    [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
+    [[nodiscard]] constexpr operator uint8_t() const { return m_value; }
+
     [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
-
-    constexpr operator uint8_t() const { return m_value; }
+    [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
+    [[nodiscard]] static constexpr uint8_t number() { return NB; }
 
    private:
-    uint8_t m_value;
+    Value m_value;
 };
+
 struct Promotion {
    public:
-    enum : uint8_t {
+    enum Value : uint8_t {
         TO_KNIGHT,
         TO_BISHOP,
         TO_ROOK,
         TO_QUEEN,
 
-        MASK = 0b11,
+        NB   = 4,
         SIZE = 2,
-        NB   = 4
+        MASK = (1 << SIZE) - 1
     };
 
-    constexpr Promotion(uint8_t value) : m_value(value) {}
+    constexpr Promotion(Value value) : m_value(value) {}
+    constexpr Promotion(uint8_t value) : m_value(static_cast<Value>(value)) {}
 
-    [[nodiscard]] static constexpr uint8_t number() { return NB; }
-    [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
+    [[nodiscard]] constexpr operator uint8_t() const { return m_value; }
+
     [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
-
-    constexpr operator uint8_t() const { return m_value; }
+    [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
+    [[nodiscard]] static constexpr uint8_t number() { return NB; }
 
    private:
-    uint8_t m_value;
+    Value m_value;
 };
+
+// Move layout (16 bits):
+// [15..14] Promotion (2 bits)
+// [13..12] Flag      (2 bits)
+// [11..6 ] To square (6 bits)
+// [5 ..0 ] From square (6 bits)
+
 struct Move {
    public:
-    constexpr Move(uint16_t value = 0) : m_value(value) {};
-    constexpr Move(Square from, Square to, Flag flag, Promotion promotion)
-        : m_value((promotion << (2 * Square::size() + Flag::size())) | (flag << (2 * Square::size())) |
-                  (to << Square::size()) | from) {};
+    constexpr Move() : m_value(0) {}
+    constexpr Move(uint16_t value) : m_value(value) {}
 
-    [[nodiscard]] constexpr Square from() const { return m_value & Square::mask(); }
+    constexpr Move(Square from, Square to, Flag flag = Flag::USUAL, Promotion promotion = Promotion::TO_QUEEN)
+        : m_value((promotion << PROMO_SHIFT) | (flag << FLAG_SHIFT) | (to << TO_SHIFT) | from) {}
 
-    [[nodiscard]] constexpr Square to() const { return (m_value >> Square::size()) & Square::mask(); }
+    [[nodiscard]] constexpr Square from() const { return Square(m_value & Square::mask()); }
 
-    [[nodiscard]] constexpr Flag flag() const { return (m_value >> (2 * Square::size())) & Flag::mask(); }
+    [[nodiscard]] constexpr Square to() const { return Square((m_value >> TO_SHIFT) & Square::mask()); }
 
-    [[nodiscard]] constexpr Promotion promotion() const { return m_value >> (2 * Square::size() + Flag::size()); }
+    [[nodiscard]] constexpr Flag flag() const { return Flag((m_value >> FLAG_SHIFT) & Flag::mask()); }
+
+    [[nodiscard]] constexpr Promotion promotion() const {
+        return Promotion((m_value >> PROMO_SHIFT) & Promotion::mask());
+    }
 
     constexpr operator uint16_t() const { return m_value; }
 
+    [[nodiscard]] constexpr bool isNull() const { return m_value == 0; }
+
    private:
     uint16_t m_value;
+
+    static constexpr int FROM_SHIFT  = 0;
+    static constexpr int TO_SHIFT    = Square::size();
+    static constexpr int FLAG_SHIFT  = 2 * Square::size();
+    static constexpr int PROMO_SHIFT = FLAG_SHIFT + Flag::size();
 };
 
-// using Delta = uint32_t;
-/*
-constexpr Delta createDelta(Piece captured, Castling castling, uint8_t enpassant, uint8_t halfmoves,
-uint8_t extraFlags = 0) {
-    return static_cast<Delta>((captured & 0xF) | ((castling & 0xF) << 4) | ((enpassant & 0x3F) << 8) |
-    ((halfmoves & 0xFF) << 14) | ((extraFlags & 0x3) << 22));
-    }
+// Delta layout (32 bits):
+// [3 ..0 ] Captured Piece (4 bits)
+// [7 ..4 ] Castling Rights (4 bits)
+// [13..8 ] En Passant Square (6 bits)
+// [21..14] Halfmove Clock (8 bits)
+// [23..22] Extra Flags (2 bits)
 
-constexpr Piece    getCaptured(Delta delta) { return Piece(delta & 0xF); }
-constexpr Castling getCastling(Delta delta) { return Castling((delta >> 4) & 0xF); }
-constexpr uint8_t  getEnpassant(Delta delta) { return (delta >> 8) & 0x3F; }
-constexpr uint8_t  getHalfmoves(Delta delta) { return (delta >> 14) & 0xFF; }
-constexpr uint8_t  getExtraFlags(Delta delta) { return (delta >> 22) & 0x3; }
-*/
-#endif
+struct Delta {
+   public:
+    constexpr Delta(Piece captured, Castling castling, uint8_t enpassant, uint8_t halfmoves, uint8_t extraFlags = 0)
+        : m_value((captured & 0xF) | ((castling & 0xF) << 4) | ((enpassant & 0x3F) << 8) | ((halfmoves & 0xFF) << 14) |
+                  ((extraFlags & 0x3) << 22)) {}
+
+    constexpr Delta(uint32_t raw) : m_value(raw) {}
+
+    constexpr operator uint32_t() const { return m_value; }
+
+    [[nodiscard]] constexpr Piece    captured() const { return m_value & 0xF; }
+    [[nodiscard]] constexpr Castling castling() const { return (m_value >> 4) & 0xF; }
+    [[nodiscard]] constexpr uint8_t  enpassant() const { return (m_value >> 8) & 0x3F; }
+    [[nodiscard]] constexpr uint8_t  halfmoves() const { return (m_value >> 14) & 0xFF; }
+    [[nodiscard]] constexpr uint8_t  extraFlags() const { return (m_value >> 22) & 0x3; }
+
+   private:
+    uint32_t m_value;
+};

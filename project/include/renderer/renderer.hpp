@@ -1,17 +1,23 @@
-#ifndef RENDERER_HPP
-#define RENDERER_HPP
+#pragma once
 
 #include <vector>
 
+#include "app_state.hpp"
 #include "game.hpp"
 #include "glfw_wrapper.hpp"
 #include "imgui_wrapper.hpp"
+#include "resource_manager.hpp"
+#include "utils.hpp"
 
 class Renderer {
    public:
     Renderer()  = default;
     ~Renderer() = default;
 
+    void start(Dimensions dimensions, const char *title, bool useVsync, AppState appState) {
+        ResourceManager::init();
+        initialize(dimensions, title, useVsync);
+    }
     void initialize(Dimensions dimensions, const char *title, bool useVsync);
     void terminate();
 
@@ -57,5 +63,3 @@ class Renderer {
     double m_currentTime    = 0;
     bool   m_showDemoWindow = false;
 };
-
-#endif

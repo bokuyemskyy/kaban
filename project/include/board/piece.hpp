@@ -1,5 +1,4 @@
-#ifndef PIECE_HPP
-#define PIECE_HPP
+#pragma once
 
 #include <cassert>
 #include <cstdint>
@@ -170,5 +169,3 @@ struct Piece {
    private:
     uint8_t m_value;
 };
-
-#endif
