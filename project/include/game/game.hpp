@@ -15,10 +15,12 @@ class Game {
     // ensures encapsulation without game.getPosition().doMove()
     // the same should be implemented with undo
 
+    void perft() {}
     // get setters for string
+    [[nodiscard]] std::string title() const { return m_title; }
 
    private:
     Position                            m_position;
-    std::string                         m_gameName;
+    std::string                         m_title;
     std::pair<std::string, std::string> m_opponents;
 };

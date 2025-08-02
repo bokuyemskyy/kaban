@@ -54,7 +54,6 @@ class MagicGenerator {
     static constexpr Bitboard premask(PieceType pieceType, Square square) {
         switch (pieceType) {
             case PieceType::ROOK: {
-                // Board edges are not considered in the relevant occupancies
                 Bitboard edges =
                     ((Bitboard::rankBB(Rank::R1) | Bitboard::rankBB(Rank::R8)) & ~Bitboard::rankBB(square.rank())) |
                     ((Bitboard::fileBB(File::FA) | Bitboard::fileBB(File::FH)) & ~Bitboard::fileBB(square.file()));
@@ -99,20 +98,17 @@ class MagicGenerator {
     }
 
    public:
-    static constexpr auto generateMagics() {
+    static auto generateMagics() {
         std::array<Magic, Square::number()>      rookMagics{};
         std::array<Magic, Square::number()>      bishopMagics{};
         std::array<Bitboard, TOTAL_ATTACKS_SIZE> attacks{};
 
-        // Optimal PRNG seeds from Stockfish to pick the correct magics in the shortest time
-        constexpr std::array<std::array<int, 8>, 2> seeds = {{
-            {8977, 44560, 54343, 38998, 5731, 95205, 104912, 17020},  // Rook seeds
-            {728, 10316, 55013, 32803, 12281, 15100, 16645, 255}      // Bishop seeds
-        }};
+        // optimal PRNG seeds from Stockfish to pick the correct magics in the shortest time
+        constexpr std::array<std::array<int, 8>, 2> seeds = {{{8977, 44560, 54343, 38998, 5731, 95205, 104912, 17020},
+                                                              {728, 10316, 55013, 32803, 12281, 15100, 16645, 255}}};
 
         size_t attacksOffset = 0;
 
-        // Generate rook magics
         for (auto square : Square::all()) {
             Magic& magic        = rookMagics[square];
             magic.premask       = premask(PieceType::ROOK, square);
@@ -123,10 +119,10 @@ class MagicGenerator {
             std::array<Bitboard, MAX_OCCUPANCIES> reference{};
             std::array<int, MAX_OCCUPANCIES>      epoch{};
 
-            int size = 0;
-            int cnt  = 0;
+            size_t size = 0;
+            int    cnt  = 0;
 
-            // Use Carry-Rippler trick to enumerate all subsets of mask
+            // use Carry-Rippler trick
             Bitboard b = Bitboard::zero();
             do {
                 occupancies[size] = b;
@@ -137,20 +133,10 @@ class MagicGenerator {
 
             PRNG rng(static_cast<uint64_t>(seeds[0][square.rank()]));
 
-            // Find a magic for square picking up an (almost) random number
-            // until we find the one that passes the verification test
-            for (int i = 0; i < size;) {
-                // Generate sparse magic numbers
+            for (size_t i = 0; i < size;) {
                 for (magic.magic = Bitboard::zero(); popCount((magic.magic * magic.premask) >> 56) < 6;) {
                     magic.magic = rng.sparse_rand<Bitboard>();
                 }
-
-                // A good magic must map every possible occupancy to an index that
-                // looks up the correct sliding attack in the attacks database.
-                // Note that we build up the database for square as a side
-                // effect of verifying the magic. Keep track of the attempt count
-                // and save it in epoch[], little speed-up trick to avoid resetting
-                // attacks[] after every failed attempt.
                 for (++cnt, i = 0; i < size; ++i) {
                     size_t idx = magic.index(occupancies[i]);
                     if (epoch[idx] < cnt) {
@@ -175,8 +161,8 @@ class MagicGenerator {
             std::array<Bitboard, MAX_OCCUPANCIES> reference{};
             std::array<int, MAX_OCCUPANCIES>      epoch{};
 
-            int size = 0;
-            int cnt  = 0;
+            size_t size = 0;
+            int    cnt  = 0;
 
             Bitboard b = Bitboard::zero();
             do {
@@ -188,7 +174,7 @@ class MagicGenerator {
 
             PRNG rng(static_cast<uint64_t>(seeds[1][square.rank()]));
 
-            for (int i = 0; i < size;) {
+            for (size_t i = 0; i < size;) {
                 for (magic.magic = Bitboard::zero(); popCount((magic.magic * magic.premask) >> 56) < 6;) {
                     magic.magic = rng.sparse_rand<Bitboard>();
                 }
