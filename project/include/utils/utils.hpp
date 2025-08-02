@@ -1,14 +1,15 @@
 #pragma once
 
-#include <cstdint>
-#include <utility>
+#include <cmath>
 
 #include "bitboard.hpp"
 
-float eucledianDistance(const std::pair<float, float> &a, const std::pair<float, float> &b);
+constexpr float eucledianDistance(const std::pair<float, float>& a, const std::pair<float, float>& b) {
+    return std::sqrt(((a.first - b.first) * (a.first - b.first)) + ((a.second - b.second) * (a.second - b.second)));
+}
 
-constexpr Square lsb(const Bitboard &x) { return static_cast<Square>(__builtin_ctzll(x)); }
-constexpr Square popLSB(Bitboard &x) {
+constexpr Square lsb(const Bitboard& x) { return static_cast<Square>(__builtin_ctzll(x)); }
+constexpr Square popLSB(Bitboard& x) {
     Square i = lsb(x);
     x &= x - 1;
     return i;

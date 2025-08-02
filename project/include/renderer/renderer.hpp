@@ -13,7 +13,7 @@ class Renderer {
    public:
     void start(int width, int height, const char *title, bool use_vsync, AppState &app_state) {
         m_app_state = &app_state;
-        m_thread    = std::thread([width, height, title, use_vsync, this, &app_state] {
+        m_thread    = std::thread([width, height, title, use_vsync, this /*, &app_state*/] {
             ResourceManager::init();
             initialize(width, height, title, use_vsync);
             runLoop();
@@ -30,13 +30,9 @@ class Renderer {
     void initialize(int width, int height, const char *title, bool use_vsync);
     void runLoop() {
         while (!m_glfw.windowShouldClose() && !m_app_state->shouldQuit()) {
-            m_app_state->render([this](const auto &games) {
-                for (const auto &game : games) {
-                    renderGame(game);
-                }
-            });
+            render();
         }
-        state_->signalQuit();
+        m_app_state->signalQuit();
     }
     void terminate();
 
@@ -45,7 +41,6 @@ class Renderer {
     void beginFrame();
     void fillFrame(float r = 0, float g = 0, float b = 0, float a = 1);
     void finishFrame();
-    void attachGames(std::vector<Game> &games) { m_games = &games; }
     void toggleDemoWindow();
     void updateMousePosition() {
         m_mousePos.first  = ImGui::GetMousePos().x;
@@ -63,9 +58,7 @@ class Renderer {
     void drawGame();
 
    private:
-    std::vector<Game> *m_games;
-    int                m_gameIndex       = 0;
-    bool               m_justCreatedGame = false;
+    bool m_justCreatedGame = false;
 
     GLFWWrapper  m_glfw;
     IMGUIWrapper m_imgui;

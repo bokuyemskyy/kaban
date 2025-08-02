@@ -27,6 +27,8 @@ struct PieceType : Iterable<PieceType> {
 
     constexpr PieceType(uint8_t value) : m_value(value) {}
 
+    [[nodiscard]] constexpr uint8_t value() const { return m_value; }
+
     [[nodiscard]] static constexpr uint8_t number() { return NB; }
     [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
     [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
@@ -50,6 +52,7 @@ struct Color : Iterable<Color> {
 
     constexpr Color(uint8_t value) : m_value(value) {}
 
+    [[nodiscard]] constexpr uint8_t        value() const { return m_value; }
     [[nodiscard]] static constexpr uint8_t number() { return NB; }
     [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
     [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
@@ -94,6 +97,8 @@ struct Piece {
         size_t index = pieceToChar.find(c);
         m_value      = (index != std::string_view::npos) ? static_cast<uint8_t>(index) : 0;
     }
+
+    [[nodiscard]] constexpr uint8_t value() const { return m_value; }
 
     [[nodiscard]] constexpr bool ok() const { return m_value <= LAST && m_value != 6 && m_value != 7; }
 
