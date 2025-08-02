@@ -1,14 +1,13 @@
 cmake_minimum_required(VERSION 3.20)
 
 
-
 set(PROJECT_NAME "kaban")
 set(EXECUTABLE_NAME "kaban")
 set(LIBRARY_NAME "kaban_lib")
 
 
-
 project(${PROJECT_NAME})
+
 add_subdirectory(scripts/perft_compare)
 
 
