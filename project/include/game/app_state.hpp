@@ -8,7 +8,7 @@
 
 #include "game.hpp"
 
-class GameState {
+class AppState {
    public:
     void addGame() {
         std::lock_guard lock(m_mutex);
