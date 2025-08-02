@@ -100,13 +100,13 @@ void Renderer::drawGame() {
             drawList->AddRectFilled(squarePos, ImVec2(squarePos.x + SQUARE_SIZE, squarePos.y + SQUARE_SIZE),
                                     squareColor);
 
-            Piece piece = m_games->at(0).getPosition().pieceAt((7 - row) * 8 + col);
+            /*Piece piece = m_games->at(0).getPosition().pieceAt((7 - row) * 8 + col);
 
             if (piece != Piece::NONE) {
                 drawList->AddImage(
                     pieceTextures[piece], ImVec2(squarePos.x + PIECE_MARGIN, squarePos.y + PIECE_MARGIN),
                     ImVec2(squarePos.x + SQUARE_SIZE - PIECE_MARGIN, squarePos.y + SQUARE_SIZE - PIECE_MARGIN));
-            }
+            }*/
         }
     }
 
@@ -148,7 +148,7 @@ void Renderer::drawWorkspace() {
                      ImGuiWindowFlags_NoBringToFrontOnFocus);
 
     if (ImGui::BeginTabBar("GameTabs")) {
-        for (size_t i = 0; i < m_games->size(); ++i) {
+        /*for (size_t i = 0; i < m_games->size(); ++i) {
             ImGuiTabItemFlags flags = 0;
             if (m_justCreatedGame && static_cast<int>(i) == m_gameIndex) {
                 flags |= ImGuiTabItemFlags_SetSelected;
@@ -158,10 +158,11 @@ void Renderer::drawWorkspace() {
             if (ImGui::BeginTabItem(("Game " + std::to_string(i)).c_str(), nullptr, flags)) {
                 ImGui::EndTabItem();
             }
-        }
+        }*/
         if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip)) {
-            m_games->emplace_back();
-            m_gameIndex       = m_games->size() - 1;
+            // m_games->emplace_back();
+            // m_gameIndex = m_games->size() - 1;
+
             m_justCreatedGame = true;
         }
         ImGui::EndTabBar();

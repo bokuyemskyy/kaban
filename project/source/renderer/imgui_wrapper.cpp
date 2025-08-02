@@ -46,23 +46,22 @@ void IMGUIWrapper::finishFrame() {
 
 void IMGUIWrapper::updateDimensions() {
     ImGuiIO &io = ImGui::GetIO();
-    m_dimensions.width = static_cast<int>(io.DisplaySize.x);
-    m_dimensions.height = static_cast<int>(io.DisplaySize.y);
+    m_width     = static_cast<int>(io.DisplaySize.x);
+    m_height    = static_cast<int>(io.DisplaySize.y);
 }
 
 void IMGUIWrapper::keepWindowInBounds(const char *windowName) const {
     ImGuiWindow *window = ImGui::FindWindowByName(windowName);
 
-    ImVec2 maxPosition{static_cast<float>(m_dimensions.width) - window->Size.x,
-                       static_cast<float>(m_dimensions.height) - window->Size.y};
+    ImVec2 maxPosition{static_cast<float>(m_width) - window->Size.x, static_cast<float>(m_height) - window->Size.y};
 
     ImVec2 newPosition{maxPosition.x > 0 ? std::clamp(window->Pos.x, 0.0F, maxPosition.x) : 0,
                        maxPosition.y > 0 ? std::clamp(window->Pos.y, 0.0F, maxPosition.y) : 0};
-    ImVec2 newSize{maxPosition.x > 0 ? window->Size.x : static_cast<float>(m_dimensions.width),
-                   maxPosition.y > 0 ? window->Size.y : static_cast<float>(m_dimensions.height)};
+    ImVec2 newSize{maxPosition.x > 0 ? window->Size.x : static_cast<float>(m_width),
+                   maxPosition.y > 0 ? window->Size.y : static_cast<float>(m_height)};
 
-    if (newPosition.x != window->Pos.x || newPosition.y != window->Pos.y ||
-        newSize.x != window->Size.x || newSize.y != window->Size.y) {
+    if (newPosition.x != window->Pos.x || newPosition.y != window->Pos.y || newSize.x != window->Size.x ||
+        newSize.y != window->Size.y) {
         ImGui::SetWindowPos(windowName, newPosition);
         ImGui::SetWindowSize(windowName, newSize);
     }

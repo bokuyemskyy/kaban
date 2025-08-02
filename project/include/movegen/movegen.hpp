@@ -47,16 +47,16 @@ template <GenerationType>
 size_t generateMoves(const Position& position, std::array<Move, MAX_MOVES>& moveList);
 
 template <bool Root>
-int perft(Position& position, int depth, std::vector<Move>& moveStack) {
+int perft(Position& position, int /*depth*/, std::vector<Move>& moveStack) {
     const size_t start = moveStack.size();
-    const size_t count = generateMoves(position, moveStack);
+    const size_t count = 0;  // generateMoves(position, moveStack);
 
     int nodes = 0;
 
     for (size_t i = 0; i < count; ++i) {
         const Move& move = moveStack[start + i];
         position.doMove(move);
-        if (isLegal(position)) [[likely]] {
+        /*if (isLegal(position)) [[likely]] {
             if (depth == 1) {
                 nodes++;
             } else {
@@ -66,7 +66,7 @@ int perft(Position& position, int depth, std::vector<Move>& moveStack) {
                 }
                 nodes += subnodes;
             }
-        }
+        }*/
         position.undoMove();
     }
     moveStack.resize(start);

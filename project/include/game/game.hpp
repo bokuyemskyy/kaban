@@ -15,7 +15,7 @@ class Game {
     // ensures encapsulation without game.getPosition().doMove()
     // the same should be implemented with undo
 
-    void perft() {}
+    void perft(int /*depth*/) {}
     // get setters for string
     [[nodiscard]] std::string title() const { return m_title; }
 

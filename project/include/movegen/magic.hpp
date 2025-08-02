@@ -26,7 +26,7 @@ constexpr size_t ROOK_ATTACKS_SIZE   = 102400;
 constexpr size_t BISHOP_ATTACKS_SIZE = 5248;
 constexpr size_t TOTAL_ATTACKS_SIZE  = ROOK_ATTACKS_SIZE + BISHOP_ATTACKS_SIZE;
 
-class MagicGenerator {
+class Magics {
     static constexpr int MAX_OCCUPANCIES = 4096;
 
     class PRNG {

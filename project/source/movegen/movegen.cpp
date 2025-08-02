@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "bitboard.hpp"
-#include "magic.hpp"
 #include "navigation.hpp"
 #include "piece.hpp"
 
@@ -19,7 +18,9 @@ std::vector<Bitboard> bishopAttacks(BISHOP_ATTACK_NB);
 std::vector<Bitboard> rookAttacks(ROOK_ATTACK_NB);
 
 template <GenerationType T, uint8_t US>
-size_t generateMovesByColor(const Position& position, std::array<Move, MAX_MOVES>& moveList) {}
+size_t generateMovesByColor(const Position& /*position*/, std::array<Move, MAX_MOVES>& /*moveList*/) {
+    return 0;
+}
 
 template <GenerationType T>
 size_t generateMoves(const Position& position, std::array<Move, MAX_MOVES>& moveList) {
@@ -34,11 +35,11 @@ template size_t generateMoves<NON_CAPTURE>(const Position&, std::array<Move, MAX
 template size_t generateMoves<EVASION>(const Position&, std::array<Move, MAX_MOVES>&);
 template size_t generateMoves<NON_EVASION>(const Position&, std::array<Move, MAX_MOVES>&);
 
-Bitboard getRookAttacks(Square square, Bitboard occupancy) {
+/*Bitboard getRookAttacks(Square square, Bitboard occupancy) {
     Bitboard attackBB = Bitboard::zero();
     for (const auto& direction : rookDirections) {
         for (uint8_t i = 1;; ++i) {
-            Bitboard destination = destinationBB(square + (direction * (i - 1)), direction);
+            Bitboard destination = Bitboard::destinationBB(square + (direction * (i - 1)), direction);
             if (destination == Bitboard::zero()) break;
 
             attackBB |= destination;
@@ -47,12 +48,12 @@ Bitboard getRookAttacks(Square square, Bitboard occupancy) {
         }
     }
     return attackBB;
-}
-Bitboard getBishopAttacks(Square square, Bitboard occupancy) {
+}*/
+/*Bitboard getBishopAttacks(Square square, Bitboard occupancy) {
     Bitboard attackBB = Bitboard::zero();
     for (const auto& direction : bishopDirections) {
         for (uint8_t i = 1;; ++i) {
-            Bitboard destination = destinationBB(square + (direction * (i - 1)), direction);
+            Bitboard destination = Bitboard::destinationBB(square + (direction * (i - 1)), direction);
             if (destination == Bitboard::zero()) break;
 
             attackBB |= destination;
@@ -61,40 +62,40 @@ Bitboard getBishopAttacks(Square square, Bitboard occupancy) {
         }
     }
     return attackBB;
-}
+}*/
 
 void init() {
-    initMagics(PieceType::BISHOP);
-    initMagics(PieceType::ROOK);
+    // initMagics(PieceType::BISHOP);
+    // initMagics(PieceType::ROOK);
 
-    for (Square square = Square::FIRST; square <= Square::LAST; ++square) {
+    for (Square square : Square::all()) {
         Bitboard pawnBB = Bitboard::zero();
         for (const auto& direction : whitePawnAttackDirections) {
-            pawnBB |= destinationBB(square, direction);
+            pawnBB |= Bitboard::destinationBB(square, direction);
         }
         pawnAttacks[Color::WHITE][square] = pawnBB;
 
         pawnBB = Bitboard::zero();
         for (const auto& direction : whitePawnAttackDirections) {
-            pawnBB |= destinationBB(square, -direction);
+            pawnBB |= Bitboard::destinationBB(square, -direction);
         }
         pawnAttacks[Color::BLACK][square] = pawnBB;
 
         pawnBB = Bitboard::zero();
-        pawnBB |= destinationBB(square, whitePawnPushDirections[0]);
+        pawnBB |= Bitboard::destinationBB(square, whitePawnPushDirections[0]);
         pawnSinglePushes[Color::WHITE][square] = pawnBB;
 
         pawnBB = Bitboard::zero();
-        pawnBB |= destinationBB(square, -whitePawnPushDirections[0]);
+        pawnBB |= Bitboard::destinationBB(square, -whitePawnPushDirections[0]);
         pawnSinglePushes[Color::BLACK][square] = pawnBB;
 
         Bitboard knightBB = Bitboard::zero();
         for (const auto& direction : knightDirections) {
-            knightBB |= destinationBB(square, direction);
+            knightBB |= Bitboard::destinationBB(square, direction);
         }
         pseudoAttacks[PieceType::KNIGHT][square] = knightBB;
 
-        auto bishopPremaskOccupancies = getPremaskOccupancies(PieceType::BISHOP, square);
+        /*auto bishopPremaskOccupancies = getPremaskOccupancies(PieceType::BISHOP, square);
         for (const auto& occupancy : bishopPremaskOccupancies) {
             bishopAttacks[square][getIndexOfOccupancy<PieceType::BISHOP>(square, occupancy)] =
                 getBishopAttacks(square, occupancy);
@@ -104,37 +105,18 @@ void init() {
         for (const auto& occupancy : rookPremaskOccupancies) {
             rookAttacks[square][getIndexOfOccupancy<PieceType::ROOK>(square, occupancy)] =
                 getRookAttacks(square, occupancy);
-        }
+        }*/
 
         Bitboard kingBB = Bitboard::zero();
         for (const auto& direction : kingDirections) {
-            kingBB |= destinationBB(square, direction);
+            kingBB |= Bitboard::destinationBB(square, direction);
         }
         pseudoAttacks[PieceType::KING][square] = kingBB;
     }
 }
-/*
-template <PieceType PieceType>
-Bitboard getMovesBB(Position& position, Square square) {
-    if constexpr (PieceType == PieceType::ROOK)
-        return rook_attacks(square);
-    else if constexpr (PieceType == PieceType::BISHOP)
-        return bishop_attacks(square);
-    else if constexpr (PieceType == PieceType::QUEEN)
-        return rook_attacks(square) | bishop_attacks(square);
-    else if constexpr (PieceType == PieceType::KNIGHT)
-        return pseudoAttacks[PieceType::KNIGHT][square];
-    else if constexpr (PieceType == PieceType::KING)
-        return king_attacks(square);
-    else if constexpr (PieceType == PieceType::PAWN)
-        return pawn_attacks(square);  // You might need side info here
-    else
-        static_assert(false, "Unsupported piece type");
-}
-*/
 
-size_t generatePseudoLegalMoves(std::vector<Move>* moveStack) {
-    size_t prevBufferSize = moveBuffer->size();
+size_t generatePseudoLegalMoves(std::vector<Move>* /*moveStack*/) {
+    /*size_t prevBufferSize = moveBuffer->size();
 
     Bitboard pieces = Bitboard::zero();
 
@@ -212,10 +194,12 @@ size_t generatePseudoLegalMoves(std::vector<Move>* moveStack) {
         }
     }
     return moveBuffer.size() - prevBufferSize;
+*/
+    return 0;
 }
 
-bool Position::isLegal() {
-    Square king = lsb(m_colorBB[m_them] & m_pieceTypeBB[PieceType::KING]);
+bool isLegal() {
+    /*Square king = lsb(m_colorBB[m_them] & m_pieceTypeBB[PieceType::KING]);
 
     Bitboard enemyAttackers = Bitboard::zero();
 
@@ -231,6 +215,28 @@ bool Position::isLegal() {
                       (m_colorBB[m_us] & (m_pieceTypeBB[PieceType::ROOK] | m_pieceTypeBB[PieceType::QUEEN]));
 
     return enemyAttackers == Bitboard::zero();
+*/
+    return false;
 }
 
 }  // namespace Movegen
+
+/*
+template <PieceType PieceType>
+Bitboard getMovesBB(Position& position, Square square) {
+    if constexpr (PieceType == PieceType::ROOK)
+        return rook_attacks(square);
+    else if constexpr (PieceType == PieceType::BISHOP)
+        return bishop_attacks(square);
+    else if constexpr (PieceType == PieceType::QUEEN)
+        return rook_attacks(square) | bishop_attacks(square);
+    else if constexpr (PieceType == PieceType::KNIGHT)
+        return pseudoAttacks[PieceType::KNIGHT][square];
+    else if constexpr (PieceType == PieceType::KING)
+        return king_attacks(square);
+    else if constexpr (PieceType == PieceType::PAWN)
+        return pawn_attacks(square);  // You might need side info here
+    else
+        static_assert(false, "Unsupported piece type");
+}
+*/
