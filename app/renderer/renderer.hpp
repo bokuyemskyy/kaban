@@ -1,10 +1,8 @@
 #pragma once
 
 #include <thread>
-#include <vector>
 
 #include "app_state.hpp"
-#include "game.hpp"
 #include "glfw_wrapper.hpp"
 #include "imgui_wrapper.hpp"
 #include "resource_manager.hpp"
