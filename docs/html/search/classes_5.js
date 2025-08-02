@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['paths_0',['Paths',['../classPaths.html',1,'']]],
-  ['position_1',['Position',['../classPosition.html',1,'']]]
+  ['game_0',['Game',['../classGame.html',1,'']]],
+  ['glfwwindow_1',['GLFWwindow',['../classGLFWwindow.html',1,'']]],
+  ['glfwwrapper_2',['GLFWWrapper',['../classGLFWWrapper.html',1,'']]]
 ];

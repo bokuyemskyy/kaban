@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['layoutmanager_0',['LayoutManager',['../classLayoutManager.html',1,'']]]
+  ['delta_0',['Delta',['../structDelta.html',1,'']]],
+  ['direction_1',['Direction',['../structDirection.html',1,'']]]
 ];

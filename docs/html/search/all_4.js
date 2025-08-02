@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['move_0',['Move',['../structMove.html',1,'']]]
+  ['file_0',['File',['../structFile.html',1,'']]],
+  ['flag_1',['Flag',['../structFlag.html',1,'']]]
 ];
