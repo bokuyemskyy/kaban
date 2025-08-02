@@ -4,8 +4,8 @@ OUTPUT_DIRECTORY       = docs
 GENERATE_HTML          = YES
 GENERATE_LATEX         = NO
 USE_MDFILE_AS_MAINPAGE = README.md
-INPUT                  =  project/
-EXCLUDE_PATTERNS       = */test/*
+INPUT                  = app/
+EXCLUDE_PATTERNS       = */tests/*
 RECURSIVE              = YES
 
 FILE_PATTERNS          = *.c \

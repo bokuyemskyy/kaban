@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['bitboard_0',['Bitboard',['../classBitboard.html',1,'']]]
+  ['appstate_0',['AppState',['../classAppState.html',1,'']]],
+  ['attackgenerator_1',['AttackGenerator',['../classAttackGenerator.html',1,'']]]
 ];
