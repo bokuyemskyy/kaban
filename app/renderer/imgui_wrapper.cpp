@@ -13,6 +13,7 @@ void IMGUIWrapper::initialize(GLFWwindow *window) {
     ImGui::StyleColorsDark();
 
     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    ImGui::GetIO().IniFilename = nullptr;
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
