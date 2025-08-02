@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <sstream>
 #include <thread>
 
@@ -20,14 +21,28 @@ class UCI {
     }
 
    private:
+    static bool inputAvailable() {
+        fd_set readfds;
+        FD_ZERO(&readfds);
+        FD_SET(STDIN_FILENO, &readfds);
+        timeval timeout = {.tv_sec = 0, .tv_usec = 0};
+        return select(STDIN_FILENO + 1, &readfds, nullptr, nullptr, &timeout) > 0;
+    }
+
     void runLoop() {
         std::string line;
-        while (!m_state->shouldQuit() && std::getline(std::cin, line)) {
-            if (line == "quit") {
-                m_state->signalQuit();
-                break;
+        while (!m_state->shouldQuit()) {
+            if (inputAvailable()) {
+                if (std::getline(std::cin, line)) {
+                    if (line == "quit") {
+                        m_state->signalQuit();
+                        break;
+                    }
+                    processCommand(line);
+                }
+            } else {
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
-            processCommand(line);
         }
     }
 
@@ -61,9 +76,9 @@ class UCI {
         });
     }
 
-    void handlePerft(const std::string& command) {
-        int depth = std::stoi(command.substr(9));
-        m_state->applyToCurrentGame([depth](Game& game) { game.perft(depth); });
+    void handlePerft(const std::string& /*command*/) {
+        // int depth = std::stoi(command.substr(9));
+        // m_state->applyToCurrentGame([depth](Game& game) { game.perft(depth); });
     }
 
     AppState*   m_state = nullptr;
@@ -71,7 +86,7 @@ class UCI {
 };
 
 /*
-Just a shortcut, I have to find place for it in UCI
+Just a piece of code I have used, I have to find place for it in UCI
 int testPerformance(Game& game, int depth, bool verbose = false) {
     auto start = std::chrono::high_resolution_clock::now();
 
