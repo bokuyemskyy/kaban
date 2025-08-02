@@ -19,7 +19,7 @@ class Position {
    public:
     Position(const std::string &fen = DEFAULT_FEN) { setFromFEN(fen); }
 
-    void                      setFromFEN(const std::string &fen);
+    void                      setFromFEN(const std::string &fen = DEFAULT_FEN);
     [[nodiscard]] std::string toFEN() const;
 
     void setPiece(Square square, Piece p);
