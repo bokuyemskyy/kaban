@@ -50,7 +50,7 @@ size_t generateMoves(const Position& position, std::array<Move, MAX_MOVES>& move
 template <bool Root>
 int perft(Position& position, int depth, std::vector<Move>& moveStack) {
     const size_t start = moveStack.size();
-    const size_t count = generatePseudoLegalMoves(moveStack);
+    const size_t count = generateMoves(position, moveStack);
 
     int nodes = 0;
 

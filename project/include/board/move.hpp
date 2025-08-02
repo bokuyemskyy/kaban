@@ -4,6 +4,7 @@
 #define MOVE_HPP
 
 #include <cstdint>
+#include <string>
 
 #include "navigation.hpp"
 

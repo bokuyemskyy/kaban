@@ -22,6 +22,10 @@ struct Bitboard {
         m_value &= other.m_value;
         return *this;
     }
+    constexpr Bitboard& operator^=(const Bitboard& other) {
+        m_value ^= other.m_value;
+        return *this;
+    }
 
     constexpr operator uint64_t() const { return m_value; }
 
