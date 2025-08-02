@@ -13,7 +13,7 @@
 #include "bitboard.hpp"
 #include "piece.hpp"
 
-void Position::setFromFEN(const std::string &fen = DEFAULT_FEN) {
+void Position::setFromFEN(const std::string &fen) {
     resetBoard();
 
     std::stringstream ss(fen);
