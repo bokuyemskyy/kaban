@@ -30,6 +30,8 @@ class ResourceManager {
      * @brief connects resource filename strings to the correspondent data
      */
     static void loadResources();
+
+    static void init() { loadResources(); }
 };
 
 #endif
