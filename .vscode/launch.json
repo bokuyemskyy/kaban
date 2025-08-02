@@ -5,7 +5,7 @@
             "name": "Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/out/bin/debug/main",
+            "program": "${workspaceFolder}/build/Debug/kaban",
             "cwd": "${workspaceFolder}",
             "externalConsole": false,
             "setupCommands": [
