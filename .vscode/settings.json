@@ -2,6 +2,7 @@
     "terminal.integrated.defaultProfile.linux": "bash",
     "cmake.generator": "Ninja",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
     "C_Cpp.intelliSenseEngine": "disabled",
     "C_Cpp.formatting": "disabled",
     "C_Cpp.codeAnalysis.clangTidy.enabled": true,
