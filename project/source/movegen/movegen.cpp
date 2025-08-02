@@ -4,10 +4,9 @@
 #include <vector>
 
 #include "bitboard.hpp"
-#include "direction.hpp"
 #include "magic.hpp"
+#include "navigation.hpp"
 #include "piece.hpp"
-#include "square.hpp"
 
 namespace Movegen {
 
@@ -19,7 +18,7 @@ std::array<std::array<Bitboard, Square::NB>, Color::NB> pawnSinglePushes{};
 std::vector<Bitboard> bishopAttacks(BISHOP_ATTACK_NB);
 std::vector<Bitboard> rookAttacks(ROOK_ATTACK_NB);
 
-template <GenerationType T, Color US>
+template <GenerationType T, uint8_t US>
 size_t generateMovesByColor(const Position& position, std::array<Move, MAX_MOVES>& moveList) {}
 
 template <GenerationType T>

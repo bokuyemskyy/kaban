@@ -7,11 +7,6 @@
 
 float eucledianDistance(const std::pair<float, float> &a, const std::pair<float, float> &b);
 
-struct Dimensions {
-    int width;
-    int height;
-};
-
 constexpr Square lsb(const Bitboard &x) { return static_cast<Square>(__builtin_ctzll(x)); }
 constexpr Square popLSB(Bitboard &x) {
     Square i = lsb(x);

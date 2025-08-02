@@ -1,8 +1,6 @@
-
 #include "app_state.hpp"
-#include "include/uci/uci.hpp"
 #include "renderer.hpp"
-#include "utils.hpp"
+#include "uci.hpp"
 
 int main() {
     AppState app_state;
@@ -10,7 +8,7 @@ int main() {
     Renderer renderer;
     UCI      uci;
 
-    renderer.start(Dimensions(800, 600), "Kaban", true, app_state);
+    renderer.start(800, 600, "Kaban", true, app_state);
     uci.start(app_state);
 
     while (!app_state.shouldQuit()) {

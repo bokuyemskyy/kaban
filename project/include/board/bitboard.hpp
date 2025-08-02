@@ -1,5 +1,4 @@
-#ifndef BITBOARD_HPP
-#define BITBOARD_HPP
+#pragma once
 
 #include <array>
 #include <cassert>
@@ -139,4 +138,3 @@ struct Bitboard {
    private:
     uint64_t m_value;
 };
-#endif

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <list>
 #include <string>
 
@@ -53,5 +52,3 @@ class Position {
     Castling m_castling  = Castling::ANY;
     uint8_t  m_halfmoves = 0;
 };
-
-#endif

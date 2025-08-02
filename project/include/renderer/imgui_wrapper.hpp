@@ -9,8 +9,6 @@
 
 #include <string>
 
-#include "utils.hpp"
-
 class GLFWwindow {};
 
 class IMGUIWrapper {
@@ -31,5 +29,6 @@ class IMGUIWrapper {
     void keepWindowInBounds(const char *windowName) const;
 
    private:
-    Dimensions m_dimensions;
+    int m_width;
+    int m_height;
 };

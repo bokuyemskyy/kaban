@@ -63,7 +63,7 @@ class UCI {
 
     void handlePerft(const std::string& command) {
         int depth = std::stoi(command.substr(9));
-        m_state->applyToAllGames([depth](Game& game) { game.perft(depth); });
+        m_state->applyToCurrentGame([depth](Game& game) { game.perft(depth); });
     }
 
     AppState*   m_state = nullptr;
