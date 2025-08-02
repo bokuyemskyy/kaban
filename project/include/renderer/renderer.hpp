@@ -1,5 +1,6 @@
 #pragma once
 
+#include <thread>
 #include <vector>
 
 #include "app_state.hpp"
@@ -7,18 +8,36 @@
 #include "glfw_wrapper.hpp"
 #include "imgui_wrapper.hpp"
 #include "resource_manager.hpp"
-#include "utils.hpp"
 
 class Renderer {
    public:
-    Renderer()  = default;
-    ~Renderer() = default;
-
-    void start(Dimensions dimensions, const char *title, bool useVsync, AppState appState) {
-        ResourceManager::init();
-        initialize(dimensions, title, useVsync);
+    void start(int width, int height, const char *title, bool use_vsync, AppState &app_state) {
+        m_app_state = &app_state;
+        m_thread    = std::thread([width, height, title, use_vsync, this, &app_state] {
+            ResourceManager::init();
+            initialize(width, height, title, use_vsync);
+            runLoop();
+            terminate();
+        });
     }
-    void initialize(Dimensions dimensions, const char *title, bool useVsync);
+    void stop() {
+        if (m_thread.joinable()) {
+            m_thread.join();
+        }
+    }
+
+   private:
+    void initialize(int width, int height, const char *title, bool use_vsync);
+    void runLoop() {
+        while (!m_glfw.windowShouldClose() && !m_app_state->shouldQuit()) {
+            m_app_state->render([this](const auto &games) {
+                for (const auto &game : games) {
+                    renderGame(game);
+                }
+            });
+        }
+        state_->signalQuit();
+    }
     void terminate();
 
     void render();
@@ -28,20 +47,20 @@ class Renderer {
     void finishFrame();
     void attachGames(std::vector<Game> &games) { m_games = &games; }
     void toggleDemoWindow();
-    bool windowShouldClose();
     void updateMousePosition() {
         m_mousePos.first  = ImGui::GetMousePos().x;
         m_mousePos.second = ImGui::GetMousePos().y;
     }
-    const std::pair<float, float> &getMousePosition() const { return m_mousePos; }
-    ImTextureID                    loadTextureFromResources(const std::string &filename);
-    void                           loadTextures();
-    void                           drawMainMenuBar();
-    void                           drawDemoWindow();
-    void                           drawLostPieces();
-    void                           drawGameInfo();
-    void                           drawWorkspace();
-    void                           drawGame();
+    [[nodiscard]] const std::pair<float, float> &getMousePosition() const { return m_mousePos; }
+    static ImTextureID                           loadTextureFromResources(const std::string &filename);
+    void                                         loadTextures();
+
+    void drawMainMenuBar();
+    void drawDemoWindow();
+    void drawLostPieces();
+    void drawGameInfo();
+    void drawWorkspace();
+    void drawGame();
 
    private:
     std::vector<Game> *m_games;
@@ -62,4 +81,7 @@ class Renderer {
     double m_deltaTime      = 0;
     double m_currentTime    = 0;
     bool   m_showDemoWindow = false;
+
+    AppState   *m_app_state = nullptr;
+    std::thread m_thread;
 };

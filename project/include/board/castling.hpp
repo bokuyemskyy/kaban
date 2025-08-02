@@ -30,7 +30,7 @@ struct Castling {
     [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
     [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
 
-    constexpr operator uint8_t() { return m_value; }
+    constexpr operator uint8_t() const { return m_value; }
 
    private:
     uint8_t m_value;

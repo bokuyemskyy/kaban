@@ -1,13 +1,7 @@
 #pragma once
 
-#include <cstdint>
-
 #include "castling.hpp"
 #include "navigation.hpp"
-
-#pragma once
-#include <cassert>
-#include <cstdint>
 
 struct Flag {
    public:
@@ -75,15 +69,13 @@ struct Move {
     constexpr Move(Square from, Square to, Flag flag = Flag::USUAL, Promotion promotion = Promotion::TO_QUEEN)
         : m_value((promotion << PROMO_SHIFT) | (flag << FLAG_SHIFT) | (to << TO_SHIFT) | from) {}
 
-    [[nodiscard]] constexpr Square from() const { return Square(m_value & Square::mask()); }
+    [[nodiscard]] constexpr Square from() const { return m_value & Square::mask(); }
 
-    [[nodiscard]] constexpr Square to() const { return Square((m_value >> TO_SHIFT) & Square::mask()); }
+    [[nodiscard]] constexpr Square to() const { return (m_value >> TO_SHIFT) & Square::mask(); }
 
-    [[nodiscard]] constexpr Flag flag() const { return Flag((m_value >> FLAG_SHIFT) & Flag::mask()); }
+    [[nodiscard]] constexpr Flag flag() const { return (m_value >> FLAG_SHIFT) & Flag::mask(); }
 
-    [[nodiscard]] constexpr Promotion promotion() const {
-        return Promotion((m_value >> PROMO_SHIFT) & Promotion::mask());
-    }
+    [[nodiscard]] constexpr Promotion promotion() const { return (m_value >> PROMO_SHIFT) & Promotion::mask(); }
 
     constexpr operator uint16_t() const { return m_value; }
 
@@ -107,20 +99,39 @@ struct Move {
 
 struct Delta {
    public:
+    constexpr Delta() : m_value(0) {}
+
     constexpr Delta(Piece captured, Castling castling, uint8_t enpassant, uint8_t halfmoves, uint8_t extraFlags = 0)
-        : m_value((captured & 0xF) | ((castling & 0xF) << 4) | ((enpassant & 0x3F) << 8) | ((halfmoves & 0xFF) << 14) |
-                  ((extraFlags & 0x3) << 22)) {}
+        : m_value((static_cast<uint32_t>(captured) << CAPTURE_SHIFT) |
+                  (static_cast<uint32_t>(castling) << CASTLING_SHIFT) |
+                  (static_cast<uint32_t>(enpassant) << ENPASSANT_SHIFT) |
+                  (static_cast<uint32_t>(halfmoves) << HALFMOVES_SHIFT) |
+                  (static_cast<uint32_t>(extraFlags) << EXTRA_SHIFT)) {}
 
     constexpr Delta(uint32_t raw) : m_value(raw) {}
 
     constexpr operator uint32_t() const { return m_value; }
 
-    [[nodiscard]] constexpr Piece    captured() const { return m_value & 0xF; }
-    [[nodiscard]] constexpr Castling castling() const { return (m_value >> 4) & 0xF; }
-    [[nodiscard]] constexpr uint8_t  enpassant() const { return (m_value >> 8) & 0x3F; }
-    [[nodiscard]] constexpr uint8_t  halfmoves() const { return (m_value >> 14) & 0xFF; }
-    [[nodiscard]] constexpr uint8_t  extraFlags() const { return (m_value >> 22) & 0x3; }
+    [[nodiscard]] constexpr Piece    captured() const { return (m_value >> CAPTURE_SHIFT) & CAPTURE_MASK; }
+    [[nodiscard]] constexpr Castling castling() const {
+        return static_cast<Castling>((m_value >> CASTLING_SHIFT) & CASTLING_MASK);
+    }
+    [[nodiscard]] constexpr uint8_t enpassant() const { return (m_value >> ENPASSANT_SHIFT) & ENPASSANT_MASK; }
+    [[nodiscard]] constexpr uint8_t halfmoves() const { return (m_value >> HALFMOVES_SHIFT) & HALFMOVES_MASK; }
+    [[nodiscard]] constexpr uint8_t extraFlags() const { return (m_value >> EXTRA_SHIFT) & EXTRA_MASK; }
 
    private:
     uint32_t m_value;
+
+    static constexpr int CAPTURE_SHIFT   = 0;
+    static constexpr int CASTLING_SHIFT  = 4;
+    static constexpr int ENPASSANT_SHIFT = 8;
+    static constexpr int HALFMOVES_SHIFT = 14;
+    static constexpr int EXTRA_SHIFT     = 22;
+
+    static constexpr uint32_t CAPTURE_MASK   = 0xF;
+    static constexpr uint32_t CASTLING_MASK  = 0xF;
+    static constexpr uint32_t ENPASSANT_MASK = 0x3F;
+    static constexpr uint32_t HALFMOVES_MASK = 0xFF;
+    static constexpr uint32_t EXTRA_MASK     = 0x3;
 };

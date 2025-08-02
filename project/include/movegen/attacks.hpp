@@ -63,30 +63,30 @@ class AttackGenerator {
         return table[square];
     }
 
-    template <PieceType PT>
+    template <uint8_t PIECETYPE>
     static constexpr Bitboard attacksBB(Square square, Bitboard occupied = Bitboard::zero()) {
-        if constexpr (PT == PieceType::KNIGHT) {
+        if constexpr (PIECETYPE == PieceType::KNIGHT) {
             return knightAttacksBB(square);
-        } else if constexpr (PT == PieceType::BISHOP) {
+        } else if constexpr (PIECETYPE == PieceType::BISHOP) {
             return bishopAttacksBB(square, occupied);
-        } else if constexpr (PT == PieceType::ROOK) {
+        } else if constexpr (PIECETYPE == PieceType::ROOK) {
             return rookAttacksBB(square, occupied);
-        } else if constexpr (PT == PieceType::QUEEN) {
+        } else if constexpr (PIECETYPE == PieceType::QUEEN) {
             return queenAttacksBB(square, occupied);
-        } else if constexpr (PT == PieceType::KING) {
+        } else if constexpr (PIECETYPE == PieceType::KING) {
             return kingAttacksBB(square);
         } else {
-            static_assert(PT != PieceType::PAWN, "Use pawnAttacksBB with color parameter for pawn attacks");
+            static_assert(PIECETYPE != PieceType::PAWN, "Use pawnAttacksBB with color parameter for pawn attacks");
             return Bitboard::zero();
         }
     }
 
-    template <PieceType PT>
+    template <uint8_t PIECETYPE>
     static constexpr Bitboard attacksBB(Color color, Square square, Bitboard occupied = Bitboard::zero()) {
-        if constexpr (PT == PieceType::PAWN) {
+        if constexpr (PIECETYPE == PieceType::PAWN) {
             return pawnAttacksBB(color, square);
         } else {
-            return attacksBB<PT>(square, occupied);
+            return attacksBB<PIECETYPE>(square, occupied);
         }
     }
 
@@ -106,18 +106,18 @@ class AttackGenerator {
 
     static constexpr Bitboard pawnAttacks(Color color, Square square) { return pawnAttacksBB(color, square); }
 
-    template <PieceType PT>
+    template <uint8_t PIECETYPE>
     static constexpr bool isAttackedBy(Square target, Square attacker, Bitboard occupied = Bitboard::zero()) {
-        return (attacksBB<PT>(attacker, occupied) & Bitboard::squareBB(target)) != Bitboard::zero();
+        return (attacksBB<PIECETYPE>(attacker, occupied) & Bitboard::squareBB(target)) != Bitboard::zero();
     }
 
-    template <PieceType PT>
+    template <uint8_t PIECETYPE>
     static constexpr bool isAttackedBy(Color color, Square target, Square attacker,
                                        Bitboard occupied = Bitboard::zero()) {
-        if constexpr (PT == PieceType::PAWN) {
+        if constexpr (PIECETYPE == PieceType::PAWN) {
             return (pawnAttacksBB(color, attacker) & Bitboard::squareBB(target)) != Bitboard::zero();
         } else {
-            return isAttackedBy<PT>(target, attacker, occupied);
+            return isAttackedBy<PIECETYPE>(target, attacker, occupied);
         }
     }
 };

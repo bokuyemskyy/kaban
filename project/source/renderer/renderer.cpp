@@ -19,14 +19,15 @@ constexpr int   PIECE_MARGIN         = 4;
 constexpr ImU32 IM_WHITE             = IM_COL32(255, 255, 255, 255);
 constexpr int   a_CHAR               = 97;
 
-void Renderer::initialize(Dimensions dimensions, const char *title, bool useVsync) {
-    m_glfw.initialize(dimensions, title, useVsync);
+void Renderer::initialize(int width, int height, const char *title, bool use_vsync) {
+    m_glfw.initialize(width, height, title, use_vsync);
     m_imgui.initialize(m_glfw.window());
 
     loadTextures();
 
     updateTime();
 }
+
 void Renderer::drawMainMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
@@ -220,8 +221,6 @@ void Renderer::terminate() {
     m_imgui.terminate();
     m_glfw.terminate();
 }
-
-bool Renderer::windowShouldClose() { return m_glfw.windowShouldClose(); }
 
 void Renderer::toggleDemoWindow() { m_showDemoWindow = !m_showDemoWindow; }
 
