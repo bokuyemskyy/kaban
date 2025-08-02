@@ -1,5 +1,4 @@
-#ifndef APP_STATE
-#define APP_STATE
+#pragma once
 
 #include <atomic>
 #include <functional>
@@ -36,5 +35,3 @@ class AppState {
     std::mutex        m_mutex;
     std::atomic<bool> m_quit_flag{false};
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef MAGIC_HPP
-#define MAGIC_HPP
+#pragma once
 
 #include <array>
 #include <cassert>
@@ -230,5 +229,3 @@ constexpr Bitboard bishopAttacksBB(Square square, Bitboard occupancy) {
 constexpr Bitboard queenAttacksBB(Square square, Bitboard occupancy) {
     return rookAttacksBB(square, occupancy) | bishopAttacksBB(square, occupancy);
 }
-
-#endif

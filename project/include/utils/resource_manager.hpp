@@ -1,5 +1,4 @@
-#ifndef RESOURCE_MANAGER_HPP
-#define RESOURCE_MANAGER_HPP
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -33,5 +32,3 @@ class ResourceManager {
 
     static void init() { loadResources(); }
 };
-
-#endif

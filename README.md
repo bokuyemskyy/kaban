@@ -35,10 +35,11 @@ This project is a learning endeavor to deepen my understanding of chess engine d
 
 1) Have VCPKG installed on your machine
 2) Set VCPKG_ROOT variable in your shell
+3) ...
+
 ```bash
 git clone https://github.com/bokuyemskyy/kaban.git
 cd kaban
-
 
 # Run cmake build as usual
 cmake --preset release -B build

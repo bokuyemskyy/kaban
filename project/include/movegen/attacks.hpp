@@ -1,5 +1,4 @@
-#ifndef ATTACKS_HPP
-#define ATTACKS_HPP
+#pragma once
 
 #include <array>
 
@@ -122,5 +121,3 @@ class AttackGenerator {
         }
     }
 };
-
-#endif

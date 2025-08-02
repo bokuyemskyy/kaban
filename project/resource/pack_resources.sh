@@ -4,8 +4,7 @@ RESOURCE_DIR="resources"
 HEADER_FILE="./resources.hpp"
 SOURCE_FILE="./resources.cpp"
 
-echo "#ifndef RESOURCES_HPP" > $HEADER_FILE
-echo "#define RESOURCES_HPP" >> $HEADER_FILE
+echo "#pragma once" >> $HEADER_FILE
 echo "" >> $HEADER_FILE
 
 echo "#include \"resources.hpp\"" > $SOURCE_FILE
@@ -23,7 +22,5 @@ for FILE in *; do
         echo "" >> $HEADER_FILE
     fi
 done
-
-echo "#endif" >> $HEADER_FILE
 
 echo "Resources were generated."

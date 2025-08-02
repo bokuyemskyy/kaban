@@ -1,5 +1,4 @@
-#ifndef UCI_HPP
-#define UCI_HPP
+#pragma once
 
 #include <sstream>
 #include <thread>
@@ -9,6 +8,7 @@
 class UCI {
    public:
     void start(AppState& state) {
+        std::cout.setf(std::ios::unitbuf);
         m_state  = &state;
         m_thread = std::thread([this] { runLoop(); });
     }
@@ -69,8 +69,6 @@ class UCI {
     AppState*   m_state = nullptr;
     std::thread m_thread;
 };
-
-#endif
 
 /*
 Just a shortcut, I have to find place for it in UCI

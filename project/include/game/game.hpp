@@ -1,5 +1,4 @@
-#ifndef GAME_HPP
-#define GAME_HPP
+#pragma once
 
 #include <string>
 
@@ -23,5 +22,3 @@ class Game {
     std::string                         m_gameName;
     std::pair<std::string, std::string> m_opponents;
 };
-
-#endif

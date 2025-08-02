@@ -1,5 +1,4 @@
-#ifndef IMGUI_WRAPPER_HPP
-#define IMGUI_WRAPPER_HPP
+#pragma once
 
 #define IMGUI_ENABLE_DOCKING
 
@@ -34,5 +33,3 @@ class IMGUIWrapper {
    private:
     Dimensions m_dimensions;
 };
-
-#endif

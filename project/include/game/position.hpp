@@ -1,5 +1,4 @@
-#ifndef POSITION_HPP
-#define POSITION_HPP
+#pragma once
 
 #include <array>
 #include <list>
