@@ -1,5 +1,4 @@
-#ifndef NAVIGATION_HPP
-#define NAVIGATION_HPP
+#pragma once
 
 #include <sys/types.h>
 
@@ -225,5 +224,3 @@ constexpr std::array<Direction, 8> queenDirections = {Direction::NE, Direction::
 
 constexpr std::array<Direction, 8> kingDirections = {Direction::E,  Direction::N,  Direction::W,  Direction::S,
                                                      Direction::NE, Direction::NW, Direction::SE, Direction::SW};
-
-#endif

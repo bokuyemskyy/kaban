@@ -1,5 +1,4 @@
-#ifndef CASTLING_HPP
-#define CASTLING_HPP
+#pragma once
 
 #include <cstdint>
 
@@ -36,4 +35,3 @@ struct Castling {
    private:
     uint8_t m_value;
 };
-#endif

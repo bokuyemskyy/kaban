@@ -1,5 +1,4 @@
-#ifndef MOVEGEN_HPP
-#define MOVEGEN_HPP
+#pragma once
 
 #include <array>
 #include <cstddef>
@@ -84,5 +83,3 @@ int perft(Position& position, int depth, bool verbose = true) {
 }
 
 }  // namespace Movegen
-
-#endif

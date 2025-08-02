@@ -1,13 +1,9 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#pragma once
 
-#include <cmath>
 #include <cstdint>
-#include <string>
 #include <utility>
 
 #include "bitboard.hpp"
-#include "move.hpp"
 
 float eucledianDistance(const std::pair<float, float> &a, const std::pair<float, float> &b);
 
@@ -23,5 +19,3 @@ constexpr Square popLSB(Bitboard &x) {
     return i;
 }
 constexpr uint8_t popCount(Bitboard x) { return __builtin_popcountll(x); }
-
-#endif
