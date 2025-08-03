@@ -9,6 +9,7 @@
 
 #include "iterator.hpp"
 #include "piece.hpp"
+#include "rect.hpp"
 
 template <typename Derived>
 struct Coordinate : Iterable<Derived> {
@@ -154,6 +155,11 @@ struct Square : Coordinate<Square> {
     [[nodiscard]] constexpr File file() const { return m_value & File::mask(); }
     [[nodiscard]] constexpr Rank rank() const { return m_value >> File::size(); }
 
+    [[nodiscard]] constexpr bool                  light() const { return (file() + rank()) % 2 == 0; }
+    [[nodiscard]] constexpr NormalizedRect<float> normalizedRect() const {
+        return {file() / static_cast<float>(File::number()), rank() / static_cast<float>(Rank::number()),
+                1 / static_cast<float>(File::number()), 1 / static_cast<float>(Rank::number())};
+    }
     static constexpr uint8_t distance(Square from, Square to) {
         static constexpr auto table = []() constexpr {
             std::array<std::array<uint8_t, NB>, NB> t{};

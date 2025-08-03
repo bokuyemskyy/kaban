@@ -122,7 +122,7 @@ size_t generatePseudoLegalMoves(std::vector<Move>* /*moveStack*/) {
 
     pieces = position.m_colorBB[m_turn] & m_pieceTypeBB[PieceType::PAWN];
     while (pieces != Bitboard::zero()) {
-        Square   square     = popLSB(pieces);
+        Square   square     = poplsb(pieces);
         Bitboard singlePush = Movegen::pawnSinglePushes[m_turn][square];
 
         if ((singlePush & m_occupancy) == Bitboard::zero()) {
@@ -130,67 +130,67 @@ size_t generatePseudoLegalMoves(std::vector<Move>* /*moveStack*/) {
                 Bitboard doublePush = m_turn == Color::WHITE ? (singlePush << 8) : (singlePush >> 8);
 
                 if ((doublePush & m_occupancy) == Bitboard::zero()) {
-                    moveBuffer.emplace_back(createMove(square, popLSB(doublePush), 0));
+                    moveBuffer.emplace_back(createMove(square, poplsb(doublePush), 0));
                 }
             }
-            moveBuffer.emplace_back(createMove(square, popLSB(singlePush), 0));
+            moveBuffer.emplace_back(createMove(square, poplsb(singlePush), 0));
         }
 
         Bitboard attacksBB = Movegen::pawnAttacks[m_turn][square] & m_colorBB[!m_turn];
 
         while (attacksBB != Bitboard::zero()) {
-            moveBuffer.emplace_back(createMove(square, popLSB(attacksBB), 0));
+            moveBuffer.emplace_back(createMove(square, poplsb(attacksBB), 0));
         }
     }
 
     pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceType::KNIGHT];
     while (pieces != Bitboard::zero()) {
-        Square   square    = popLSB(pieces);
+        Square   square    = poplsb(pieces);
         Bitboard attacksBB = Movegen::getMovesBB<PieceType::KNIGHT>(this, square) & ~m_colorBB[m_turn];
         while (attacksBB != Bitboard::zero()) {
-            moveBuffer.emplace_back(createMove(square, popLSB(attacksBB), 0));
+            moveBuffer.emplace_back(createMove(square, poplsb(attacksBB), 0));
         }
     }
     pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceType::BISHOP];
     while (pieces != Bitboard::zero()) {
-        Square   square = popLSB(pieces);
+        Square   square = poplsb(pieces);
         Bitboard attacksBB =
             Movegen::getMovesBB<PieceType::BISHOP>(square)
                 Movegen::bishopAttacks[square][Movegen::getIndexOfOccupancy<PieceType::BISHOP>(square, m_occupancy)] &
             ~m_colorBB[m_turn];
         while (attacksBB != Bitboard::zero()) {
-            moveBuffer.emplace_back(createMove(square, popLSB(attacksBB), 0));
+            moveBuffer.emplace_back(createMove(square, poplsb(attacksBB), 0));
         }
     }
     pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceType::ROOK];
     while (pieces != Bitboard::zero()) {
-        Square   square = popLSB(pieces);
+        Square   square = poplsb(pieces);
         Bitboard attacksBB =
             Movegen::rookAttacks[square][Movegen::getIndexOfOccupancy<PieceType::ROOK>(square, m_occupancy)] &
             ~m_colorBB[m_turn];
         while (attacksBB != Bitboard::zero()) {
-            moveBuffer.emplace_back(createMove(square, popLSB(attacksBB), 0));
+            moveBuffer.emplace_back(createMove(square, poplsb(attacksBB), 0));
         }
     }
 
     pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceType::QUEEN];
     while (pieces != Bitboard::zero()) {
-        Square   square = popLSB(pieces);
+        Square   square = poplsb(pieces);
         Bitboard attacksBB =
             (Movegen::rookAttacks[square][Movegen::getIndexOfOccupancy<PieceType::ROOK>(square, m_occupancy)] |
              Movegen::bishopAttacks[square][Movegen::getIndexOfOccupancy<PieceType::BISHOP>(square, m_occupancy)]) &
             ~m_colorBB[m_turn];
         while (attacksBB != Bitboard::zero()) {
-            moveBuffer.emplace_back(createMove(square, popLSB(attacksBB), 0));
+            moveBuffer.emplace_back(createMove(square, poplsb(attacksBB), 0));
         }
     }
 
     pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceType::KING];
     while (pieces != 0ULL) {
-        Square   square    = popLSB(pieces);
+        Square   square    = poplsb(pieces);
         Bitboard attacksBB = Movegen::pseudoAttacks[PieceType::KING][square] & ~m_colorBB[m_turn];
         while (attacksBB != Bitboard::zero()) {
-            moveBuffer.emplace_back(createMove(square, popLSB(attacksBB), 0));
+            moveBuffer.emplace_back(createMove(square, poplsb(attacksBB), 0));
         }
     }
     return moveBuffer.size() - prevBufferSize;

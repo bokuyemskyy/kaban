@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <atomic>
@@ -10,7 +9,7 @@
 
 #include "game.hpp"
 
-class AppState {
+class Session {
    public:
     void addGame(const std::function<void(Game&)>& initializer = {}) {
         std::lock_guard lock(m_mutex);
@@ -64,15 +63,16 @@ class AppState {
         }
     }
 
-    struct UISnapshot {
-        std::vector<std::string>   game_titles;
-        std::optional<std::size_t> selected_index;
-        const Game*                current_game = nullptr;
+    struct SessionSnapshot {
+        std::vector<std::string>     game_titles;
+        std::optional<std::size_t>   selected_index;
+        const Game*                  current_game = nullptr;
+        [[nodiscard]] constexpr bool empty() const { return game_titles.empty(); }
     };
 
-    UISnapshot snapshot() const {
+    SessionSnapshot snapshot() const {
         std::lock_guard lock(m_mutex);
-        UISnapshot      snap;
+        SessionSnapshot snap;
         snap.game_titles.reserve(m_games.size());
 
         for (const auto& game : m_games) {

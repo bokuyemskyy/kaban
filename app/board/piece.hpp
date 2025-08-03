@@ -174,3 +174,10 @@ struct Piece {
    private:
     uint8_t m_value;
 };
+
+namespace std {
+template <>
+struct hash<Piece> {
+    std::size_t operator()(const Piece& piece) const { return std::hash<int>()(piece.value()); }
+};
+}  // namespace std
