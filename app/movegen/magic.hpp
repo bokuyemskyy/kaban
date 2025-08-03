@@ -8,7 +8,7 @@
 #include "bitboard.hpp"
 #include "navigation.hpp"
 #include "piece.hpp"
-#include "utils.hpp"
+
 using Shift = uint8_t;
 
 struct Magic {
@@ -112,7 +112,7 @@ class Magics {
         for (auto square : Square::all()) {
             Magic& magic        = rookMagics[square];
             magic.premask       = premask(PieceType::ROOK, square);
-            magic.shift         = Square::number() - popCount(magic.premask);
+            magic.shift         = Square::number() - popcount(magic.premask);
             magic.attacksOffset = attacksOffset;
 
             std::array<Bitboard, MAX_OCCUPANCIES> occupancies{};
@@ -134,7 +134,7 @@ class Magics {
             PRNG rng(static_cast<uint64_t>(seeds[0][square.rank()]));
 
             for (size_t i = 0; i < size;) {
-                for (magic.magic = Bitboard::zero(); popCount((magic.magic * magic.premask) >> 56) < 6;) {
+                for (magic.magic = Bitboard::zero(); popcount((magic.magic * magic.premask) >> 56) < 6;) {
                     magic.magic = rng.sparse_rand<Bitboard>();
                 }
                 for (++cnt, i = 0; i < size; ++i) {
@@ -148,13 +148,13 @@ class Magics {
                 }
             }
 
-            attacksOffset += (1ULL << popCount(magic.premask));
+            attacksOffset += (1ULL << popcount(magic.premask));
         }
 
         for (auto square : Square::all()) {
             Magic& magic        = bishopMagics[square];
             magic.premask       = premask(PieceType::BISHOP, square);
-            magic.shift         = Square::number() - popCount(magic.premask);
+            magic.shift         = Square::number() - popcount(magic.premask);
             magic.attacksOffset = attacksOffset;
 
             std::array<Bitboard, MAX_OCCUPANCIES> occupancies{};
@@ -175,7 +175,7 @@ class Magics {
             PRNG rng(static_cast<uint64_t>(seeds[1][square.rank()]));
 
             for (size_t i = 0; i < size;) {
-                for (magic.magic = Bitboard::zero(); popCount((magic.magic * magic.premask) >> 56) < 6;) {
+                for (magic.magic = Bitboard::zero(); popcount((magic.magic * magic.premask) >> 56) < 6;) {
                     magic.magic = rng.sparse_rand<Bitboard>();
                 }
 
@@ -190,7 +190,7 @@ class Magics {
                 }
             }
 
-            attacksOffset += (1ULL << popCount(magic.premask));
+            attacksOffset += (1ULL << popcount(magic.premask));
         }
 
         return std::make_tuple(rookMagics, bishopMagics, attacks);

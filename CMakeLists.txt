@@ -1,14 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 
-
-
 # initialization
 project("kaban")
 
 # scripts
-add_subdirectory(scripts/perft_compare)
-
-
+add_subdirectory(scripts/compare_perft)
 
 # release optimization
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
@@ -20,7 +16,6 @@ foreach(var
     set(${var} "${${var}} -O3 -march=native -flto -DNDEBUG"
         CACHE STRING "Tuned for performance" FORCE)
 endforeach()
-
 
 # compile options for code clarity 
 add_compile_options(
@@ -87,7 +82,7 @@ foreach(path ${HEADER_DIRS})
     endif()
 endforeach()
 include_directories(${INCLUDE_DIRS})
-include_directories(SYSTEM ${VCPKG_INCLUDE_DIR})
+#include_directories(SYSTEM ${VCPKG_INCLUDE_DIR})
 
 # building library
 if(LIB_SOURCES)
