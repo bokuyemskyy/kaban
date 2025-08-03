@@ -16,11 +16,20 @@ class Game {
     // the same should be implemented with undo
 
     void perft(int /*depth*/) {}
+
+    void                      setTitle(const std::string& title) { m_title = title; }
+    void                      setWhiteName(const std::string& name) { m_white_name = name; }
+    void                      setBlackName(const std::string& name) { m_black_name = name; }
+    [[nodiscard]] std::string title() const { return m_title.empty() ? whiteName() + " vs " + blackName() : m_title; }
+    [[nodiscard]] std::string whiteName() const { return m_white_name.empty() ? "Player White" : m_white_name; }
+    [[nodiscard]] std::string blackName() const { return m_black_name.empty() ? "Player Black" : m_black_name; }
+
     // get setters for string
-    [[nodiscard]] std::string title() const { return m_title; }
+    [[nodiscard]] const Position& position() const { return m_position; }
 
    private:
-    Position                            m_position;
-    std::string                         m_title;
-    std::pair<std::string, std::string> m_opponents;
+    Position    m_position;
+    std::string m_title;
+    std::string m_white_name;
+    std::string m_black_name;
 };

@@ -5,3 +5,14 @@ alignas of important arrays
 think about removing the arrays with precomputed attackmaps that are easier to compute again, than seek for in memory (pawns, at least)
 read something about _mm_popcnt_u64 and SIMD preferences, perf stat -e cache-misses,cache-references
 create the universal Movegen::GetAttackPreBB<PIECETYPE>(Square square, Bitboard occupancy)
+
+
+
+
+
+
+main first constructs the renderer and Uci and then start, stop;
+magics is a member of Movegen
+clear out what should be the properties of position, game 
+remove utils and put them into some meaningful modules
+make a module for textures 

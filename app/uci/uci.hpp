@@ -1,17 +1,16 @@
 #pragma once
 
 #include <chrono>
-#include <sstream>
 #include <thread>
 
-#include "app_state.hpp"
+#include "session.hpp"
 
 class UCI {
    public:
-    void start(AppState& state) {
+    void start(Session& session) {
         std::cout.setf(std::ios::unitbuf);
-        m_state  = &state;
-        m_thread = std::thread([this] { runLoop(); });
+        m_session = &session;
+        m_thread  = std::thread([this] { runLoop(); });
     }
 
     void stop() {
@@ -31,11 +30,11 @@ class UCI {
 
     void runLoop() {
         std::string line;
-        while (!m_state->shouldQuit()) {
+        while (!m_session->shouldQuit()) {
             if (inputAvailable()) {
                 if (std::getline(std::cin, line)) {
                     if (line == "quit") {
-                        m_state->signalQuit();
+                        m_session->signalQuit();
                         break;
                     }
                     processCommand(line);
@@ -57,7 +56,7 @@ class UCI {
     }
 
     void handlePosition(const std::string& command) {
-        m_state->applyToAllGames([&](Game& game) {
+        m_session->applyToAllGames([&](Game& game) {
             if (command.find("startpos") != std::string::npos) {
                 game.start();
             } else if (command.find("fen") != std::string::npos) {
@@ -81,7 +80,7 @@ class UCI {
         // m_state->applyToCurrentGame([depth](Game& game) { game.perft(depth); });
     }
 
-    AppState*   m_state = nullptr;
+    Session*    m_session = nullptr;
     std::thread m_thread;
 };
 

@@ -1,18 +1,18 @@
-#include "app_state.hpp"
 #include "renderer.hpp"
+#include "session.hpp"
 #include "uci.hpp"
 
 int main() {
-    AppState app_state;
+    Session session;
 
     Renderer renderer;
     UCI      uci;
 
-    renderer.start(800, 600, "Kaban", true, app_state);
-    uci.start(app_state);
+    renderer.start(800, 600, "Kaban", true, session);
+    uci.start(session);
 
-    while (!app_state.shouldQuit()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    while (!session.shouldQuit()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
     renderer.stop();
