@@ -4,7 +4,6 @@
 
 #include <cassert>
 #include <cstddef>
-#include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
@@ -87,8 +86,8 @@ void Position::set(Square square, Piece piece) {
     assert(piece != Piece::NONE);
 
     unset(square);
-    m_colorBB[piece.color()] |= Bitboard::squareBB(square);
-    m_pieceTypeBB[piece.pieceType()] |= Bitboard::squareBB(square);
+    m_color_bb[piece.color()] |= Bitboard::squareBB(square);
+    m_piece_type_bb[piece.pieceType()] |= Bitboard::squareBB(square);
     m_board[square] = piece;
 }
 
@@ -96,8 +95,8 @@ void Position::unset(Square square) {
     assert(square != Square::NONE);
 
     if (m_board[square] == Piece::NONE) return;
-    m_colorBB[m_board[square].color()] &= ~Bitboard::squareBB(square);
-    m_pieceTypeBB[m_board[square].pieceType()] &= ~Bitboard::squareBB(square);
+    m_color_bb[m_board[square].color()] &= ~Bitboard::squareBB(square);
+    m_piece_type_bb[m_board[square].pieceType()] &= ~Bitboard::squareBB(square);
     m_board[square] = Piece::NONE;
 }
 void Position::clear() {
@@ -107,7 +106,7 @@ void Position::clear() {
     m_turn = Color::WHITE;
 }
 
-inline void Position::toggleTurn() { m_turn = !m_turn; }
+inline void Position::nextTurn() { m_turn = !m_turn; }
 
 void Position::doMove(const Move move) {
     Square from = move.from();
@@ -120,17 +119,17 @@ void Position::doMove(const Move move) {
 
     if (m_board[to] != Piece::NONE) {
         Bitboard maskBB = ~Bitboard::squareBB(to);
-        m_colorBB[m_board[to].color()] &= maskBB;
-        m_pieceTypeBB[m_board[to].pieceType()] &= maskBB;
+        m_color_bb[m_board[to].color()] &= maskBB;
+        m_piece_type_bb[m_board[to].pieceType()] &= maskBB;
     }
 
-    m_colorBB[m_board[from].color()] ^= moveBB;
-    m_pieceTypeBB[m_board[from].pieceType()] ^= moveBB;
+    m_color_bb[m_board[from].color()] ^= moveBB;
+    m_piece_type_bb[m_board[from].pieceType()] ^= moveBB;
 
     m_board[to]   = m_board[from];
     m_board[from] = Piece::NONE;
 
-    toggleTurn();
+    nextTurn();
 }
 
 void Position::undoMove() {
@@ -155,17 +154,17 @@ void Position::undoMove() {
     m_board[from] = movedPiece;
     // m_board[to]   = capturedPiece;
 
-    m_colorBB[movedPiece.color()] ^= moveBB;
-    m_pieceTypeBB[movedPiece.pieceType()] ^= moveBB;
+    m_color_bb[movedPiece.color()] ^= moveBB;
+    m_piece_type_bb[movedPiece.pieceType()] ^= moveBB;
 
     /*if (capturedPiece != Piece::NONE) {
         Bitboard toBB = squareBB(to);
-        m_colorBB[getColor(capturedPiece)] |= toBB;
-        m_pieceTypeBB[getPieceType(capturedPiece)] |= toBB;
+        m_color_bb[getColor(capturedPiece)] |= toBB;
+        m_piece_type_bb[getPieceType(capturedPiece)] |= toBB;
     }*/
 
     // m_castling  = getCastling(delta);
     // m_halfmoves = getHalfmoves(delta);
 
-    toggleTurn();
+    nextTurn();
 }

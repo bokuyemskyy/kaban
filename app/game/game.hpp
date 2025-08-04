@@ -18,7 +18,7 @@ class Game {
         Snapshot() = default;
         Snapshot(const Position& position_) {
             for (Square square : Square::all()) {
-                position[square] = position_.pieceAt(square);
+                position[square] = position_.at(square);
             }
         }
         std::array<Piece, Square::number()> position;
