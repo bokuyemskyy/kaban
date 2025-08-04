@@ -52,7 +52,7 @@ cmake --build build --preset debug
 
 ## Usage
 ```bash
-./out/bin/release/kaban
+./build/Debug/kaban
 ```
 
 ## Contributing
