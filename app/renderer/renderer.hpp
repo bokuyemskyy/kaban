@@ -71,10 +71,10 @@ class Renderer {
     void drawLostPieces();
     void drawGameInfo();
     void drawWorkspace();
-    void drawGame(const Session::SessionSnapshot &snapshot);
+    void drawGame();
     void drawBoard(Rect<float> board);
-    void drawPieces(Rect<float> board, const Session::SessionSnapshot &snapshot);
-    void drawGameUI(Rect<float> panel, const Session::SessionSnapshot &snapshot);
+    void drawPieces(Rect<float> board);
+    void drawGameUI(Rect<float> panel);
 
     bool m_justCreatedGame = false;
 

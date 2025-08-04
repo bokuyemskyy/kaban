@@ -3,6 +3,7 @@
 #include <atomic>
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <optional>
 #include <vector>
@@ -11,95 +12,96 @@
 
 class Session {
    public:
-    void addGame(const std::function<void(Game&)>& initializer = {}) {
+    void addGame() {
         std::lock_guard lock(m_mutex);
-        m_games.emplace_back();
-        auto& new_game = m_games.back();
 
-        if (initializer) {
-            initializer(new_game);
-        }
+        m_games.emplace_back(std::make_shared<Game>(m_next_game_id++));
 
         m_selected_index = m_games.size() - 1;
+        m_dirty          = true;
     }
 
-    void selectGame(std::size_t index) {
+    void selectGame(size_t index) {
         std::lock_guard lock(m_mutex);
-        if (index < m_games.size()) {
-            m_selected_index = index;
-        }
+
+        if (index >= m_games.size()) return;
+
+        m_selected_index = index;
+
+        m_dirty = true;
     }
 
     void closeGame(size_t index) {
         std::lock_guard lock(m_mutex);
+
         if (index >= m_games.size()) return;
 
         m_games.erase(m_games.begin() + static_cast<int>(index));
 
-        if (!m_selected_index) return;
-
-        if (index < *m_selected_index) {
-            --(*m_selected_index);
-        } else if (index == *m_selected_index) {
-            if (m_games.empty()) {
-                m_selected_index.reset();
-            } else if (index >= m_games.size()) {
-                m_selected_index = m_games.size() - 1;
+        if (m_selected_index) {
+            if (index < *m_selected_index) {
+                --(*m_selected_index);
+            } else if (index == *m_selected_index) {
+                if (m_games.empty()) {
+                    m_selected_index.reset();
+                } else if (index >= m_games.size()) {
+                    m_selected_index = m_games.size() - 1;
+                }
             }
         }
+
+        m_dirty = true;
     }
 
-    void applyToAllGames(const std::function<void(Game&)>& action) {
-        std::lock_guard lock(m_mutex);
-        for (auto& game : m_games) {
-            action(game);
+    std::optional<std::shared_ptr<Game>> selectedGame() {
+        if (!m_selected_index) return std::nullopt;
+        return m_games[*m_selected_index];
+    }
+
+    struct Snapshot {
+        struct GameEntry {
+            size_t      id;
+            std::string title;
+        };
+        Snapshot() = default;
+        Snapshot(const std::vector<std::shared_ptr<Game>>& games_, const std::optional<size_t> selected_index_)
+            : selected_index(selected_index_) {
+            games.reserve(games_.size());
+            for (const auto& game : games_) {
+                games.emplace_back(GameEntry{.id = game->id(), .title = game->title()});
+            }
         }
-    }
 
-    void applyToCurrentGame(const std::function<void(Game&)>& action) {
-        std::lock_guard lock(m_mutex);
-        if (auto index = currentIndex()) {
-            action(m_games[*index]);
-        }
-    }
+        std::vector<GameEntry>     games;
+        std::optional<std::size_t> selected_index;
 
-    struct SessionSnapshot {
-        std::vector<std::string>     game_titles;
-        std::optional<std::size_t>   selected_index;
-        const Game*                  current_game = nullptr;
-        [[nodiscard]] constexpr bool empty() const { return game_titles.empty(); }
+        [[nodiscard]] constexpr bool empty() const { return games.empty(); }
     };
 
-    SessionSnapshot snapshot() const {
+    Snapshot snapshot() const {
         std::lock_guard lock(m_mutex);
-        SessionSnapshot snap;
-        snap.game_titles.reserve(m_games.size());
 
-        for (const auto& game : m_games) {
-            snap.game_titles.push_back(game.title());
+        if (m_dirty) {
+            m_cached_snapshot = Snapshot(m_games, m_selected_index);
+            m_dirty           = false;
         }
 
-        snap.selected_index = m_selected_index;
-
-        if (auto index = currentIndex()) {
-            snap.current_game = &m_games[*index];
-        }
-        return snap;
+        return m_cached_snapshot;
     }
 
     [[nodiscard]] bool shouldQuit() const { return m_quit_flag.load(); }
     void               signalQuit() { m_quit_flag = true; }
 
    private:
-    std::optional<std::size_t> currentIndex() const {
-        if (m_selected_index.has_value() && m_selected_index.value() < m_games.size()) {
-            return m_selected_index;
-        }
-        return std::nullopt;
-    }
+    mutable std::mutex m_mutex;
 
-    std::vector<Game>          m_games;
-    std::optional<std::size_t> m_selected_index;
-    mutable std::mutex         m_mutex;
-    std::atomic<bool>          m_quit_flag{false};
+    std::vector<std::shared_ptr<Game>> m_games;
+    std::optional<size_t>              m_selected_index;
+
+    std::atomic<size_t> m_next_game_id{0};
+
+    mutable Snapshot          m_cached_snapshot;
+    mutable std::atomic<bool> m_dirty{true};
+
+    std::atomic<bool> m_quit_flag{false};
 };
