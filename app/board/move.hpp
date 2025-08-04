@@ -79,7 +79,7 @@ struct Move {
 
     constexpr operator uint16_t() const { return m_value; }
 
-    [[nodiscard]] constexpr bool isNull() const { return m_value == 0; }
+    [[nodiscard]] constexpr bool empty() const { return m_value == 0; }
 
    private:
     uint16_t m_value;
