@@ -120,7 +120,7 @@ size_t generatePseudoLegalMoves(std::vector<Move>* /*moveStack*/) {
 
     Bitboard pieces = Bitboard::zero();
 
-    pieces = position.m_colorBB[m_turn] & m_pieceTypeBB[PieceType::PAWN];
+    pieces = position.m_color_bb[m_turn] & m_piece_type_bb[PieceType::PAWN];
     while (pieces != Bitboard::zero()) {
         Square   square     = poplsb(pieces);
         Bitboard singlePush = Movegen::pawnSinglePushes[m_turn][square];
@@ -136,59 +136,59 @@ size_t generatePseudoLegalMoves(std::vector<Move>* /*moveStack*/) {
             moveBuffer.emplace_back(createMove(square, poplsb(singlePush), 0));
         }
 
-        Bitboard attacksBB = Movegen::pawnAttacks[m_turn][square] & m_colorBB[!m_turn];
+        Bitboard attacksBB = Movegen::pawnAttacks[m_turn][square] & m_color_bb[!m_turn];
 
         while (attacksBB != Bitboard::zero()) {
             moveBuffer.emplace_back(createMove(square, poplsb(attacksBB), 0));
         }
     }
 
-    pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceType::KNIGHT];
+    pieces = m_color_bb[m_turn] & m_piece_type_bb[PieceType::KNIGHT];
     while (pieces != Bitboard::zero()) {
         Square   square    = poplsb(pieces);
-        Bitboard attacksBB = Movegen::getMovesBB<PieceType::KNIGHT>(this, square) & ~m_colorBB[m_turn];
+        Bitboard attacksBB = Movegen::getMovesBB<PieceType::KNIGHT>(this, square) & ~m_color_bb[m_turn];
         while (attacksBB != Bitboard::zero()) {
             moveBuffer.emplace_back(createMove(square, poplsb(attacksBB), 0));
         }
     }
-    pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceType::BISHOP];
+    pieces = m_color_bb[m_turn] & m_piece_type_bb[PieceType::BISHOP];
     while (pieces != Bitboard::zero()) {
         Square   square = poplsb(pieces);
         Bitboard attacksBB =
             Movegen::getMovesBB<PieceType::BISHOP>(square)
                 Movegen::bishopAttacks[square][Movegen::getIndexOfOccupancy<PieceType::BISHOP>(square, m_occupancy)] &
-            ~m_colorBB[m_turn];
+            ~m_color_bb[m_turn];
         while (attacksBB != Bitboard::zero()) {
             moveBuffer.emplace_back(createMove(square, poplsb(attacksBB), 0));
         }
     }
-    pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceType::ROOK];
+    pieces = m_color_bb[m_turn] & m_piece_type_bb[PieceType::ROOK];
     while (pieces != Bitboard::zero()) {
         Square   square = poplsb(pieces);
         Bitboard attacksBB =
             Movegen::rookAttacks[square][Movegen::getIndexOfOccupancy<PieceType::ROOK>(square, m_occupancy)] &
-            ~m_colorBB[m_turn];
+            ~m_color_bb[m_turn];
         while (attacksBB != Bitboard::zero()) {
             moveBuffer.emplace_back(createMove(square, poplsb(attacksBB), 0));
         }
     }
 
-    pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceType::QUEEN];
+    pieces = m_color_bb[m_turn] & m_piece_type_bb[PieceType::QUEEN];
     while (pieces != Bitboard::zero()) {
         Square   square = poplsb(pieces);
         Bitboard attacksBB =
             (Movegen::rookAttacks[square][Movegen::getIndexOfOccupancy<PieceType::ROOK>(square, m_occupancy)] |
              Movegen::bishopAttacks[square][Movegen::getIndexOfOccupancy<PieceType::BISHOP>(square, m_occupancy)]) &
-            ~m_colorBB[m_turn];
+            ~m_color_bb[m_turn];
         while (attacksBB != Bitboard::zero()) {
             moveBuffer.emplace_back(createMove(square, poplsb(attacksBB), 0));
         }
     }
 
-    pieces = m_colorBB[m_turn] & m_pieceTypeBB[PieceType::KING];
+    pieces = m_color_bb[m_turn] & m_piece_type_bb[PieceType::KING];
     while (pieces != 0ULL) {
         Square   square    = poplsb(pieces);
-        Bitboard attacksBB = Movegen::pseudoAttacks[PieceType::KING][square] & ~m_colorBB[m_turn];
+        Bitboard attacksBB = Movegen::pseudoAttacks[PieceType::KING][square] & ~m_color_bb[m_turn];
         while (attacksBB != Bitboard::zero()) {
             moveBuffer.emplace_back(createMove(square, poplsb(attacksBB), 0));
         }
@@ -199,20 +199,20 @@ size_t generatePseudoLegalMoves(std::vector<Move>* /*moveStack*/) {
 }
 
 bool isLegal() {
-    /*Square king = lsb(m_colorBB[m_them] & m_pieceTypeBB[PieceType::KING]);
+    /*Square king = lsb(m_color_bb[m_them] & m_piece_type_bb[PieceType::KING]);
 
     Bitboard enemyAttackers = Bitboard::zero();
 
-    enemyAttackers |= Movegen::pawnAttacks[m_them][king] & (m_colorBB[m_us] & m_pieceTypeBB[PieceType::PAWN]);
+    enemyAttackers |= Movegen::pawnAttacks[m_them][king] & (m_color_bb[m_us] & m_piece_type_bb[PieceType::PAWN]);
     enemyAttackers |=
-        Movegen::pseudoAttacks[PieceType::KING][king] & (m_colorBB[m_us] & m_pieceTypeBB[PieceType::KING]);
+        Movegen::pseudoAttacks[PieceType::KING][king] & (m_color_bb[m_us] & m_piece_type_bb[PieceType::KING]);
     enemyAttackers |=
-        Movegen::pseudoAttacks[PieceType::KNIGHT][king] & (m_colorBB[m_us] & m_pieceTypeBB[PieceType::KNIGHT]);
+        Movegen::pseudoAttacks[PieceType::KNIGHT][king] & (m_color_bb[m_us] & m_piece_type_bb[PieceType::KNIGHT]);
 
     enemyAttackers |= Movegen::bishopAttacks[king][Movegen::getIndexOfOccupancy<PieceType::BISHOP>(king, m_occupancy)] &
-                      (m_colorBB[m_us] & (m_pieceTypeBB[PieceType::BISHOP] | m_pieceTypeBB[PieceType::QUEEN]));
+                      (m_color_bb[m_us] & (m_piece_type_bb[PieceType::BISHOP] | m_piece_type_bb[PieceType::QUEEN]));
     enemyAttackers |= Movegen::rookAttacks[king][Movegen::getIndexOfOccupancy<PieceType::ROOK>(king, m_occupancy)] &
-                      (m_colorBB[m_us] & (m_pieceTypeBB[PieceType::ROOK] | m_pieceTypeBB[PieceType::QUEEN]));
+                      (m_color_bb[m_us] & (m_piece_type_bb[PieceType::ROOK] | m_piece_type_bb[PieceType::QUEEN]));
 
     return enemyAttackers == Bitboard::zero();
 */

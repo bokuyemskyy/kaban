@@ -5,6 +5,7 @@
 
 #include "bitboard.hpp"
 #include "castling.hpp"
+#include "en_passant.hpp"
 #include "move.hpp"
 #include "navigation.hpp"
 #include "piece.hpp"
@@ -20,16 +21,14 @@ class Position {
     void                      setFromFEN(const std::string &fen = DEFAULT_FEN);
     [[nodiscard]] std::string toFEN() const;
 
-    [[nodiscard]] Piece at(Square square) const { return m_board[square]; };
-
-    [[nodiscard]] bool isLegal();
-
     void doMove(Move move);
     void undoMove();
 
     [[nodiscard]] Color    turn() const { return m_turn; }
-    [[nodiscard]] bool     isLegal() const;
-    [[nodiscard]] Castling castlingRights() const { return m_castling; }
+    [[nodiscard]] Castling castling() const { return m_castling; }
+    [[nodiscard]] Piece    at(Square square) const { return m_board[square]; };
+
+    [[nodiscard]] bool isLegal() const;
 
    private:
     void clear();
@@ -38,14 +37,15 @@ class Position {
 
     void nextTurn();
 
-    std::array<Piece, Square::NB>       m_board{};
-    std::array<Bitboard, Color::NB>     m_colorBB{Bitboard::zero()};
-    std::array<Bitboard, PieceType::NB> m_pieceTypeBB{Bitboard::zero()};
+    std::array<Piece, Square::number()>       m_board{};
+    std::array<Bitboard, Color::number()>     m_color_bb{Bitboard::zero()};
+    std::array<Bitboard, PieceType::number()> m_piece_type_bb{Bitboard::zero()};
 
-    std::vector<State> m_states{};
+    std::vector<State> m_states;
     std::vector<Move>  m_moves;
 
-    Color    m_turn      = Color::WHITE;
-    Castling m_castling  = Castling::ANY;
-    uint8_t  m_halfmoves = 0;
+    Color     m_turn     = Color::WHITE;
+    Castling  m_castling = Castling::ANY;
+    EnPassant m_en_passant;
+    uint8_t   m_halfmoves;
 };
