@@ -33,33 +33,16 @@ struct Bitboard {
 
     static constexpr Bitboard zero() { return 0ULL; }
 
-    static constexpr Bitboard squareBB(Square square) { return (1ULL << square); }
-    static constexpr Bitboard destinationBB(Square square, Direction direction) {
+    [[nodiscard]] constexpr bool empty() const { return m_value == zero(); }
+
+    static constexpr Bitboard square(Square square) { return (1ULL << square); }
+    static constexpr Bitboard destination(Square square, Direction direction) {
         Square destination = square + direction;
-        return (destination.ok() && Square::distance(square, destination) <= 2) ? squareBB(destination) : zero();
+        return (destination.ok() && Square::distance(square, destination) <= 2) ? Bitboard::square(destination)
+                                                                                : zero();
     };
 
-    template <int8_t D>
-    [[nodiscard]] constexpr Bitboard pushed() const {
-        switch (D) {
-            case Direction::N:
-            case Direction::NN:
-                return m_value << D;
-            case Direction::S:
-            case Direction::SS:
-                return m_value >> -D;
-            case Direction::NE:
-            case Direction::SE:
-                return (m_value & ~fileBB(File::FH)) << D;
-            case Direction::NW:
-            case Direction::SW:
-                return (m_value & ~fileBB(File::FA)) >> -D;
-            default:
-                return zero();
-        }
-    }
-
-    static constexpr Bitboard rankBB(Rank rank) {
+    static constexpr Bitboard rank(Rank rank) {
         static constexpr auto table = []() constexpr {
             std::array<Bitboard, Rank::number()> t{};
 
@@ -74,7 +57,7 @@ struct Bitboard {
         return table[rank];
     }
 
-    static constexpr Bitboard fileBB(File file) {
+    static constexpr Bitboard file(File file) {
         static constexpr auto table = []() constexpr {
             std::array<Bitboard, File::NB> t{};
 
@@ -89,7 +72,7 @@ struct Bitboard {
         return table[file];
     }
 
-    static constexpr Bitboard diagBB(Square square) {
+    static constexpr Bitboard diag(Square square) {
         static constexpr auto table = []() constexpr {
             std::array<Bitboard, Square::NB> t{};
             for (auto square : Square::all()) {
@@ -101,7 +84,7 @@ struct Bitboard {
                     for (auto file : File::all()) {
                         Square possibleSquare = Square(file, rank);
                         if (file - rank == squareFile - squareRank) {
-                            diag = diag | squareBB(possibleSquare);
+                            diag = diag | Bitboard::square(possibleSquare);
                         }
                     }
                 }
@@ -112,7 +95,7 @@ struct Bitboard {
         return table[square];
     }
 
-    static constexpr Bitboard antiDiagBB(Square square) {
+    static constexpr Bitboard antiDiag(Square square) {
         static constexpr auto table = []() constexpr {
             std::array<Bitboard, Square::NB> t{};
             for (auto square : Square::all()) {
@@ -124,7 +107,7 @@ struct Bitboard {
                     for (auto file : File::all()) {
                         Square possibleSquare = Square(file, rank);
                         if (file + rank == squareFile + squareRank) {
-                            antiDiag = antiDiag | squareBB(possibleSquare);
+                            antiDiag = antiDiag | Bitboard::square(possibleSquare);
                         }
                     }
                 }
@@ -134,6 +117,26 @@ struct Bitboard {
         }();
         return table[square];
     }
+
+    /*template <int8_t D>
+    [[nodiscard]] constexpr Bitboard shifted() const {
+        switch (D) {
+            case Direction::N:
+            case Direction::NN:
+                return m_value << D;
+            case Direction::S:
+            case Direction::SS:
+                return m_value >> -D;
+            case Direction::NE:
+            case Direction::SE:
+                return (m_value & ~Bitboard::file(File::FH)) << D;
+            case Direction::NW:
+            case Direction::SW:
+                return (m_value & ~Bitboard::file(File::FA)) >> -D;
+            default:
+                return zero();
+        }
+    }*/
 
    private:
     uint64_t m_value;

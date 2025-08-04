@@ -86,8 +86,8 @@ void Position::set(Square square, Piece piece) {
     assert(piece != Piece::NONE);
 
     unset(square);
-    m_color_bb[piece.color()] |= Bitboard::squareBB(square);
-    m_piece_type_bb[piece.pieceType()] |= Bitboard::squareBB(square);
+    m_color_bb[piece.color()] |= Bitboard::square(square);
+    m_piece_type_bb[piece.pieceType()] |= Bitboard::square(square);
     m_board[square] = piece;
 }
 
@@ -95,8 +95,8 @@ void Position::unset(Square square) {
     assert(square != Square::NONE);
 
     if (m_board[square] == Piece::NONE) return;
-    m_color_bb[m_board[square].color()] &= ~Bitboard::squareBB(square);
-    m_piece_type_bb[m_board[square].pieceType()] &= ~Bitboard::squareBB(square);
+    m_color_bb[m_board[square].color()] &= ~Bitboard::square(square);
+    m_piece_type_bb[m_board[square].pieceType()] &= ~Bitboard::square(square);
     m_board[square] = Piece::NONE;
 }
 void Position::clear() {
@@ -112,13 +112,13 @@ void Position::doMove(const Move move) {
     Square from = move.from();
     Square to   = move.to();
 
-    Bitboard moveBB = Bitboard::squareBB(from) | Bitboard::squareBB(to);
+    Bitboard moveBB = Bitboard::square(from) | Bitboard::square(to);
 
     // m_deltas.emplace_back(Delta(m_board[to], m_castling, 0, m_halfmoves));
     m_moves.emplace_back(move);
 
     if (m_board[to] != Piece::NONE) {
-        Bitboard maskBB = ~Bitboard::squareBB(to);
+        Bitboard maskBB = ~Bitboard::square(to);
         m_color_bb[m_board[to].color()] &= maskBB;
         m_piece_type_bb[m_board[to].pieceType()] &= maskBB;
     }
@@ -146,7 +146,7 @@ void Position::undoMove() {
     Square from = move.from();
     Square to   = move.to();
 
-    Bitboard moveBB = Bitboard::squareBB(from) | Bitboard::squareBB(to);
+    Bitboard moveBB = Bitboard::square(from) | Bitboard::square(to);
 
     Piece movedPiece = m_board[to];
     // Piece capturedPiece = getCaptured(delta);

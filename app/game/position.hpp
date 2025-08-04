@@ -30,6 +30,12 @@ class Position {
 
     [[nodiscard]] bool isLegal() const;
 
+    [[nodiscard]] Bitboard bitboard(Color color, PieceType piece_type) const {
+        return m_color_bb[color] & m_piece_type_bb[piece_type];
+    }
+    [[nodiscard]] Bitboard bitboard(Color color) const { return m_color_bb[color]; }
+    [[nodiscard]] Bitboard bitboard(PieceType piece_type) const { return m_piece_type_bb[piece_type]; }
+
    private:
     void clear();
     void set(Square square, Piece p);
