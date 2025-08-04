@@ -71,7 +71,7 @@ void Renderer::drawMainMenuBar() {
     }
 }
 
-void Renderer::drawGame(const Session::SessionSnapshot &snapshot) {
+void Renderer::drawGame() {
     ImVec2 panelMin  = ImGui::GetCursorScreenPos();
     ImVec2 availSize = ImGui::GetContentRegionAvail();
 
@@ -86,10 +86,8 @@ void Renderer::drawGame(const Session::SessionSnapshot &snapshot) {
     Rect   board    = Rect(boardMin.x, boardMin.y, BOARD_SIZE, BOARD_SIZE);
 
     drawBoard(board);
-    if (!snapshot.empty()) {
-        drawGameUI(panel, snapshot);
-        drawPieces(board, snapshot);
-    }
+    drawGameUI(panel);
+    drawPieces(board);
 }
 
 void Renderer::drawBoard(Rect<float> board) {
@@ -129,32 +127,40 @@ void Renderer::drawBoard(Rect<float> board) {
     }
 }
 
-void Renderer::drawGameUI(Rect<float> panel, const Session::SessionSnapshot &snapshot) {
+void Renderer::drawGameUI(Rect<float> panel) {
     ImDrawList *drawList = ImGui::GetWindowDrawList();
 
     const int FONT_SIZE = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
 
-    drawList->AddText(ImVec2(panel.x, panel.y), IM_WHITE, snapshot.current_game->blackName().c_str());
-    drawList->AddText(ImVec2(panel.x, panel.bottom() - static_cast<float>(FONT_SIZE)), IM_WHITE,
-                      snapshot.current_game->whiteName().c_str());
+    auto game = m_session->selectedGame();
+
+    if (game) {
+        drawList->AddText(ImVec2(panel.x, panel.y), IM_WHITE, game.value()->blackName().c_str());
+        drawList->AddText(ImVec2(panel.x, panel.bottom() - static_cast<float>(FONT_SIZE)), IM_WHITE,
+                          game.value()->whiteName().c_str());
+    }
 }
 
-void Renderer::drawPieces(Rect<float> board, const Session::SessionSnapshot &snapshot) {
+void Renderer::drawPieces(Rect<float> board) {
     ImDrawList *drawList = ImGui::GetWindowDrawList();
 
-    for (Square square : Square::all()) {
-        Rect rect = square.normalizedRect().absolute(board.width, board.height);
+    auto game = m_session->selectedGame();
 
-        ImVec2 begin = ImVec2(board.x + rect.left(), board.y + rect.top());
-        ImVec2 end   = ImVec2(board.x + rect.right(), board.y + rect.bottom());
+    if (game) {
+        for (Square square : Square::all()) {
+            Rect rect = square.normalizedRect().absolute(board.width, board.height);
 
-        Piece piece = snapshot.current_game->position().pieceAt(square);
+            ImVec2 begin = ImVec2(board.x + rect.left(), board.y + rect.top());
+            ImVec2 end   = ImVec2(board.x + rect.right(), board.y + rect.bottom());
 
-        ImVec2 piece_begin = ImVec2(begin.x + PIECE_MARGIN, begin.y + PIECE_MARGIN);
-        ImVec2 piece_end   = ImVec2(begin.x - PIECE_MARGIN, begin.y - PIECE_MARGIN);
+            Piece piece = game.value()->snapshot().position[square];
 
-        if (piece != Piece::NONE) {
-            drawList->AddImage(pieceTextures[piece], piece_begin, piece_end);
+            ImVec2 piece_begin = ImVec2(begin.x + PIECE_MARGIN, begin.y + PIECE_MARGIN);
+            ImVec2 piece_end   = ImVec2(end.x - PIECE_MARGIN, end.y - PIECE_MARGIN);
+
+            if (piece != Piece::NONE) {
+                drawList->AddImage(pieceTextures[piece], piece_begin, piece_end);
+            }
         }
     }
 }
@@ -164,7 +170,7 @@ void Renderer::drawLostPieces() { ImGui::Text("Captured Pieces"); }
 void Renderer::drawGameInfo() { ImGui::Text("Game Information"); }
 
 void Renderer::drawWorkspace() {
-    auto snapshot = m_session->snapshot();
+    auto session_snapshot = m_session->snapshot();
 
     ImGui::GetStyle().ItemSpacing.y = ITEM_SPACING;
     ImGui::GetStyle().ItemSpacing.x = ITEM_SPACING;
@@ -177,14 +183,14 @@ void Renderer::drawWorkspace() {
                      ImGuiWindowFlags_NoBringToFrontOnFocus);
 
     if (ImGui::BeginTabBar("GameTabs")) {
-        for (size_t game_index = 0; game_index < snapshot.game_titles.size(); ++game_index) {
+        for (size_t game_index = 0; game_index < session_snapshot.games.size(); ++game_index) {
             ImGuiTabItemFlags flags = 0;
-            if (m_justCreatedGame && snapshot.selected_index == game_index) {
+            if (m_justCreatedGame && session_snapshot.selected_index == game_index) {
                 flags |= ImGuiTabItemFlags_SetSelected;
                 m_justCreatedGame = false;
             }
 
-            if (ImGui::BeginTabItem(snapshot.game_titles[game_index].c_str(), nullptr, flags)) {
+            if (ImGui::BeginTabItem(session_snapshot.games[game_index].title.c_str(), nullptr, flags)) {
                 ImGui::EndTabItem();
             }
         }
@@ -204,7 +210,7 @@ void Renderer::drawWorkspace() {
     ImGui::BeginChild("LeftPanel", ImVec2(leftPanelWidth, availSpace.y), 0);
     {
         ImGui::BeginChild("Game", ImVec2(0, boardHeight), 1);
-        drawGame(snapshot);
+        drawGame();
         ImGui::EndChild();
 
         ImGui::BeginChild("LostPieces", ImVec2(0, 0), 1);

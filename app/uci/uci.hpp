@@ -55,8 +55,8 @@ class UCI {
         }
     }
 
-    void handlePosition(const std::string& command) {
-        m_session->applyToAllGames([&](Game& game) {
+    void handlePosition(const std::string& /*command*/) {
+        /*m_session->applyToAllGames([&](Game& game) {
             if (command.find("startpos") != std::string::npos) {
                 game.start();
             } else if (command.find("fen") != std::string::npos) {
@@ -72,7 +72,7 @@ class UCI {
                     game.doMove(move);
                 }
             }
-        });
+        });*/
     }
 
     void handlePerft(const std::string& /*command*/) {
