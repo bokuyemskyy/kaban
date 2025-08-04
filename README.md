@@ -1,24 +1,23 @@
-# kaban - chess movegen
-
-<img width="800" height="628" alt="Screenshot_20250802_202233" src="https://github.com/user-attachments/assets/3c259921-91bd-434e-a7a7-cfaeab1585f3" />
-
+# kaban - chess movegen with GUI
 
 A project, aimed to be a high-performance chess engine that uses bitboard techniques. 
-Inspired by [Stockfish](https://stockfishchess.org/), this project aims to utilize efficient board representation, move generation and modern C++ practices to achieve high perft (performance test) results.
+Inspired by [Stockfish](https://stockfishchess.org/), this project utilizes efficient board representation, move generation and modern C++ practices to achieve high perft (performance test) results.
+
+<img width="802" height="629" alt="Screenshot_20250804_103950-1" src="https://github.com/user-attachments/assets/34ada001-ab00-466a-b595-88b31466d711" />
 
 ## Documentation
-The projects future documentation you will be able to find on here: [DOCUMENTATION](https://bokuyemskyy.github.io/kaban/docs/html/) (empty by now)
+The project's future documentation you will be able to find on here: [DOCUMENTATION](https://bokuyemskyy.github.io/kaban/docs/html/) (empty by now)
 
 ## Features roadmap
 ### Implemented
-- **Build system**: convenient, agile and fast CMake-Ninja build system;
-- **Additional configurations**: clang-family tools to ensure clean code, Doxygen documentation generator and VCPKG dependency manager;
+- **Build system**: convenient and fast CMake-Ninja build system;
+- **Additional configurations**: clang tools to ensure clean code, Doxygen documentation generator and VCPKG dependency manager;
 - **Testing framework**: unit tests for the code;
-- **Project structure**: modular code, split into Main, Renderer, Board and Movegen. The code combines different practices, e.g: object-oriented classes, functional-style code in namespaces;
+- **Modular structure**: modular code, split into Main, Renderer, UCI, Board and Movegen.
 - **Bitboards**: board representation and operations using 64-bit integers.
-- **Bit-packing**: using raw bit fields instead of structures to increase efficiency and have more control over the memory; 
-- **Magic bitboards**: a powerful approach of mapping the board occupancy to an index to access precomputed rook and bishop moves;
-- **Simple move generation**: accurate, but simple (no en-passant, castling, 50-moves rule) move generation with legality checks;
+- **Bit-packing**: using raw bit fields inside of structures to increase efficiency and have more control over the memory; 
+- **Magic bitboards**: mapping the board occupancy to an index to access precomputed rook and bishop moves;
+- **Simple move generation**: accurate, but simplified (no en-passant, castling, 50-moves rule) move generation with legality checks;
 ### Pending
 - **Complex move generation**: accurate and absolutely rule-compliant move generation;
 - **UCI protocol compatibility**: integration with Universal Chess Interface for compatibility with chess GUIs;
@@ -36,18 +35,20 @@ This project is a learning endeavor to deepen my understanding of chess engine d
 
 ## Installation
 
-1) Have VCPKG installed on your machine
-2) Set VCPKG_ROOT variable in your shell
-3) ...
+- Have VCPKG installed on your machine
+- Set VCPKG_ROOT env variable (e.g. export VCPKG_ROOT="$HOME/Code/vcpkg")
 
 ```bash
 git clone https://github.com/bokuyemskyy/kaban.git
 cd kaban
 
-# Run cmake build as usual
-cmake --preset release -B build
-cmake --build build --preset release
+# Configure build
+cmake -B build --preset default
+
+# Build the app
+cmake --build build --preset debug
 ```
+
 
 ## Usage
 ```bash
