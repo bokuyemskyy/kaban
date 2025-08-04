@@ -167,7 +167,29 @@ void Renderer::drawPieces(Rect<float> board) {
 
 void Renderer::drawLostPieces() { ImGui::Text("Captured Pieces"); }
 
-void Renderer::drawGameInfo() { ImGui::Text("Game Information"); }
+void Renderer::drawGameInfo() {
+    ImGui::Text("Game Information");
+
+    ImGui::Separator();
+
+    ImGui::Text("Game status:");
+    ImGui::Text("  Turn: White to move");
+    ImGui::Text("  Result: In progress");
+
+    ImGui::Separator();
+
+    ImGui::Text("Engine evaluation (N/A):");
+    ImGui::Text("  Score: NAN");
+    ImGui::Text("  Best move: NAN");
+    ImGui::Text("  Depth: NAN");
+
+    ImGui::Separator();
+
+    ImGui::Text("Move history:");
+    ImGui::Text("  1. ");
+
+    ImGui::Separator();
+}
 
 void Renderer::drawWorkspace() {
     auto session_snapshot = m_session->snapshot();
@@ -190,7 +212,8 @@ void Renderer::drawWorkspace() {
                 m_justCreatedGame = false;
             }
 
-            if (ImGui::BeginTabItem(session_snapshot.games[game_index].title.c_str(), nullptr, flags)) {
+            std::string label = session_snapshot.games[game_index].title + "###" + std::to_string(game_index);
+            if (ImGui::BeginTabItem(label.c_str(), nullptr, flags)) {
                 ImGui::EndTabItem();
             }
         }
