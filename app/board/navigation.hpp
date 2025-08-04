@@ -157,7 +157,8 @@ struct Square : Coordinate<Square> {
 
     [[nodiscard]] constexpr bool                  light() const { return (file() + rank()) % 2 == 0; }
     [[nodiscard]] constexpr NormalizedRect<float> normalizedRect() const {
-        return {file() / static_cast<float>(File::number()), rank() / static_cast<float>(Rank::number()),
+        return {file() / static_cast<float>(File::number()),
+                1 - 1 / static_cast<float>(Rank::number()) - rank() / static_cast<float>(Rank::number()),
                 1 / static_cast<float>(File::number()), 1 / static_cast<float>(Rank::number())};
     }
     static constexpr uint8_t distance(Square from, Square to) {

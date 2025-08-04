@@ -82,7 +82,6 @@ foreach(path ${HEADER_DIRS})
     endif()
 endforeach()
 include_directories(${INCLUDE_DIRS})
-#include_directories(SYSTEM ${VCPKG_INCLUDE_DIR})
 
 # building library
 if(LIB_SOURCES)
