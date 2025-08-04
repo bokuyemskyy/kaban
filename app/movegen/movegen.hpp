@@ -2,17 +2,20 @@
 
 #include <array>
 #include <cstddef>
-#include <iostream>
 #include <vector>
 
 #include "bitboard.hpp"
+#include "navigation.hpp"
+#include "piece.hpp"
 #include "position.hpp"
 
-namespace Movegen {
+// MOVEGEN IS UNDER RECONSTRUCTION
+// MOVEGEN IS UNDER RECONSTRUCTION
+// MOVEGEN IS UNDER RECONSTRUCTION
 
-constexpr int MAX_MOVES = 256;  // limit of possible number of moves that can be performed from any position
+static constexpr int MAX_MOVES = 256;  // limit of possible number of moves that can be performed from any position
 
-enum GenerationType {
+enum class GenerationType : uint8_t {
     CAPTURE,
     NON_CAPTURE,
     EVASION,
@@ -20,66 +23,113 @@ enum GenerationType {
     LEGAL
 };
 
-extern std::array<std::array<Bitboard, Square::NB>, PieceType::NB> pseudoAttacks;
-
-extern std::array<std::array<Bitboard, Square::NB>, Color::NB> pawnAttacks;
-extern std::array<std::array<Bitboard, Square::NB>, Color::NB> pawnSinglePushes;
-
-const int BISHOP_ATTACK_NB = 0x1480;
-const int ROOK_ATTACK_NB   = 0x19000;
-
-extern std::vector<Bitboard> bishopAttacks;
-extern std::vector<Bitboard> rookAttacks;
-
-void init();
-
-template <GenerationType T>
+template <GenerationType GT>
 class MoveList {
    private:
     std::array<Move, MAX_MOVES> moveList;
     size_t                      size;
 
    public:
-    explicit MoveList(const Position& position) : size(generateMoves<T>(position, moveList)) {}
+    explicit MoveList(const Position& position) : size(generateMoves<GT>(position, moveList)) {}
 };
 
-template <GenerationType>
-size_t generateMoves(const Position& position, std::array<Move, MAX_MOVES>& moveList);
+class Movegen {
+    static constexpr Bitboard knightAttackBB(Square square) {
+        static constexpr auto table = []() constexpr {
+            std::array<Bitboard, Square::number()> t{};
 
-template <bool Root>
-int perft(Position& position, int /*depth*/, std::vector<Move>& moveStack) {
-    const size_t start = moveStack.size();
-    const size_t count = 0;  // generateMoves(position, moveStack);
+            constexpr std::array<Direction, 8> knightDirections = {Direction::NNE, Direction::NNW, Direction::ENE,
+                                                                   Direction::WNW, Direction::SSE, Direction::SSW,
+                                                                   Direction::ESE, Direction::WSW};
 
-    int nodes = 0;
-
-    for (size_t i = 0; i < count; ++i) {
-        const Move& move = moveStack[start + i];
-        position.doMove(move);
-        /*if (isLegal(position)) [[likely]] {
-            if (depth == 1) {
-                nodes++;
-            } else {
-                int subnodes = perft<false>(position, depth - 1, moveStack);
-                if constexpr (Root) {
-                    std::cout << move.from() << move.to() << ": " << subnodes << '\n';
+            for (auto square_ : Square::all()) {
+                Bitboard attackBB = Bitboard::zero();
+                for (const auto& direction : knightDirections) {
+                    attackBB |= Bitboard::destination(square_, direction);
                 }
-                nodes += subnodes;
+                t[square_] = attackBB;
             }
-        }*/
-        position.undoMove();
-    }
-    moveStack.resize(start);
-    return nodes;
-}
 
-int perft(Position& position, int depth, bool verbose = true) {
-    std::vector<Move> moveStack;
-    if (verbose) {
-        return perft<true>(position, depth, moveStack);
-    } else {
-        return perft<false>(position, depth, moveStack);
-    }
-}
+            return t;
+        }();
 
-}  // namespace Movegen
+        return table[square];
+    }
+
+    static constexpr Bitboard kingAttackBB(Square square) {
+        static constexpr auto table = []() constexpr {
+            std::array<Bitboard, Square::number()> t{};
+
+            constexpr std::array<Direction, 8> kingDirections = {Direction::E,  Direction::N,  Direction::W,
+                                                                 Direction::S,  Direction::NE, Direction::NW,
+                                                                 Direction::SE, Direction::SW};
+
+            for (auto square_ : Square::all()) {
+                Bitboard attackBB = Bitboard::zero();
+                for (const auto& direction : kingDirections) {
+                    attackBB |= Bitboard::destination(square_, direction);
+                }
+                t[square_] = attackBB;
+            }
+
+            return t;
+        }();
+
+        return table[square];
+    }
+
+    const int BISHOP_ATTACK_NB = 0x1480;
+    const int ROOK_ATTACK_NB   = 0x19000;
+
+    // extern std::vector<Bitboard> bishopAttacks;
+    // extern std::vector<Bitboard> rookAttacks;
+
+    void init();
+
+    template <GenerationType GT>
+    size_t generateMoves(const Position& position, std::array<Move, MAX_MOVES>& /*moveList*/) {
+        Bitboard pieces = position.bitboard(position.turn(), PieceType::PAWN);
+
+        while (!pieces.empty()) {
+            // for each pawn we do poplsb and generate moves
+        }
+
+        pieces = position.bitboard(position.turn(), PieceType::KNIGHT);
+        //...
+    }
+
+   public:
+    template <bool Root>
+    static int perft(Position& /*position*/, int /*depth*/) {
+        /*int nodes = 0;
+
+        for (size_t i = 0; i < count; ++i) {
+            const Move& move = moveStack[start + i];
+            position.doMove(move);
+            if (isLegal(position)) [[likely]] {
+                if (depth == 1) {
+                    nodes++;
+                } else {
+                    int subnodes = perft<false>(position, depth - 1, moveStack);
+                    if constexpr (Root) {
+                        std::cout << move.from() << move.to() << ": " << subnodes << '\n';
+                    }
+                    nodes += subnodes;
+                }
+            }
+            position.undoMove();
+        }
+        moveStack.resize(start);
+        return nodes;*/
+        return 0;
+    }
+
+    static int perft(Position& position, int depth, bool verbose = true) {
+        std::vector<Move> moveStack;
+        if (verbose) {
+            return perft<true>(position, depth);
+        } else {
+            return perft<false>(position, depth);
+        }
+    }
+};

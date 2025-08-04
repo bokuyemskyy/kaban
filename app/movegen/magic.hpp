@@ -6,6 +6,7 @@
 #include <cstdint>
 
 #include "bitboard.hpp"
+#include "bitops.hpp"
 #include "navigation.hpp"
 #include "piece.hpp"
 
@@ -55,13 +56,13 @@ class Magics {
         switch (pieceType) {
             case PieceType::ROOK: {
                 Bitboard edges =
-                    ((Bitboard::rankBB(Rank::R1) | Bitboard::rankBB(Rank::R8)) & ~Bitboard::rankBB(square.rank())) |
-                    ((Bitboard::fileBB(File::FA) | Bitboard::fileBB(File::FH)) & ~Bitboard::fileBB(square.file()));
+                    ((Bitboard::rank(Rank::R1) | Bitboard::rank(Rank::R8)) & ~Bitboard::rank(square.rank())) |
+                    ((Bitboard::file(File::FA) | Bitboard::file(File::FH)) & ~Bitboard::file(square.file()));
                 return slidingAttacksBB(PieceType::ROOK, square, Bitboard::zero()) & ~edges;
             }
             case PieceType::BISHOP: {
-                Bitboard edges = (Bitboard::rankBB(Rank::R1) | Bitboard::rankBB(Rank::R8) | Bitboard::fileBB(File::FA) |
-                                  Bitboard::fileBB(File::FH));
+                Bitboard edges = (Bitboard::rank(Rank::R1) | Bitboard::rank(Rank::R8) | Bitboard::file(File::FA) |
+                                  Bitboard::file(File::FH));
                 return slidingAttacksBB(PieceType::BISHOP, square, Bitboard::zero()) & ~edges;
             }
             default:
@@ -82,7 +83,7 @@ class Magics {
             Square currentSquare = square;
 
             while (true) {
-                Bitboard destination = Bitboard::destinationBB(currentSquare, direction);
+                Bitboard destination = Bitboard::destination(currentSquare, direction);
                 if (destination == Bitboard::zero()) break;
 
                 attacks |= destination;

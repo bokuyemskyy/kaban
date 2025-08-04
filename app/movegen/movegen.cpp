@@ -1,39 +1,8 @@
 #include "movegen.hpp"
 
-#include <cstddef>
-#include <vector>
-
-#include "bitboard.hpp"
-#include "navigation.hpp"
-#include "piece.hpp"
-
-namespace Movegen {
-
-std::array<std::array<Bitboard, Square::NB>, PieceType::NB> pseudoAttacks{};
-
-std::array<std::array<Bitboard, Square::NB>, Color::NB> pawnAttacks{};
-std::array<std::array<Bitboard, Square::NB>, Color::NB> pawnSinglePushes{};
-
-std::vector<Bitboard> bishopAttacks(BISHOP_ATTACK_NB);
-std::vector<Bitboard> rookAttacks(ROOK_ATTACK_NB);
-
-template <GenerationType T, uint8_t US>
-size_t generateMovesByColor(const Position& /*position*/, std::array<Move, MAX_MOVES>& /*moveList*/) {
-    return 0;
-}
-
-template <GenerationType T>
-size_t generateMoves(const Position& position, std::array<Move, MAX_MOVES>& moveList) {
-    Color us = position.turn();
-
-    return us == Color::WHITE ? generateMovesByColor<T, Color::WHITE>(position, moveList)
-                              : generateMovesByColor<T, Color::BLACK>(position, moveList);
-}
-
-template size_t generateMoves<CAPTURE>(const Position&, std::array<Move, MAX_MOVES>&);
-template size_t generateMoves<NON_CAPTURE>(const Position&, std::array<Move, MAX_MOVES>&);
-template size_t generateMoves<EVASION>(const Position&, std::array<Move, MAX_MOVES>&);
-template size_t generateMoves<NON_EVASION>(const Position&, std::array<Move, MAX_MOVES>&);
+// MOVEGEN IS UNDER RECONSTRUCTION
+// MOVEGEN IS UNDER RECONSTRUCTION
+// MOVEGEN IS UNDER RECONSTRUCTION
 
 /*Bitboard getRookAttacks(Square square, Bitboard occupancy) {
     Bitboard attackBB = Bitboard::zero();
@@ -68,55 +37,21 @@ void init() {
     // initMagics(PieceType::BISHOP);
     // initMagics(PieceType::ROOK);
 
-    for (Square square : Square::all()) {
-        Bitboard pawnBB = Bitboard::zero();
-        for (const auto& direction : whitePawnAttackDirections) {
-            pawnBB |= Bitboard::destinationBB(square, direction);
-        }
-        pawnAttacks[Color::WHITE][square] = pawnBB;
-
-        pawnBB = Bitboard::zero();
-        for (const auto& direction : whitePawnAttackDirections) {
-            pawnBB |= Bitboard::destinationBB(square, -direction);
-        }
-        pawnAttacks[Color::BLACK][square] = pawnBB;
-
-        pawnBB = Bitboard::zero();
-        pawnBB |= Bitboard::destinationBB(square, whitePawnPushDirections[0]);
-        pawnSinglePushes[Color::WHITE][square] = pawnBB;
-
-        pawnBB = Bitboard::zero();
-        pawnBB |= Bitboard::destinationBB(square, -whitePawnPushDirections[0]);
-        pawnSinglePushes[Color::BLACK][square] = pawnBB;
-
-        Bitboard knightBB = Bitboard::zero();
-        for (const auto& direction : knightDirections) {
-            knightBB |= Bitboard::destinationBB(square, direction);
-        }
-        pseudoAttacks[PieceType::KNIGHT][square] = knightBB;
-
-        /*auto bishopPremaskOccupancies = getPremaskOccupancies(PieceType::BISHOP, square);
-        for (const auto& occupancy : bishopPremaskOccupancies) {
-            bishopAttacks[square][getIndexOfOccupancy<PieceType::BISHOP>(square, occupancy)] =
-                getBishopAttacks(square, occupancy);
-        }
-
-        auto rookPremaskOccupancies = getPremaskOccupancies(PieceType::ROOK, square);
-        for (const auto& occupancy : rookPremaskOccupancies) {
-            rookAttacks[square][getIndexOfOccupancy<PieceType::ROOK>(square, occupancy)] =
-                getRookAttacks(square, occupancy);
-        }*/
-
-        Bitboard kingBB = Bitboard::zero();
-        for (const auto& direction : kingDirections) {
-            kingBB |= Bitboard::destinationBB(square, direction);
-        }
-        pseudoAttacks[PieceType::KING][square] = kingBB;
+    /*auto bishopPremaskOccupancies = getPremaskOccupancies(PieceType::BISHOP, square);
+    for (const auto& occupancy : bishopPremaskOccupancies) {
+        bishopAttacks[square][getIndexOfOccupancy<PieceType::BISHOP>(square, occupancy)] =
+            getBishopAttacks(square, occupancy);
     }
+
+    auto rookPremaskOccupancies = getPremaskOccupancies(PieceType::ROOK, square);
+    for (const auto& occupancy : rookPremaskOccupancies) {
+        rookAttacks[square][getIndexOfOccupancy<PieceType::ROOK>(square, occupancy)] =
+            getRookAttacks(square, occupancy);
+    }*/
 }
 
-size_t generatePseudoLegalMoves(std::vector<Move>* /*moveStack*/) {
-    /*size_t prevBufferSize = moveBuffer->size();
+/*size_t generatePseudoLegalMoves(std::vector<Move>* moveStack) {
+    size_t prevBufferSize = moveBuffer->size();
 
     Bitboard pieces = Bitboard::zero();
 
@@ -153,11 +88,11 @@ size_t generatePseudoLegalMoves(std::vector<Move>* /*moveStack*/) {
     }
     pieces = m_color_bb[m_turn] & m_piece_type_bb[PieceType::BISHOP];
     while (pieces != Bitboard::zero()) {
-        Square   square = poplsb(pieces);
-        Bitboard attacksBB =
-            Movegen::getMovesBB<PieceType::BISHOP>(square)
-                Movegen::bishopAttacks[square][Movegen::getIndexOfOccupancy<PieceType::BISHOP>(square, m_occupancy)] &
-            ~m_color_bb[m_turn];
+        Square   square    = poplsb(pieces);
+        Bitboard attacksBB = Movegen::getMovesBB<PieceType::BISHOP>(square)
+                                 Movegen::bishopAttacks[square][Movegen::getIndexOfOccupancy<PieceType::BISHOP>(
+                                     square, m_occupancy)] &
+                             ~m_color_bb[m_turn];
         while (attacksBB != Bitboard::zero()) {
             moveBuffer.emplace_back(createMove(square, poplsb(attacksBB), 0));
         }
@@ -194,9 +129,8 @@ size_t generatePseudoLegalMoves(std::vector<Move>* /*moveStack*/) {
         }
     }
     return moveBuffer.size() - prevBufferSize;
-*/
-    return 0;
-}
+     return 0;
+}*/
 
 bool isLegal() {
     /*Square king = lsb(m_color_bb[m_them] & m_piece_type_bb[PieceType::KING]);
@@ -209,8 +143,8 @@ bool isLegal() {
     enemyAttackers |=
         Movegen::pseudoAttacks[PieceType::KNIGHT][king] & (m_color_bb[m_us] & m_piece_type_bb[PieceType::KNIGHT]);
 
-    enemyAttackers |= Movegen::bishopAttacks[king][Movegen::getIndexOfOccupancy<PieceType::BISHOP>(king, m_occupancy)] &
-                      (m_color_bb[m_us] & (m_piece_type_bb[PieceType::BISHOP] | m_piece_type_bb[PieceType::QUEEN]));
+    enemyAttackers |= Movegen::bishopAttacks[king][Movegen::getIndexOfOccupancy<PieceType::BISHOP>(king,
+    m_occupancy)] & (m_color_bb[m_us] & (m_piece_type_bb[PieceType::BISHOP] | m_piece_type_bb[PieceType::QUEEN]));
     enemyAttackers |= Movegen::rookAttacks[king][Movegen::getIndexOfOccupancy<PieceType::ROOK>(king, m_occupancy)] &
                       (m_color_bb[m_us] & (m_piece_type_bb[PieceType::ROOK] | m_piece_type_bb[PieceType::QUEEN]));
 
@@ -218,8 +152,6 @@ bool isLegal() {
 */
     return false;
 }
-
-}  // namespace Movegen
 
 /*
 template <PieceType PieceType>

@@ -224,11 +224,5 @@ constexpr std::array<Direction, 1> whitePawnPushDirections = {Direction::N};
 
 constexpr std::array<Direction, 2> whitePawnAttackDirections = {Direction::NE, Direction::NW};
 
-constexpr std::array<Direction, 8> knightDirections = {Direction::NNE, Direction::NNW, Direction::ENE, Direction::WNW,
-                                                       Direction::SSE, Direction::SSW, Direction::ESE, Direction::WSW};
-
 constexpr std::array<Direction, 8> queenDirections = {Direction::NE, Direction::NW, Direction::SE, Direction::SW,
                                                       Direction::N,  Direction::S,  Direction::E,  Direction::W};
-
-constexpr std::array<Direction, 8> kingDirections = {Direction::E,  Direction::N,  Direction::W,  Direction::S,
-                                                     Direction::NE, Direction::NW, Direction::SE, Direction::SW};
