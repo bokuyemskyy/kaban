@@ -1,7 +1,7 @@
 #pragma once
 
-#include <list>
 #include <string>
+#include <vector>
 
 #include "bitboard.hpp"
 #include "castling.hpp"
@@ -20,33 +20,30 @@ class Position {
     void                      setFromFEN(const std::string &fen = DEFAULT_FEN);
     [[nodiscard]] std::string toFEN() const;
 
-    void setPiece(Square square, Piece p);
-    void unsetPiece(Square square);
-    void resetBoard();
-
-    [[nodiscard]] Piece pieceAt(Square square) const { return m_board[square]; };
-
-    void toggleTurn();
+    [[nodiscard]] Piece at(Square square) const { return m_board[square]; };
 
     [[nodiscard]] bool isLegal();
-
-    void makeMoveUci(std::string moveUci) {
-        Move move = Move(Square(moveUci.substr(0, 2)), Square(moveUci.substr(2, 2)), 0, 0);
-        doMove(move);
-    }
 
     void doMove(Move move);
     void undoMove();
 
-    [[nodiscard]] Color turn() const { return m_turn; }
+    [[nodiscard]] Color    turn() const { return m_turn; }
+    [[nodiscard]] bool     isLegal() const;
+    [[nodiscard]] Castling castlingRights() const { return m_castling; }
 
    private:
+    void clear();
+    void set(Square square, Piece p);
+    void unset(Square square);
+
+    void nextTurn();
+
     std::array<Piece, Square::NB>       m_board{};
     std::array<Bitboard, Color::NB>     m_colorBB{Bitboard::zero()};
     std::array<Bitboard, PieceType::NB> m_pieceTypeBB{Bitboard::zero()};
 
-    // std::list<Delta> m_deltas;
-    std::list<Move> m_moves;
+    std::vector<State> m_states{};
+    std::vector<Move>  m_moves;
 
     Color    m_turn      = Color::WHITE;
     Castling m_castling  = Castling::ANY;

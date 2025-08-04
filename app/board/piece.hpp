@@ -57,7 +57,9 @@ struct Color : Iterable<Color> {
     [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
     [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
 
-    constexpr operator uint8_t() { return m_value; }
+    constexpr operator uint8_t() const { return m_value; }
+
+    [[nodiscard]] constexpr Color flip() const { return {static_cast<uint8_t>(m_value ^ 1)}; }
 
    private:
     uint8_t m_value;
