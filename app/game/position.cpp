@@ -11,10 +11,11 @@
 #include <string>
 
 #include "bitboard.hpp"
+#include "navigation.hpp"
 #include "piece.hpp"
 
 void Position::setFromFEN(const std::string &fen) {
-    resetBoard();
+    clear();
 
     std::stringstream ss(fen);
     std::string       argument;
@@ -34,7 +35,7 @@ void Position::setFromFEN(const std::string &fen) {
                         current_file += num;
                     } else {
                         Square s = Square(current_file, current_rank);
-                        setPiece(s, Piece(c));
+                        set(s, Piece(c));
                         ++current_file;
                     }
                 }
@@ -81,17 +82,17 @@ std::string Position::toFEN() const {
     return fen.str();
 }
 
-void Position::setPiece(Square square, Piece piece) {
+void Position::set(Square square, Piece piece) {
     assert(square != Square::NONE);
     assert(piece != Piece::NONE);
 
-    unsetPiece(square);
+    unset(square);
     m_colorBB[piece.color()] |= Bitboard::squareBB(square);
     m_pieceTypeBB[piece.pieceType()] |= Bitboard::squareBB(square);
     m_board[square] = piece;
 }
 
-void Position::unsetPiece(Square square) {
+void Position::unset(Square square) {
     assert(square != Square::NONE);
 
     if (m_board[square] == Piece::NONE) return;
@@ -99,15 +100,9 @@ void Position::unsetPiece(Square square) {
     m_pieceTypeBB[m_board[square].pieceType()] &= ~Bitboard::squareBB(square);
     m_board[square] = Piece::NONE;
 }
-void Position::resetBoard() {
-    for (uint8_t i = 0; i < Color::NB; ++i) {
-        m_colorBB[i] = Bitboard::zero();
-    }
-    for (uint8_t i = 0; i < PieceType::NB; ++i) {
-        m_pieceTypeBB[i] = Bitboard::zero();
-    }
-    for (uint8_t i = 0; i < Square::NB; ++i) {
-        m_board[i] = Piece::NONE;
+void Position::clear() {
+    for (Square square : Square::all()) {
+        unset(square);
     }
     m_turn = Color::WHITE;
 }
