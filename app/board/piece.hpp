@@ -6,8 +6,9 @@
 #include <string_view>
 
 #include "iterator.hpp"
+#include "metadata.hpp"
 
-struct PieceType : Iterable<PieceType> {
+struct PieceType : Iterable<PieceType>, Metadata<PieceType> {
    public:
     enum : uint8_t {
         PAWN   = 0b000,
@@ -29,17 +30,13 @@ struct PieceType : Iterable<PieceType> {
 
     [[nodiscard]] constexpr uint8_t value() const { return m_value; }
 
-    [[nodiscard]] static constexpr uint8_t number() { return NB; }
-    [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
-    [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
-
     constexpr operator uint8_t() { return m_value; }
 
    private:
     uint8_t m_value;
 };
 
-struct Color : Iterable<Color> {
+struct Color : Iterable<Color>, Metadata<Color> {
    public:
     enum : uint8_t {
         WHITE = 0,
@@ -52,10 +49,7 @@ struct Color : Iterable<Color> {
 
     constexpr Color(uint8_t value) : m_value(value) {}
 
-    [[nodiscard]] constexpr uint8_t        value() const { return m_value; }
-    [[nodiscard]] static constexpr uint8_t number() { return NB; }
-    [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
-    [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
+    [[nodiscard]] constexpr uint8_t value() const { return m_value; }
 
     constexpr operator uint8_t() const { return m_value; }
 
@@ -65,7 +59,7 @@ struct Color : Iterable<Color> {
     uint8_t m_value;
 };
 
-struct Piece {
+struct Piece : Metadata<Piece> {
     enum : uint8_t {
         W_PAWN   = (Color::WHITE << PieceType::size()) | PieceType::PAWN,
         W_KNIGHT = (Color::WHITE << PieceType::size()) | PieceType::KNIGHT,
@@ -108,10 +102,6 @@ struct Piece {
 
     [[nodiscard]] constexpr Color color() const { return m_value >> PieceType::size(); }
     [[nodiscard]] constexpr Color pieceType() const { return m_value & PieceType::mask(); }
-
-    [[nodiscard]] static constexpr uint8_t number() { return NB; }
-    [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
-    [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
 
     [[nodiscard]] static constexpr Piece first() { return Piece::FIRST; }
     [[nodiscard]] static constexpr Piece last() { return Piece::LAST; }
