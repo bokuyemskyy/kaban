@@ -2,8 +2,10 @@
 
 #include <cstdint>
 
-struct Castling {
-    enum : std::uint8_t {
+#include "piece.hpp"
+
+struct Castling : Metadata<Castling> {
+    enum : uint8_t {
         W_KING_SIDE  = 0b0001,
         W_QUEEN_SIDE = 0b0010,
         B_KING_SIDE  = 0b0100,
@@ -26,11 +28,9 @@ struct Castling {
 
     [[nodiscard]] static constexpr uint8_t none() { return NONE; }
 
-    [[nodiscard]] static constexpr uint8_t number() { return NB; }
-    [[nodiscard]] static constexpr uint8_t mask() { return MASK; }
-    [[nodiscard]] static constexpr uint8_t size() { return SIZE; }
-
     constexpr operator uint8_t() const { return m_value; }
+
+    [[nodiscard]] constexpr uint8_t value() const { return m_value; }
 
    private:
     uint8_t m_value;
