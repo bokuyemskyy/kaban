@@ -1,12 +1,8 @@
 #pragma once
 
-#include <array>
+// simple generation drafts, used for reference
 
-#include "bitboard.hpp"
-#include "magic.hpp"
-#include "navigation.hpp"
-#include "piece.hpp"
-
+/*
 class AttackGenerator {
    public:
     static constexpr Bitboard pawnAttacksBB(Color color, Square square) {
@@ -23,45 +19,6 @@ class AttackGenerator {
         return table[color][square];
     }
 
-    static constexpr Bitboard knightAttacksBB(Square square) {
-        static constexpr auto table = []() constexpr {
-            std::array<Bitboard, Square::NB> t{};
-
-            constexpr std::array<Direction, 8> knightDirections = {Direction::NNE, Direction::NNW, Direction::ENE,
-                                                                   Direction::WNW, Direction::SSE, Direction::SSW,
-                                                                   Direction::ESE, Direction::WSW};
-
-            for (auto square : Square::all()) {
-                Bitboard attacks = Bitboard::zero();
-                for (auto direction : knightDirections) {
-                    attacks |= Bitboard::destinationBB(square, direction);
-                }
-                t[square] = attacks;
-            }
-            return t;
-        }();
-        return table[square];
-    }
-
-    static constexpr Bitboard kingAttacksBB(Square square) {
-        static constexpr auto table = []() constexpr {
-            std::array<Bitboard, Square::NB> t{};
-
-            constexpr std::array<Direction, 8> kingDirections = {Direction::E,  Direction::N,  Direction::W,
-                                                                 Direction::S,  Direction::NE, Direction::NW,
-                                                                 Direction::SE, Direction::SW};
-
-            for (auto square : Square::all()) {
-                Bitboard attacks = Bitboard::zero();
-                for (auto direction : kingDirections) {
-                    attacks |= Bitboard::destinationBB(square, direction);
-                }
-                t[square] = attacks;
-            }
-            return t;
-        }();
-        return table[square];
-    }
 
     template <uint8_t PIECETYPE>
     static constexpr Bitboard attacksBB(Square square, Bitboard occupied = Bitboard::zero()) {
@@ -121,3 +78,5 @@ class AttackGenerator {
         }
     }
 };
+
+*/
