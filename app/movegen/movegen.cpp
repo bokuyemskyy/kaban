@@ -4,51 +4,27 @@
 // MOVEGEN IS UNDER RECONSTRUCTION
 // MOVEGEN IS UNDER RECONSTRUCTION
 
-/*Bitboard getRookAttacks(Square square, Bitboard occupancy) {
-    Bitboard attackBB = Bitboard::zero();
-    for (const auto& direction : rookDirections) {
-        for (uint8_t i = 1;; ++i) {
-            Bitboard destination = Bitboard::destinationBB(square + (direction * (i - 1)), direction);
-            if (destination == Bitboard::zero()) break;
+template <>
+constexpr Bitboard Movegen::attackBB<PieceType::KNIGHT>(Square square) {
+    constexpr std::array<Direction, 8> knightDirections = {Direction::NNE, Direction::NNW, Direction::ENE,
+                                                           Direction::WNW, Direction::SSE, Direction::SSW,
+                                                           Direction::ESE, Direction::WSW};
 
-            attackBB |= destination;
-
-            if (occupancy & destination) break;
-        }
-    }
-    return attackBB;
-}*/
-/*Bitboard getBishopAttacks(Square square, Bitboard occupancy) {
-    Bitboard attackBB = Bitboard::zero();
-    for (const auto& direction : bishopDirections) {
-        for (uint8_t i = 1;; ++i) {
-            Bitboard destination = Bitboard::destinationBB(square + (direction * (i - 1)), direction);
-            if (destination == Bitboard::zero()) break;
-
-            attackBB |= destination;
-
-            if (occupancy & destination) break;
-        }
-    }
-    return attackBB;
-}*/
-
-void init() {
-    // initMagics(PieceType::BISHOP);
-    // initMagics(PieceType::ROOK);
-
-    /*auto bishopPremaskOccupancies = getPremaskOccupancies(PieceType::BISHOP, square);
-    for (const auto& occupancy : bishopPremaskOccupancies) {
-        bishopAttacks[square][getIndexOfOccupancy<PieceType::BISHOP>(square, occupancy)] =
-            getBishopAttacks(square, occupancy);
-    }
-
-    auto rookPremaskOccupancies = getPremaskOccupancies(PieceType::ROOK, square);
-    for (const auto& occupancy : rookPremaskOccupancies) {
-        rookAttacks[square][getIndexOfOccupancy<PieceType::ROOK>(square, occupancy)] =
-            getRookAttacks(square, occupancy);
-    }*/
+    static constexpr auto table = simpleAttackTable(knightDirections);
+    return table[square];
 }
+template <>
+constexpr Bitboard Movegen::attackBB<PieceType::KING>(Square square) {
+    constexpr std::array<Direction, 8> kingDirections = {Direction::E,  Direction::N,  Direction::W,  Direction::S,
+                                                         Direction::NE, Direction::NW, Direction::SE, Direction::SW};
+
+    static constexpr auto table = simpleAttackTable(kingDirections);
+    return table[square];
+}
+
+//
+//
+//
 
 /*size_t generatePseudoLegalMoves(std::vector<Move>* moveStack) {
     size_t prevBufferSize = moveBuffer->size();

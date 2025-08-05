@@ -10,24 +10,24 @@
 #include "navigation.hpp"
 #include "piece.hpp"
 
-using Shift = uint8_t;
-
-struct Magic {
-    Bitboard magic;
-    Shift    shift{};
-    Bitboard premask;
-    size_t   attacksOffset{};
-
-    [[nodiscard]] constexpr size_t index(Bitboard occupancy) const {
-        return (((occupancy & premask) * magic) >> shift);
-    }
-};
-
 constexpr size_t ROOK_ATTACKS_SIZE   = 102400;
 constexpr size_t BISHOP_ATTACKS_SIZE = 5248;
 constexpr size_t TOTAL_ATTACKS_SIZE  = ROOK_ATTACKS_SIZE + BISHOP_ATTACKS_SIZE;
-
+// Magics should be a part of Movegen
 class Magics {
+    using Shift = uint8_t;
+
+    struct Magic {
+        Bitboard magic;
+        Shift    shift{};
+        Bitboard premask;
+        size_t   attacksOffset{};
+
+        [[nodiscard]] constexpr size_t index(Bitboard occupancy) const {
+            return (((occupancy & premask) * magic) >> shift);
+        }
+    };
+
     static constexpr int MAX_OCCUPANCIES = 4096;
 
     class PRNG {
@@ -198,11 +198,11 @@ class Magics {
     }
 };
 
+/*
 auto            MAGIC_TABLES  = MagicGenerator::generateMagics();
 constexpr auto& ROOK_MAGICS   = std::get<0>(MAGIC_TABLES);
 constexpr auto& BISHOP_MAGICS = std::get<1>(MAGIC_TABLES);
 constexpr auto& MAGIC_ATTACKS = std::get<2>(MAGIC_TABLES);
-
 constexpr Bitboard rookAttacksBB(Square square, Bitboard occupancy) {
     const Magic& magic = ROOK_MAGICS[square];
     return MAGIC_ATTACKS[magic.attacksOffset + magic.index(occupancy)];
@@ -216,3 +216,4 @@ constexpr Bitboard bishopAttacksBB(Square square, Bitboard occupancy) {
 constexpr Bitboard queenAttacksBB(Square square, Bitboard occupancy) {
     return rookAttacksBB(square, occupancy) | bishopAttacksBB(square, occupancy);
 }
+*/
