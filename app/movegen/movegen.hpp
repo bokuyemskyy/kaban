@@ -34,67 +34,36 @@ class MoveList {
 };
 
 class Movegen {
-    static constexpr Bitboard knightAttackBB(Square square) {
-        static constexpr auto table = []() constexpr {
-            std::array<Bitboard, Square::number()> t{};
+    template <size_t N>
+    static consteval std::array<Bitboard, Square::number()> simpleAttackTable(
+        const std::array<Direction, N>& directions) {
+        std::array<Bitboard, Square::number()> table{};
 
-            constexpr std::array<Direction, 8> knightDirections = {Direction::NNE, Direction::NNW, Direction::ENE,
-                                                                   Direction::WNW, Direction::SSE, Direction::SSW,
-                                                                   Direction::ESE, Direction::WSW};
-
-            for (auto square_ : Square::all()) {
-                Bitboard attackBB = Bitboard::zero();
-                for (const auto& direction : knightDirections) {
-                    attackBB |= Bitboard::destination(square_, direction);
-                }
-                t[square_] = attackBB;
+        for (auto square : Square::all()) {
+            Bitboard attackBB = Bitboard::zero();
+            for (const auto& direction : directions) {
+                attackBB |= Bitboard::destination(square, direction);
             }
+            table[square] = attackBB;
+        }
 
-            return t;
-        }();
-
-        return table[square];
+        return table;
     }
 
-    static constexpr Bitboard kingAttackBB(Square square) {
-        static constexpr auto table = []() constexpr {
-            std::array<Bitboard, Square::number()> t{};
-
-            constexpr std::array<Direction, 8> kingDirections = {Direction::E,  Direction::N,  Direction::W,
-                                                                 Direction::S,  Direction::NE, Direction::NW,
-                                                                 Direction::SE, Direction::SW};
-
-            for (auto square_ : Square::all()) {
-                Bitboard attackBB = Bitboard::zero();
-                for (const auto& direction : kingDirections) {
-                    attackBB |= Bitboard::destination(square_, direction);
-                }
-                t[square_] = attackBB;
-            }
-
-            return t;
-        }();
-
-        return table[square];
-    }
-
-    const int BISHOP_ATTACK_NB = 0x1480;
-    const int ROOK_ATTACK_NB   = 0x19000;
-
-    // extern std::vector<Bitboard> bishopAttacks;
-    // extern std::vector<Bitboard> rookAttacks;
+    template <uint8_t>
+    static constexpr Bitboard attackBB(Square square);
 
     void init();
 
     template <GenerationType GT>
     size_t generateMoves(const Position& position, std::array<Move, MAX_MOVES>& /*moveList*/) {
-        Bitboard pieces = position.bitboard(position.turn(), PieceType::PAWN);
+        Bitboard pieces = position.ourOccupancy(PieceType::PAWN);
 
         while (!pieces.empty()) {
             // for each pawn we do poplsb and generate moves
         }
 
-        pieces = position.bitboard(position.turn(), PieceType::KNIGHT);
+        pieces = position.ourOccupancy(PieceType::KNIGHT);
         //...
     }
 

@@ -6,6 +6,7 @@
 #include "bitboard.hpp"
 #include "castling.hpp"
 #include "en_passant.hpp"
+#include "halfmove.hpp"
 #include "move.hpp"
 #include "navigation.hpp"
 #include "piece.hpp"
@@ -30,11 +31,17 @@ class Position {
 
     [[nodiscard]] bool isLegal() const;
 
-    [[nodiscard]] Bitboard bitboard(Color color, PieceType piece_type) const {
-        return m_color_bb[color] & m_piece_type_bb[piece_type];
+    [[nodiscard]] Bitboard occupancy() const { return m_color_bb[Color::WHITE] | m_color_bb[Color::BLACK]; }
+
+    [[nodiscard]] Bitboard ourOccupancy() const { return m_color_bb[m_turn]; }
+    [[nodiscard]] Bitboard ourOccupancy(PieceType piece_type) const {
+        return m_color_bb[m_turn] & m_piece_type_bb[piece_type];
     }
-    [[nodiscard]] Bitboard bitboard(Color color) const { return m_color_bb[color]; }
-    [[nodiscard]] Bitboard bitboard(PieceType piece_type) const { return m_piece_type_bb[piece_type]; }
+
+    [[nodiscard]] Bitboard theirOccupancy() const { return m_color_bb[m_turn.flipped()]; }
+    [[nodiscard]] Bitboard theirOccupancy(PieceType piece_type) const {
+        return m_color_bb[m_turn.flipped()] & m_piece_type_bb[piece_type];
+    }  // these better be some templates <SIDE (us/them/both)>
 
    private:
     void clear();
@@ -53,5 +60,5 @@ class Position {
     Color     m_turn     = Color::WHITE;
     Castling  m_castling = Castling::ANY;
     EnPassant m_en_passant;
-    uint8_t   m_halfmoves;
+    Halfmove  m_halfmove;
 };
