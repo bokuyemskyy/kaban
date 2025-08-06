@@ -153,7 +153,7 @@ void Renderer::drawPieces(Rect<float> board) {
             ImVec2 begin = ImVec2(board.x + rect.left(), board.y + rect.top());
             ImVec2 end   = ImVec2(board.x + rect.right(), board.y + rect.bottom());
 
-            Piece piece = game.value()->snapshot().position[square];
+            Piece piece = game.value()->snapshot().board[square];
 
             ImVec2 piece_begin = ImVec2(begin.x + PIECE_MARGIN, begin.y + PIECE_MARGIN);
             ImVec2 piece_end   = ImVec2(end.x - PIECE_MARGIN, end.y - PIECE_MARGIN);

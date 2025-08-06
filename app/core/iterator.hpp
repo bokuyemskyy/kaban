@@ -18,7 +18,7 @@ struct Iterable {
         using pointer           = const Derived*;
         using reference         = const Derived&;
 
-        constexpr Iterator(uint8_t value) : m_current(value) {}
+        constexpr Iterator(uint8_t current) : m_current(current) {}
 
         constexpr Derived operator*() const { return m_current; }
 

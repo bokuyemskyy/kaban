@@ -10,6 +10,7 @@
 #include "move.hpp"
 #include "navigation.hpp"
 #include "piece.hpp"
+#include "state.hpp"
 
 constexpr auto DEFAULT_FEN       = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
 const int      MAX_DEPTH         = 64;  // Hard cap for recursion
