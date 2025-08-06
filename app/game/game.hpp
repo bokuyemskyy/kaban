@@ -6,6 +6,7 @@
 #include <mutex>
 #include <string>
 
+#include "move.hpp"
 #include "navigation.hpp"
 #include "piece.hpp"
 #include "position.hpp"
@@ -18,10 +19,10 @@ class Game {
         Snapshot() = default;
         Snapshot(const Position& position_) {
             for (Square square : Square::all()) {
-                position[square] = position_.at(square);
+                board[square] = position_.at(square);
             }
         }
-        std::array<Piece, Square::number()> position;
+        std::array<Piece, Square::number()> board;
     };
 
     [[nodiscard]] const Snapshot& snapshot() const {
@@ -59,8 +60,6 @@ class Game {
     [[nodiscard]] std::string whiteName() const { return m_white_name.empty() ? "Player White" : m_white_name; }
     [[nodiscard]] std::string blackName() const { return m_black_name.empty() ? "Player Black" : m_black_name; }
     [[nodiscard]] size_t      id() const { return m_id; }
-
-    [[nodiscard]] const Position& position() const { return m_position; }
 
    private:
     mutable std::mutex m_mutex;
