@@ -296,9 +296,9 @@ ImTextureID Renderer::loadTexture(Resource resource) {
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    int            width{};
-    int            height{};
-    int            channels{};
+    int            width    = 0;
+    int            height   = 0;
+    int            channels = 0;
     unsigned char *data =
         stbi_load_from_memory(resource.data, static_cast<int>(resource.length), &width, &height, &channels, 4);
 
