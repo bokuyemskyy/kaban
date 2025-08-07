@@ -18,8 +18,8 @@ class Game {
     struct Snapshot {
         Snapshot() = default;
         Snapshot(const Position& position_) {
-            for (Square square : Square::all()) {
-                board[square] = position_.at(square);
+            for (Square square : Squares::all()) {
+                board[square.value()] = position_.at(square);
             }
         }
         std::array<Piece, Square::number()> board;

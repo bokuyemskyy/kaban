@@ -7,7 +7,7 @@ constexpr Bitboard Movegen::attackBB<PieceType::KNIGHT>(Square square) {
                                                            Direction::ESE, Direction::WSW};
 
     static constexpr auto table = simpleAttackTable(knightDirections);
-    return table[square];
+    return table[square.value()];
 }
 template <>
 constexpr Bitboard Movegen::attackBB<PieceType::KING>(Square square) {
@@ -15,5 +15,5 @@ constexpr Bitboard Movegen::attackBB<PieceType::KING>(Square square) {
                                                          Direction::NE, Direction::NW, Direction::SE, Direction::SW};
 
     static constexpr auto table = simpleAttackTable(kingDirections);
-    return table[square];
+    return table[square.value()];
 }

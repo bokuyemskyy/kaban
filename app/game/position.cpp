@@ -22,7 +22,7 @@ void Position::setFromFEN(const std::string &fen) {
     while (std::getline(ss, argument, ' ')) {
         switch (argument_index) {
             case 0: {
-                int current_rank = File::NB - 1;
+                int current_rank = File::number() - 1;
                 int current_file = 0;
 
                 for (char c : argument) {
@@ -33,7 +33,7 @@ void Position::setFromFEN(const std::string &fen) {
                         int num = c - '0';
                         current_file += num;
                     } else {
-                        Square s = Square(current_file, current_rank);
+                        Square s = Square(File(current_file), Rank(current_rank));
                         set(s, Piece(c));
                         ++current_file;
                     }
@@ -56,11 +56,11 @@ void Position::setFromFEN(const std::string &fen) {
 std::string Position::toFEN() const {
     std::stringstream fen;
 
-    for (int r = Rank::NB - 1; r >= 0; r--) {
+    for (int r = Rank::number() - 1; r >= 0; r--) {
         int empty = 0;
-        for (int f = 0; f < File::NB; ++f) {
+        for (int f = 0; f < File::number(); ++f) {
             Square s = Square(File(f), Rank(r));
-            Piece  p = m_board[s];
+            Piece  p = m_board[s.value()];
 
             if (p == Piece::NONE) {
                 ++empty;
@@ -82,25 +82,20 @@ std::string Position::toFEN() const {
 }
 
 void Position::set(Square square, Piece piece) {
-    assert(square != Square::NONE);
-    assert(piece != Piece::NONE);
-
     unset(square);
     m_color_bb[piece.color()] |= Bitboard::square(square);
     m_piece_type_bb[piece.pieceType()] |= Bitboard::square(square);
-    m_board[square] = piece;
+    m_board[square.value()] = piece;
 }
 
 void Position::unset(Square square) {
-    assert(square != Square::NONE);
-
-    if (m_board[square] == Piece::NONE) return;
-    m_color_bb[m_board[square].color()] &= ~Bitboard::square(square);
-    m_piece_type_bb[m_board[square].pieceType()] &= ~Bitboard::square(square);
-    m_board[square] = Piece::NONE;
+    if (m_board[square.value()] == Piece::NONE) return;
+    m_color_bb[m_board[square.value()].color()] &= ~Bitboard::square(square);
+    m_piece_type_bb[m_board[square.value()].pieceType()] &= ~Bitboard::square(square);
+    m_board[square.value()] = Piece::NONE;
 }
 void Position::clear() {
-    for (Square square : Square::all()) {
+    for (Square square : Squares::all()) {
         unset(square);
     }
     m_turn = Color::WHITE;
@@ -117,17 +112,17 @@ void Position::doMove(const Move move) {
     // m_deltas.emplace_back(Delta(m_board[to], m_castling, 0, m_halfmoves));
     m_moves.emplace_back(move);
 
-    if (m_board[to] != Piece::NONE) {
+    if (m_board[to.value()] != Piece::NONE) {
         Bitboard maskBB = ~Bitboard::square(to);
-        m_color_bb[m_board[to].color()] &= maskBB;
-        m_piece_type_bb[m_board[to].pieceType()] &= maskBB;
+        m_color_bb[m_board[to.value()].color()] &= maskBB;
+        m_piece_type_bb[m_board[to.value()].pieceType()] &= maskBB;
     }
 
-    m_color_bb[m_board[from].color()] ^= moveBB;
-    m_piece_type_bb[m_board[from].pieceType()] ^= moveBB;
+    m_color_bb[m_board[from.value()].color()] ^= moveBB;
+    m_piece_type_bb[m_board[from.value()].pieceType()] ^= moveBB;
 
-    m_board[to]   = m_board[from];
-    m_board[from] = Piece::NONE;
+    m_board[to.value()]   = m_board[from.value()];
+    m_board[from.value()] = Piece::NONE;
 
     nextTurn();
 }
@@ -148,10 +143,10 @@ void Position::undoMove() {
 
     Bitboard moveBB = Bitboard::square(from) | Bitboard::square(to);
 
-    Piece movedPiece = m_board[to];
+    Piece movedPiece = m_board[to.value()];
     // Piece capturedPiece = getCaptured(delta);
 
-    m_board[from] = movedPiece;
+    m_board[from.value()] = movedPiece;
     // m_board[to]   = capturedPiece;
 
     m_color_bb[movedPiece.color()] ^= moveBB;
