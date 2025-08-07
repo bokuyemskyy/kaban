@@ -9,18 +9,19 @@
 #include "piece.hpp"
 
 struct EnPassant : Metadata<EnPassant> {
-    EnPassant(uint8_t value = 0) { (value & 0b1000) ? m_file->set(value & 0b0111) : m_file.reset(); }
+    EnPassant(uint8_t value = 0)
+        : m_file((value & 0b1000) ? std::optional<File>(File(value & 0b0111)) : std::nullopt) {}
 
-    [[nodiscard]] bool has_value() const { return m_file.has_value(); }
+    [[nodiscard]] bool hasValue() const { return m_file.has_value(); }
     void               clear() { m_file.reset(); }
 
     [[nodiscard]] Square square(Color toMove) const {
         assert(m_file.has_value());
-        return Square(m_file.value(), toMove == Color::WHITE ? Rank::R6 : Rank::R3);
+        return Square(m_file.value(), toMove == Color::WHITE ? Ranks::R6 : Ranks::R3);
     }
 
     void set(Square toSquare) {
-        assert(toSquare.rank() == Rank::R4 || toSquare.rank() == Rank::R5);
+        assert(toSquare.rank() == Ranks::R4 || toSquare.rank() == Ranks::R5);
         m_file = toSquare.file();
     }
 

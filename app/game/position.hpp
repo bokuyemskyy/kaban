@@ -28,7 +28,7 @@ class Position {
 
     [[nodiscard]] Color    turn() const { return m_turn; }
     [[nodiscard]] Castling castling() const { return m_castling; }
-    [[nodiscard]] Piece    at(Square square) const { return m_board[square]; };
+    [[nodiscard]] Piece    at(Square square) const { return m_board[square.value()]; };
 
     [[nodiscard]] bool isLegal() const;
 

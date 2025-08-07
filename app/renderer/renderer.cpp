@@ -93,7 +93,7 @@ void Renderer::drawGame() {
 void Renderer::drawBoard(Rect<float> board) {
     ImDrawList *drawList = ImGui::GetWindowDrawList();
 
-    for (Square square : Square::all()) {
+    for (Square square : Squares::all()) {
         ImU32 color = square.light() ? IM_COL32(240, 217, 181, 255) : IM_COL32(181, 136, 99, 255);
         Rect  rect  = square.normalizedRect().absolute(board.width, board.height);
 
@@ -105,20 +105,20 @@ void Renderer::drawBoard(Rect<float> board) {
 
     const ImVec2 CHAR_SIZE = ImGui::CalcTextSize("A");
 
-    for (File file : File::all()) {
-        std::string label(1, static_cast<char>(a_CHAR_INDEX + file));
+    for (auto file : Files::all()) {
+        std::string label(1, static_cast<char>(a_CHAR_INDEX + file.value()));
 
-        Square reference_square = Square(file, 0);
+        Square reference_square = Square(file, Ranks::R1);
         Rect   reference_rect   = reference_square.normalizedRect().absolute(board.width, board.height);
 
         float x = board.x + reference_rect.left() + (reference_rect.width / 2) - (CHAR_SIZE.x / 2);
         drawList->AddText(ImVec2(x, board.y - CHAR_SIZE.y - PIECE_MARGIN), IM_WHITE, label.c_str());
         drawList->AddText(ImVec2(x, board.y + board.height + PIECE_MARGIN), IM_WHITE, label.c_str());
     }
-    for (Rank rank : Rank::all()) {
-        std::string label = std::to_string(Rank::NB - rank);
+    for (auto rank : Ranks::all()) {
+        std::string label = std::to_string(Rank::number() - rank.value());
 
-        Square reference_square = Square(0, rank);
+        Square reference_square = Square(Files::FA, rank);
         Rect   reference_rect   = reference_square.normalizedRect().absolute(board.width, board.height);
 
         float y = board.y + reference_rect.top() + (reference_rect.height / 2) - (CHAR_SIZE.y / 2);
@@ -147,13 +147,13 @@ void Renderer::drawPieces(Rect<float> board) {
     auto game = m_session->selectedGame();
 
     if (game) {
-        for (Square square : Square::all()) {
+        for (Square square : Squares::all()) {
             Rect rect = square.normalizedRect().absolute(board.width, board.height);
 
             ImVec2 begin = ImVec2(board.x + rect.left(), board.y + rect.top());
             ImVec2 end   = ImVec2(board.x + rect.right(), board.y + rect.bottom());
 
-            Piece piece = game.value()->snapshot().board[square];
+            Piece piece = game.value()->snapshot().board[square.value()];
 
             ImVec2 piece_begin = ImVec2(begin.x + PIECE_MARGIN, begin.y + PIECE_MARGIN);
             ImVec2 piece_end   = ImVec2(end.x - PIECE_MARGIN, end.y - PIECE_MARGIN);

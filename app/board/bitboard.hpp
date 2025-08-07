@@ -35,11 +35,11 @@ struct Bitboard {
 
     [[nodiscard]] constexpr bool empty() const { return m_value == zero(); }
 
-    static constexpr Bitboard square(Square square) { return (1ULL << square); }
+    static constexpr Bitboard square(Square square) { return (1ULL << square.value()); }
     static constexpr Bitboard destination(Square square, Direction direction) {
         Square destination = square + direction;
-        return (destination.ok() && Square::distance(square, destination) <= 2) ? Bitboard::square(destination)
-                                                                                : zero();
+        return (destination.isOk() && Square::distance(square, destination) <= 2) ? Bitboard::square(destination)
+                                                                                  : zero();
     };
 
     static constexpr Bitboard rank(Rank rank) {
@@ -48,74 +48,74 @@ struct Bitboard {
 
             constexpr Bitboard RANK_A = 0xFFULL;
 
-            for (auto rank : Rank::all()) {
-                t[rank] = (RANK_A << (rank * File::number()));
+            for (auto rank : Ranks::all()) {
+                t[rank.value()] = (RANK_A << (rank.value() * File::number()));
             }
             return t;
         }();
 
-        return table[rank];
+        return table[rank.value()];
     }
 
     static constexpr Bitboard file(File file) {
         static constexpr auto table = []() constexpr {
-            std::array<Bitboard, File::NB> t{};
+            std::array<Bitboard, File::number()> t{};
 
             constexpr Bitboard FILE_A = 0x0101010101010101ULL;
 
-            for (auto file : File::all()) {
-                t[file] = (FILE_A << file);
+            for (auto file : Files::all()) {
+                t[file.value()] = (FILE_A << file.value());
             }
             return t;
         }();
 
-        return table[file];
+        return table[file.value()];
     }
 
     static constexpr Bitboard diag(Square square) {
         static constexpr auto table = []() constexpr {
-            std::array<Bitboard, Square::NB> t{};
-            for (auto square : Square::all()) {
+            std::array<Bitboard, Square::number()> t{};
+            for (auto square : Squares::all()) {
                 Bitboard diag       = zero();
                 File     squareFile = square.file();
                 Rank     squareRank = square.rank();
 
-                for (auto rank : Rank::all()) {
-                    for (auto file : File::all()) {
+                for (auto rank : Ranks::all()) {
+                    for (auto file : Files::all()) {
                         Square possibleSquare = Square(file, rank);
-                        if (file - rank == squareFile - squareRank) {
+                        if (file.value() - rank.value() == squareFile.value() - squareRank.value()) {
                             diag = diag | Bitboard::square(possibleSquare);
                         }
                     }
                 }
-                t[square] = diag;
+                t[square.value()] = diag;
             }
             return t;
         }();
-        return table[square];
+        return table[square.value()];
     }
 
     static constexpr Bitboard antiDiag(Square square) {
         static constexpr auto table = []() constexpr {
-            std::array<Bitboard, Square::NB> t{};
-            for (auto square : Square::all()) {
+            std::array<Bitboard, Square::number()> t{};
+            for (auto square : Squares::all()) {
                 Bitboard antiDiag   = zero();
                 File     squareFile = square.file();
                 Rank     squareRank = square.rank();
 
-                for (auto rank : Rank::all()) {
-                    for (auto file : File::all()) {
+                for (auto rank : Ranks::all()) {
+                    for (auto file : Files::all()) {
                         Square possibleSquare = Square(file, rank);
-                        if (file + rank == squareFile + squareRank) {
+                        if (file.value() + rank.value() == squareFile.value() + squareRank.value()) {
                             antiDiag = antiDiag | Bitboard::square(possibleSquare);
                         }
                     }
                 }
-                t[square] = antiDiag;
+                t[square.value()] = antiDiag;
             }
             return t;
         }();
-        return table[square];
+        return table[square.value()];
     }
 
     /*template <int8_t D>

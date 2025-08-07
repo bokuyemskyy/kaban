@@ -62,19 +62,21 @@ struct Move {
     constexpr Move(uint16_t value) : m_value(value) {}
 
     constexpr Move(Square from, Square to, Flag flag = Flag::USUAL, Promotion promotion = Promotion::TO_QUEEN)
-        : m_value((promotion << PROMOTION_SHIFT) | (flag << FLAG_SHIFT) | (to << TO_SHIFT) | from) {}
+        : m_value((promotion << PROMOTION_SHIFT) | (flag << FLAG_SHIFT) | (to.value() << TO_SHIFT) | from.value()) {}
 
-    [[nodiscard]] constexpr Square from() const { return m_value & Square::mask(); }
+    [[nodiscard]] constexpr Square from() const { return Square(m_value & Square::mask()); }
 
-    [[nodiscard]] constexpr Square to() const { return (m_value >> TO_SHIFT) & Square::mask(); }
+    [[nodiscard]] constexpr Square to() const { return Square((m_value >> TO_SHIFT) & Square::mask()); }
 
-    [[nodiscard]] constexpr Flag flag() const { return (m_value >> FLAG_SHIFT) & Flag::mask(); }
+    [[nodiscard]] constexpr Flag flag() const { return Flag((m_value >> FLAG_SHIFT) & Flag::mask()); }
 
-    [[nodiscard]] constexpr Promotion promotion() const { return (m_value >> PROMOTION_SHIFT) & Promotion::mask(); }
+    [[nodiscard]] constexpr Promotion promotion() const {
+        return Promotion((m_value >> PROMOTION_SHIFT) & Promotion::mask());
+    }
 
     constexpr operator uint16_t() const { return m_value; }
 
-    [[nodiscard]] constexpr bool empty() const { return m_value == 0; }
+    [[nodiscard]] constexpr bool hasValue() const { return m_value != 0; }
 
    private:
     uint16_t m_value;

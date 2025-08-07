@@ -5,8 +5,8 @@
 #include "navigation.hpp"
 
 TEST(MoveTest, CreateAndExtractMove) {
-    Square from  = Square::A1;
-    Square to    = Square::H8;
+    Square from  = Squares::A1;
+    Square to    = Squares::H8;
     Flag   flags = 4;
 
     Move move = Move(from, to, flags, 0);
