@@ -39,12 +39,12 @@ class Movegen {
         const std::array<Direction, N>& directions) {
         std::array<Bitboard, Square::number()> table{};
 
-        for (auto square : Square::all()) {
+        for (auto square : Squares::all()) {
             Bitboard attackBB = Bitboard::zero();
             for (const auto& direction : directions) {
                 attackBB |= Bitboard::destination(square, direction);
             }
-            table[square] = attackBB;
+            table[square.value()] = attackBB;
         }
 
         return table;
