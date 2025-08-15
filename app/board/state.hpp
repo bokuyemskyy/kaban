@@ -4,33 +4,32 @@
 
 #include "castling.hpp"
 #include "en_passant.hpp"
+#include "halfmove.hpp"
 #include "piece.hpp"
+#include "strong.hpp"
 
-struct State {
+class State : public Strong::Value<State, uint32_t> {
    public:
-    constexpr State(Castling castling, EnPassant en_passant, uint8_t halfmoves)
-        : m_value(static_cast<uint32_t>(castling.value() & Castling::mask()) << CASTLING_SHIFT |
-                  static_cast<uint32_t>(en_passant.value() & EnPassant::mask()) << EN_PASSANT_SHIFT |
-                  static_cast<uint32_t>(halfmoves & HALFMOVES_MASK) << HALFMOVES_SHIFT) {}
+    using Value::Value;
 
-    [[nodiscard]] constexpr Castling castling() const { return (m_value >> CASTLING_SHIFT) & Castling::mask(); }
+    constexpr State(Castling castling, EnPassant en_passant, Halfmove halfmove)
+        : Value(static_cast<uint32_t>(castling.value()) << CASTLING_SHIFT |
+                static_cast<uint32_t>(en_passant.value()) << EN_PASSANT_SHIFT |
+                static_cast<uint32_t>(halfmove.value()) << HALFMOVE_SHIFT) {}
 
-    [[nodiscard]] constexpr EnPassant en_passant() const { return (m_value >> EN_PASSANT_SHIFT) & EnPassant::mask(); }
+    [[nodiscard]] constexpr Castling castling() const { return Castling(m_value >> CASTLING_SHIFT); }
 
-    [[nodiscard]] constexpr uint8_t halfmoves() const { return (m_value >> HALFMOVES_SHIFT) & HALFMOVES_MASK; }
+    [[nodiscard]] constexpr EnPassant en_passant() const { return EnPassant(m_value >> EN_PASSANT_SHIFT); }
 
-    constexpr void setCaptured(Piece captured) { m_value |= ((captured.value() & Piece::mask()) << CAPTURED_SHIFT); }
-    [[nodiscard]] constexpr Piece captured() const { return (m_value >> CAPTURED_SHIFT) & Piece::mask(); }
+    [[nodiscard]] constexpr Halfmove halfmove() const { return Halfmove(m_value >> HALFMOVE_SHIFT); }
+
+    [[nodiscard]] constexpr Piece captured() const { return Piece(m_value >> CAPTURED_SHIFT); }
+
+    constexpr void setCaptured(Piece captured) { m_value |= (captured.value() << CAPTURED_SHIFT); }
 
    private:
-    uint16_t m_value;
-
-    static constexpr int HALFMOVES_BITS = 6;
-
     static constexpr int CASTLING_SHIFT   = 0;
     static constexpr int EN_PASSANT_SHIFT = CASTLING_SHIFT + Castling::size();
-    static constexpr int HALFMOVES_SHIFT  = EN_PASSANT_SHIFT + EnPassant::size();
-    static constexpr int CAPTURED_SHIFT   = HALFMOVES_SHIFT + HALFMOVES_BITS;
-
-    static constexpr uint32_t HALFMOVES_MASK = 0b111111;
+    static constexpr int HALFMOVE_SHIFT   = EN_PASSANT_SHIFT + EnPassant::size();
+    static constexpr int CAPTURED_SHIFT   = HALFMOVE_SHIFT + Halfmove::size();
 };

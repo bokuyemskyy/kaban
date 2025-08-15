@@ -1,24 +1,22 @@
-#include <concepts>
+#pragma once
+
 #include <cstdint>
 
-#include "glfw_wrapper.hpp"
-#include "navigation.hpp"
+#include "strong.hpp"
 
-// example of a clear, type-safe wrapper (i have to implement the other ones the same way)
+class Halfmove : public Strong::Value<Halfmove, uint8_t>, public Strong::Field<Halfmove, uint8_t, 7> {
+   public:
+    using Value::Value;
 
-struct Halfmove {
-    constexpr Halfmove() : m_value(0) {}
-    constexpr explicit Halfmove(uint8_t value) : m_value(value) {}
-
-    [[nodiscard]] constexpr uint8_t value() const { return m_value; }
-
-    constexpr Halfmove& operator++() {
+    constexpr Halfmove& operator++() noexcept {
         ++m_value;
         return *this;
     }
-    constexpr bool operator==(const Halfmove& other) const { return m_value == other.m_value; }
-    constexpr bool operator<(const Halfmove& other) const { return m_value < other.m_value; }
 
-   private:
-    uint8_t m_value;
+    constexpr Halfmove& reset() noexcept {
+        m_value = 0;
+        return *this;
+    }
+
+    [[nodiscard]] constexpr bool isDraw() const noexcept { return m_value >= 100; }
 };
