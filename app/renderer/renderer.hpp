@@ -44,6 +44,7 @@ class Renderer {
             drawDemoWindow();
 
             finishFrame();
+
             if (m_glfw.windowShouldClose()) {
                 m_session->signalQuit();
             }
@@ -81,7 +82,7 @@ class Renderer {
     GLFWWrapper  m_glfw;
     IMGUIWrapper m_imgui;
 
-    std::array<ImTextureID, Piece::mask()> pieceTextures;
+    std::unordered_map<Piece, ImTextureID> m_pieceTextures;
 
     std::pair<float, float> m_mousePos;
 

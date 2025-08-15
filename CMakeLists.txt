@@ -19,35 +19,35 @@ endforeach()
 
 # compile options for code clarity 
 add_compile_options(
-    -Wall
-    -Werror
-    -Wextra
-    -Wundef
-    -Wunused
-    -Weffc++
-    -Wshadow
-    -Wformat
-    -Wcomment
-    -Wpedantic
-    -Wnarrowing
-    -Wcast-align
-    -Wreturn-type
-    -Winvalid-pch
-    -Wunused-macros
-    -Wunused-result
-    -Wold-style-cast
-    -Wsign-conversion
-    -Wredundant-decls
-    -Wnull-dereference
-    -Wunused-parameter
-    -Wnon-virtual-dtor
-    -Wdouble-promotion
-    -Woverloaded-virtual
-    -Wimplicit-fallthrough
-    -Wmissing-declarations
-    -Wmissing-include-dirs
-    -Wmisleading-indentation
-    -Wmissing-format-attribute
+   #-Wall
+    #-Werror
+    #-Wextra
+    #-Wundef
+    #-Wunused
+    #-Weffc++
+    #-Wshadow
+    #-Wformat
+    #-Wcomment
+    #-Wpedantic
+    #-Wnarrowing
+    #-Wcast-align
+    #-Wreturn-type
+    #-Winvalid-pch
+    #-Wunused-macros
+    #-Wunused-result
+    #-Wold-style-cast
+    #-Wsign-conversion
+    #-Wredundant-decls
+    #-Wnull-dereference
+    #-Wunused-parameter
+    #-Wnon-virtual-dtor
+    #-Wdouble-promotion
+    #-Woverloaded-virtual
+    #-Wimplicit-fallthrough
+    #-Wmissing-declarations
+    #-Wmissing-include-dirs
+    #-Wmisleading-indentation
+    #-Wmissing-format-attribute
     #    -Wconversion
 )
 

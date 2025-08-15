@@ -2,12 +2,14 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
+#include <iostream>
 #include <vector>
 
 #include "bitboard.hpp"
-#include "navigation.hpp"
 #include "piece.hpp"
 #include "position.hpp"
+#include "square.hpp"
 
 // MOVEGEN IS UNDER RECONSTRUCTION
 // MOVEGEN IS UNDER RECONSTRUCTION
@@ -35,14 +37,15 @@ class MoveList {
 
 class Movegen {
     template <size_t N>
-    static consteval std::array<Bitboard, Square::number()> simpleAttackTable(
+    static constexpr std::array<Bitboard, Square::number()> simpleAttackTable(
         const std::array<Direction, N>& directions) {
         std::array<Bitboard, Square::number()> table{};
 
         for (auto square : Squares::all()) {
-            Bitboard attackBB = Bitboard::zero();
+            Bitboard attackBB = Bitboards::ZERO;
             for (const auto& direction : directions) {
-                attackBB |= Bitboard::destination(square, direction);
+                Square destination = square.moved(direction);
+                if (destination.hasValue()) attackBB |= Bitboard::square(destination);
             }
             table[square.value()] = attackBB;
         }
@@ -57,13 +60,13 @@ class Movegen {
 
     template <GenerationType GT>
     size_t generateMoves(const Position& position, std::array<Move, MAX_MOVES>& /*moveList*/) {
-        Bitboard pieces = position.ourOccupancy(PieceType::PAWN);
+        Bitboard pieces = position.ourOccupancy(PieceTypes::PAWN);
 
-        while (!pieces.empty()) {
+        while (pieces.hasValue()) {
             // for each pawn we do poplsb and generate moves
         }
 
-        pieces = position.ourOccupancy(PieceType::KNIGHT);
+        pieces = position.ourOccupancy(PieceTypes::KNIGHT);
         //...
     }
 

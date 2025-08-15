@@ -6,10 +6,10 @@
 #include <stdexcept>
 #include <string>
 
-#include "navigation.hpp"
 #include "piece.hpp"
 #include "rect.hpp"
 #include "resource_manager.hpp"
+#include "square.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -93,7 +93,7 @@ void Renderer::drawGame() {
 void Renderer::drawBoard(Rect<float> board) {
     ImDrawList *drawList = ImGui::GetWindowDrawList();
 
-    for (Square square : Squares::all()) {
+    for (auto square : Squares::all()) {
         ImU32 color = square.light() ? IM_COL32(240, 217, 181, 255) : IM_COL32(181, 136, 99, 255);
         Rect  rect  = square.normalizedRect().absolute(board.width, board.height);
 
@@ -116,7 +116,7 @@ void Renderer::drawBoard(Rect<float> board) {
         drawList->AddText(ImVec2(x, board.y + board.height + PIECE_MARGIN), IM_WHITE, label.c_str());
     }
     for (auto rank : Ranks::all()) {
-        std::string label = std::to_string(Rank::number() - rank.value());
+        std::string label = std::to_string(rank.value() + 1);
 
         Square reference_square = Square(Files::FA, rank);
         Rect   reference_rect   = reference_square.normalizedRect().absolute(board.width, board.height);
@@ -158,8 +158,8 @@ void Renderer::drawPieces(Rect<float> board) {
             ImVec2 piece_begin = ImVec2(begin.x + PIECE_MARGIN, begin.y + PIECE_MARGIN);
             ImVec2 piece_end   = ImVec2(end.x - PIECE_MARGIN, end.y - PIECE_MARGIN);
 
-            if (piece != Piece::NONE) {
-                drawList->AddImage(pieceTextures[piece], piece_begin, piece_end);
+            if (piece.hasValue()) {
+                drawList->AddImage(m_pieceTextures[piece], piece_begin, piece_end);
             }
         }
     }
@@ -283,11 +283,11 @@ void Renderer::updateTime() {
 void Renderer::fillFrame(float r, float g, float b, float a) { m_glfw.fillFrame(r, g, b, a); }
 
 void Renderer::initPieceTextures() {
-    for (Piece piece : Piece::all()) {
-        std::string name(1, piece.to_char());
+    for (Piece piece : Pieces::all()) {
+        std::string name(1, piece.toChar());
         GLuint      texture = loadTexture(ResourceManager::getResource(name + ".png"));
         if (texture == 0) throw std::runtime_error("Failed to load a texture");
-        pieceTextures[piece] = texture;
+        m_pieceTextures[piece] = texture;
     }
 }
 

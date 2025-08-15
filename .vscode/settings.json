@@ -10,6 +10,9 @@
     "C_Cpp.codeAnalysis.clangTidy.path": "/usr/bin/clang-tidy",
     "C_Cpp.default.compilerPath": "/usr/bin/clang++",
     "clangd.path": "/usr/bin/clangd",
+    "clangd.arguments": [
+        "--header-insertion=iwyu"
+    ],
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
     "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",

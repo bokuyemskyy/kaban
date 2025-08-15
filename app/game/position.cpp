@@ -10,8 +10,10 @@
 #include <string>
 
 #include "bitboard.hpp"
-#include "navigation.hpp"
+#include "file.hpp"
 #include "piece.hpp"
+#include "rank.hpp"
+#include "square.hpp"
 
 void Position::setFromFEN(const std::string &fen) {
     clear();
@@ -34,17 +36,18 @@ void Position::setFromFEN(const std::string &fen) {
                         current_file += num;
                     } else {
                         Square s = Square(File(current_file), Rank(current_rank));
-                        set(s, Piece(c));
+                        Piece  p = Piece::fromChar(c);
+                        set(s, p);
                         ++current_file;
                     }
                 }
                 break;
             }
             case 1:
-                if (argument == "w")
-                    m_turn = Color::WHITE;
+                if (argument == "b")
+                    m_turn = Colors::BLACK;
                 else
-                    m_turn = Color::BLACK;
+                    m_turn = Colors::WHITE;
                 break;
             default:
                 break;
@@ -62,14 +65,14 @@ std::string Position::toFEN() const {
             Square s = Square(File(f), Rank(r));
             Piece  p = m_board[s.value()];
 
-            if (p == Piece::NONE) {
+            if (p.hasValue()) {
                 ++empty;
             } else {
                 if (empty > 0) {
                     fen << empty;
                     empty = 0;
                 }
-                fen << p.to_char();
+                fen << p.toChar();
             }
         }
         if (empty > 0) {
@@ -83,25 +86,26 @@ std::string Position::toFEN() const {
 
 void Position::set(Square square, Piece piece) {
     unset(square);
-    m_color_bb[piece.color()] |= Bitboard::square(square);
-    m_piece_type_bb[piece.pieceType()] |= Bitboard::square(square);
+    m_color_bb[piece.color().value()] |= Bitboard::square(square);
+    m_piece_type_bb[piece.pieceType().value()] |= Bitboard::square(square);
     m_board[square.value()] = piece;
 }
 
 void Position::unset(Square square) {
-    if (m_board[square.value()] == Piece::NONE) return;
-    m_color_bb[m_board[square.value()].color()] &= ~Bitboard::square(square);
-    m_piece_type_bb[m_board[square.value()].pieceType()] &= ~Bitboard::square(square);
-    m_board[square.value()] = Piece::NONE;
+    Piece set_piece = at(square);
+    if (!at(square).hasValue()) return;
+    m_color_bb[set_piece.color().value()] &= ~Bitboard::square(square);
+    m_piece_type_bb[set_piece.pieceType().value()] &= ~Bitboard::square(square);
+    m_board[square.value()] = Pieces::NONE;
 }
 void Position::clear() {
     for (Square square : Squares::all()) {
         unset(square);
     }
-    m_turn = Color::WHITE;
+    m_turn = Colors::WHITE;
 }
 
-inline void Position::nextTurn() { m_turn = !m_turn; }
+inline void Position::nextTurn() { m_turn.flip(); }
 
 void Position::doMove(const Move move) {
     Square from = move.from();
@@ -112,7 +116,7 @@ void Position::doMove(const Move move) {
     // m_deltas.emplace_back(Delta(m_board[to], m_castling, 0, m_halfmoves));
     m_moves.emplace_back(move);
 
-    if (m_board[to.value()] != Piece::NONE) {
+    /*if (m_board[to.value()] != Piece::NONE) {
         Bitboard maskBB = ~Bitboard::square(to);
         m_color_bb[m_board[to.value()].color()] &= maskBB;
         m_piece_type_bb[m_board[to.value()].pieceType()] &= maskBB;
@@ -120,9 +124,9 @@ void Position::doMove(const Move move) {
 
     m_color_bb[m_board[from.value()].color()] ^= moveBB;
     m_piece_type_bb[m_board[from.value()].pieceType()] ^= moveBB;
-
-    m_board[to.value()]   = m_board[from.value()];
-    m_board[from.value()] = Piece::NONE;
+*/
+    m_board[to.value()] = m_board[from.value()];
+    // m_board[from.value()] = Piece::NONE;
 
     nextTurn();
 }
@@ -149,8 +153,8 @@ void Position::undoMove() {
     m_board[from.value()] = movedPiece;
     // m_board[to]   = capturedPiece;
 
-    m_color_bb[movedPiece.color()] ^= moveBB;
-    m_piece_type_bb[movedPiece.pieceType()] ^= moveBB;
+    m_color_bb[movedPiece.color().value()] ^= moveBB;
+    m_piece_type_bb[movedPiece.pieceType().value()] ^= moveBB;
 
     /*if (capturedPiece != Piece::NONE) {
         Bitboard toBB = squareBB(to);

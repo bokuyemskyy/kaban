@@ -7,8 +7,10 @@
 
 #include "bitboard.hpp"
 #include "bitops.hpp"
-#include "navigation.hpp"
+#include "file.hpp"
 #include "piece.hpp"
+#include "rank.hpp"
+#include "square.hpp"
 
 constexpr size_t ROOK_ATTACKS_SIZE   = 102400;
 constexpr size_t BISHOP_ATTACKS_SIZE = 5248;
@@ -56,22 +58,22 @@ class Magics {
         switch (pieceType) {
             case PieceType::ROOK: {
                 Bitboard edges =
-                    ((Bitboard::rank(Rank::R1) | Bitboard::rank(Rank::R8)) & ~Bitboard::rank(square.rank())) |
-                    ((Bitboard::file(File::FA) | Bitboard::file(File::FH)) & ~Bitboard::file(square.file()));
-                return slidingAttacksBB(PieceType::ROOK, square, Bitboard::zero()) & ~edges;
+                    ((Bitboard::rank(Ranks::R1) | Bitboard::rank(Ranks::R8)) & ~Bitboard::rank(square.rank())) |
+                    ((Bitboard::file(Files::FA) | Bitboard::file(Files::FH)) & ~Bitboard::file(square.file()));
+                return slidingAttacksBB(PieceType::ROOK, square, Bitboards::ZERO) & ~edges;
             }
             case PieceType::BISHOP: {
-                Bitboard edges = (Bitboard::rank(Rank::R1) | Bitboard::rank(Rank::R8) | Bitboard::file(File::FA) |
-                                  Bitboard::file(File::FH));
-                return slidingAttacksBB(PieceType::BISHOP, square, Bitboard::zero()) & ~edges;
+                Bitboard edges = (Bitboard::rank(Ranks::R1) | Bitboard::rank(Ranks::R8) | Bitboard::file(Files::FA) |
+                                  Bitboard::file(Files::FH));
+                return slidingAttacksBB(PieceType::BISHOP, square, Bitboards::ZERO) & ~edges;
             }
             default:
-                return Bitboard::zero();
+                return Bitboards::ZERO;
         }
     }
 
     static constexpr Bitboard slidingAttacksBB(PieceType pieceType, Square square, Bitboard occupancy) {
-        Bitboard attacks = Bitboard::zero();
+        Bitboard attacks = Bitboards::ZERO;
 
         constexpr std::array<Direction, 4> rookDirections   = {Direction::N, Direction::S, Direction::E, Direction::W};
         constexpr std::array<Direction, 4> bishopDirections = {Direction::NE, Direction::NW, Direction::SE,
@@ -84,12 +86,12 @@ class Magics {
 
             while (true) {
                 Bitboard destination = Bitboard::destination(currentSquare, direction);
-                if (destination == Bitboard::zero()) break;
+                if (destination == Bitboards::ZERO) break;
 
                 attacks |= destination;
                 currentSquare = currentSquare + direction;
 
-                if ((destination & occupancy) != Bitboard::zero()) {
+                if ((destination & occupancy) != Bitboards::ZERO) {
                     break;
                 }
             }
@@ -110,8 +112,8 @@ class Magics {
 
         size_t attacksOffset = 0;
 
-        for (auto square : Square::all()) {
-            Magic& magic        = rookMagics[square];
+        for (auto square : Squares::all()) {
+            Magic& magic        = rookMagics[square.value()];
             magic.premask       = premask(PieceType::ROOK, square);
             magic.shift         = Square::number() - popcount(magic.premask);
             magic.attacksOffset = attacksOffset;
@@ -124,18 +126,18 @@ class Magics {
             int    cnt  = 0;
 
             // use Carry-Rippler trick
-            Bitboard b = Bitboard::zero();
+            Bitboard b = Bitboards::ZERO;
             do {
                 occupancies[size] = b;
                 reference[size]   = slidingAttacksBB(PieceType::ROOK, square, b);
                 size++;
                 b = (b - magic.premask) & magic.premask;
-            } while (b != Bitboard::zero());
+            } while (b != Bitboards::ZERO);
 
-            PRNG rng(static_cast<uint64_t>(seeds[0][square.rank()]));
+            PRNG rng(static_cast<uint64_t>(seeds[0][square.rank().value()]));
 
             for (size_t i = 0; i < size;) {
-                for (magic.magic = Bitboard::zero(); popcount((magic.magic * magic.premask) >> 56) < 6;) {
+                for (magic.magic = Bitboards::ZERO; popcount((magic.magic * magic.premask) >> 56) < 6;) {
                     magic.magic = rng.sparse_rand<Bitboard>();
                 }
                 for (++cnt, i = 0; i < size; ++i) {
@@ -152,8 +154,8 @@ class Magics {
             attacksOffset += (1ULL << popcount(magic.premask));
         }
 
-        for (auto square : Square::all()) {
-            Magic& magic        = bishopMagics[square];
+        for (auto square : Squares::all()) {
+            Magic& magic        = bishopMagics[square.value()];
             magic.premask       = premask(PieceType::BISHOP, square);
             magic.shift         = Square::number() - popcount(magic.premask);
             magic.attacksOffset = attacksOffset;
@@ -165,18 +167,18 @@ class Magics {
             size_t size = 0;
             int    cnt  = 0;
 
-            Bitboard b = Bitboard::zero();
+            Bitboard b = Bitboards::ZERO;
             do {
                 occupancies[size] = b;
                 reference[size]   = slidingAttacksBB(PieceType::BISHOP, square, b);
                 size++;
                 b = (b - magic.premask) & magic.premask;
-            } while (b != Bitboard::zero());
+            } while (b != Bitboards::ZERO);
 
-            PRNG rng(static_cast<uint64_t>(seeds[1][square.rank()]));
+            PRNG rng(static_cast<uint64_t>(seeds[1][square.rank().value()]));
 
             for (size_t i = 0; i < size;) {
-                for (magic.magic = Bitboard::zero(); popcount((magic.magic * magic.premask) >> 56) < 6;) {
+                for (magic.magic = Bitboards::ZERO; popcount((magic.magic * magic.premask) >> 56) < 6;) {
                     magic.magic = rng.sparse_rand<Bitboard>();
                 }
 
