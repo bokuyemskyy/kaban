@@ -36,3 +36,12 @@ struct Direction {
    private:
     int8_t m_value;
 };
+
+/*
+constexpr std::array<Direction, 1> whitePawnPushDirections = {Direction::N};
+
+constexpr std::array<Direction, 2> whitePawnAttackDirections = {Direction::NE, Direction::NW};
+
+constexpr std::array<Direction, 8> queenDirections = {Direction::NE, Direction::NW, Direction::SE, Direction::SW,
+                                                      Direction::N,  Direction::S,  Direction::E,  Direction::W};
+*/
