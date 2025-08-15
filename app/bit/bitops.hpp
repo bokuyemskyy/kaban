@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bitboard.hpp"
-#include "navigation.hpp"
+#include "square.hpp"
 
 constexpr Square lsb(const Bitboard& x) { return static_cast<Square>(__builtin_ctzll(x)); }
 constexpr Square poplsb(Bitboard& x) {

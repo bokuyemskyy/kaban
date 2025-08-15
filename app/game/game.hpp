@@ -6,10 +6,9 @@
 #include <mutex>
 #include <string>
 
-#include "move.hpp"
-#include "navigation.hpp"
 #include "piece.hpp"
 #include "position.hpp"
+#include "square.hpp"
 
 class Game {
    public:
