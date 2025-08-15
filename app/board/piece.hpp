@@ -1,177 +1,77 @@
 #pragma once
 
-#include <cassert>
+#include <array>
+#include <cctype>
 #include <cstdint>
-#include <ostream>
-#include <string_view>
+#include <functional>
 
-#include "iterator.hpp"
-#include "metadata.hpp"
+#include "color.hpp"
+#include "piece_type.hpp"
+#include "strong.hpp"
 
-struct PieceType : Iterable<PieceType>, Metadata<PieceType> {
+class Piece : public Strong::Value<Piece, uint8_t>,
+              public Strong::Enumerator<Piece, uint8_t, 12>,
+              public Strong::Field<Piece, uint8_t, 6> {
    public:
-    enum : uint8_t {
-        PAWN   = 0b000,
-        KNIGHT = 0b001,
-        BISHOP = 0b010,
-        ROOK   = 0b011,
-        QUEEN  = 0b100,
-        KING   = 0b101,
+    using Value::Value;
 
-        FIRST = PAWN,
-        LAST  = KING,
+    explicit constexpr Piece(Color color, PieceType pieceType) noexcept
+        : Value(static_cast<uint8_t>((color.value() << PieceType::size()) | pieceType.value())) {}
 
-        MASK = 0b111,
-        SIZE = 3,
-        NB   = 6
-    };
+    [[nodiscard]] constexpr bool hasValue() const { return color().hasValue() && pieceType().hasValue(); }
 
-    constexpr PieceType(uint8_t value) : m_value(value) {}
+    [[nodiscard]] constexpr Color color() const noexcept { return Color(m_value >> PieceType::size()); }
 
-    [[nodiscard]] constexpr uint8_t value() const { return m_value; }
+    [[nodiscard]] constexpr PieceType pieceType() const noexcept { return PieceType(m_value & PieceType::mask()); }
 
-    constexpr operator uint8_t() { return m_value; }
-
-   private:
-    uint8_t m_value;
-};
-
-struct Color : Iterable<Color>, Metadata<Color> {
-   public:
-    enum : uint8_t {
-        WHITE = 0,
-        BLACK = 1,
-
-        MASK = 0b1,
-        SIZE = 1,
-        NB   = 2
-    };
-
-    constexpr Color(uint8_t value) : m_value(value) {}
-
-    [[nodiscard]] constexpr uint8_t value() const { return m_value; }
-
-    constexpr operator uint8_t() const { return m_value; }
-
-    [[nodiscard]] constexpr Color flip() { return {static_cast<uint8_t>(m_value ^= 1)}; }
-
-    [[nodiscard]] constexpr Color flipped() const { return {static_cast<uint8_t>(m_value ^ 1)}; }
-
-   private:
-    uint8_t m_value;
-};
-
-struct Piece : Metadata<Piece> {
-    enum : uint8_t {
-        W_PAWN   = (Color::WHITE << PieceType::size()) | PieceType::PAWN,
-        W_KNIGHT = (Color::WHITE << PieceType::size()) | PieceType::KNIGHT,
-        W_BISHOP = (Color::WHITE << PieceType::size()) | PieceType::BISHOP,
-        W_ROOK   = (Color::WHITE << PieceType::size()) | PieceType::ROOK,
-        W_QUEEN  = (Color::WHITE << PieceType::size()) | PieceType::QUEEN,
-        W_KING   = (Color::WHITE << PieceType::size()) | PieceType::KING,
-
-        B_PAWN   = (Color::BLACK << PieceType::size()) | PieceType::PAWN,
-        B_KNIGHT = (Color::BLACK << PieceType::size()) | PieceType::KNIGHT,
-        B_BISHOP = (Color::BLACK << PieceType::size()) | PieceType::BISHOP,
-        B_ROOK   = (Color::BLACK << PieceType::size()) | PieceType::ROOK,
-        B_QUEEN  = (Color::BLACK << PieceType::size()) | PieceType::QUEEN,
-        B_KING   = (Color::BLACK << PieceType::size()) | PieceType::KING,
-
-        FIRST = W_PAWN,
-        LAST  = B_KING,
-
-        NONE = 0b1111,
-        MASK = 0b1111,
-        SIZE = 4,
-        NB   = 12
-    };
-
-    static constexpr std::string_view pieceToChar = "PNBRQK  pnbrqk";
-
-    constexpr Piece(uint8_t value = none()) : m_value(value) {}
-    explicit constexpr Piece(PieceType pieceType, Color color) : m_value((color << PieceType::size()) | pieceType) {}
-
-    explicit constexpr Piece(char c) {
-        size_t index = pieceToChar.find(c);
-        m_value      = (index != std::string_view::npos) ? static_cast<uint8_t>(index) : 0;
+    static constexpr Piece fromChar(char c) noexcept {
+        Color     color      = isupper(static_cast<unsigned char>(c)) ? Colors::WHITE : Colors::BLACK;
+        PieceType piece_type = PieceType::fromChar(c);
+        return Piece(color, piece_type);
     }
 
-    [[nodiscard]] constexpr uint8_t value() const { return m_value; }
-
-    [[nodiscard]] constexpr bool ok() const { return m_value <= LAST && m_value != 6 && m_value != 7; }
-
-    [[nodiscard]] static constexpr Piece none() { return Piece::NONE; }
-
-    [[nodiscard]] constexpr Color color() const { return m_value >> PieceType::size(); }
-    [[nodiscard]] constexpr Color pieceType() const { return m_value & PieceType::mask(); }
-
-    [[nodiscard]] static constexpr Piece first() { return Piece::FIRST; }
-    [[nodiscard]] static constexpr Piece last() { return Piece::LAST; }
-
-    class Iterator {
-       private:
-        uint8_t        m_current;
-        constexpr void skipInvalid() {
-            while (m_current <= Piece::LAST && !Piece(m_current).ok()) {
-                ++m_current;
-            }
-        }
-
-       public:
-        using iterator_category = std::forward_iterator_tag;
-        using value_type        = Piece;
-        using difference_type   = std::ptrdiff_t;
-        using pointer           = const Piece*;
-        using reference         = const Piece&;
-
-        constexpr Iterator(uint8_t value) : m_current(value) { skipInvalid(); }
-
-        constexpr Piece operator*() const { return m_current; }
-
-        constexpr Iterator& operator++() {
-            ++m_current;
-            skipInvalid();
-            return *this;
-        }
-
-        constexpr Iterator operator++(int) {
-            Iterator tmp = *this;
-            ++m_current;
-            skipInvalid();
-            return tmp;
-        }
-
-        constexpr bool operator==(const Iterator& other) const { return m_current == other.m_current; }
-
-        constexpr bool operator!=(const Iterator& other) const { return m_current != other.m_current; }
-    };
-
-    class Range {
-       public:
-        [[nodiscard]] constexpr Iterator begin() const { return Piece::FIRST; }
-        [[nodiscard]] constexpr Iterator end() const { return Piece::LAST + 1; }
-    };
-
-    [[nodiscard]] static constexpr Range all() { return Range{}; }
-
-    constexpr operator uint8_t() { return m_value; }
-
-    friend std::ostream& operator<<(std::ostream& os, const Piece& obj) {
-        obj.print(os);
-        return os;
+    [[nodiscard]] constexpr char toChar() const noexcept {
+        return color() == Colors::WHITE ? toupper(pieceType().toChar()) : pieceType().toChar();
     }
 
-    void print(std::ostream& os) const { os << to_char(); }
-
-    [[nodiscard]] char constexpr to_char() const { return ok() ? pieceToChar[m_value] : '?'; }
-
    private:
-    uint8_t m_value;
+    // clang-format off
+    enum Values : uint8_t {
+        NONE = 16
+    };
+    // clang-format on
+
+    friend struct Pieces;
+};
+
+struct Pieces {
+    // clang-format off
+    static constexpr Piece NONE = Piece(Piece::Values::NONE);
+
+    static constexpr Piece W_PAWN = Piece(Colors::WHITE, PieceTypes::PAWN);
+    static constexpr Piece W_KNIGHT = Piece(Colors::WHITE, PieceTypes::KNIGHT);
+    static constexpr Piece W_BISHOP = Piece(Colors::WHITE, PieceTypes::BISHOP);
+    static constexpr Piece W_ROOK = Piece(Colors::WHITE, PieceTypes::ROOK);
+    static constexpr Piece W_QUEEN = Piece(Colors::WHITE, PieceTypes::QUEEN);
+    static constexpr Piece W_KING = Piece(Colors::WHITE, PieceTypes::KING);
+
+    static constexpr Piece B_PAWN = Piece(Colors::BLACK, PieceTypes::PAWN);
+    static constexpr Piece B_KNIGHT = Piece(Colors::BLACK, PieceTypes::KNIGHT);
+    static constexpr Piece B_BISHOP = Piece(Colors::BLACK, PieceTypes::BISHOP);
+    static constexpr Piece B_ROOK = Piece(Colors::BLACK, PieceTypes::ROOK);
+    static constexpr Piece B_QUEEN = Piece(Colors::BLACK, PieceTypes::QUEEN);
+    static constexpr Piece B_KING = Piece(Colors::BLACK, PieceTypes::KING);
+
+    static constexpr std::array<Piece, Piece::number()> all() {
+        return {W_PAWN, W_KNIGHT, W_BISHOP, W_ROOK, W_QUEEN, W_KING,
+                B_PAWN, B_KNIGHT, B_BISHOP, B_ROOK, B_QUEEN, B_KING};
+    }
+    // clang-format on
 };
 
 namespace std {
 template <>
 struct hash<Piece> {
-    std::size_t operator()(const Piece& piece) const { return std::hash<int>()(piece.value()); }
+    std::size_t operator()(const Piece& piece) const noexcept { return std::hash<uint8_t>()(piece.value()); }
 };
 }  // namespace std

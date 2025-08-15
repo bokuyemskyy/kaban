@@ -1,38 +1,23 @@
 #pragma once
 
-#include <sys/types.h>
-
 #include <cstdint>
-#include <optional>
 
-#include "navigation.hpp"
-#include "piece.hpp"
+#include "color.hpp"
+#include "file.hpp"
+#include "square.hpp"
+#include "strong.hpp"
 
-struct EnPassant : Metadata<EnPassant> {
-    EnPassant(uint8_t value = 0)
-        : m_file((value & 0b1000) ? std::optional<File>(File(value & 0b0111)) : std::nullopt) {}
+class EnPassant : public Strong::Value<EnPassant, uint8_t>, public Strong::Field<EnPassant, uint8_t, 4> {
+   public:
+    using Value::Value;
 
-    [[nodiscard]] bool hasValue() const { return m_file.has_value(); }
-    void               clear() { m_file.reset(); }
+    constexpr void set(File file) noexcept { m_value = ((1 << 3) | file.value()); }
+    constexpr void clear() noexcept { m_value = 0; }
 
-    [[nodiscard]] Square square(Color toMove) const {
-        assert(m_file.has_value());
-        return Square(m_file.value(), toMove == Color::WHITE ? Ranks::R6 : Ranks::R3);
+    [[nodiscard]] constexpr bool hasValue() const noexcept { return (m_value & (1 << 3)) != 0; }
+    [[nodiscard]] constexpr File file() const noexcept { return File(m_value & File::mask()); }
+
+    [[nodiscard]] Square square(Color sideToMove) const noexcept {
+        return Square(file(), sideToMove == Colors::WHITE ? Ranks::R6 : Ranks::R3);
     }
-
-    void set(Square toSquare) {
-        assert(toSquare.rank() == Ranks::R4 || toSquare.rank() == Ranks::R5);
-        m_file = toSquare.file();
-    }
-
-    [[nodiscard]] uint8_t value() const { return m_file.has_value() ? (0b1000 | m_file->value()) : 0b0000; }
-
-    enum : uint8_t {
-        NB   = 8,
-        SIZE = 4,
-        MASK = 0b1111
-    };
-
-   private:
-    std::optional<File> m_file;
 };
