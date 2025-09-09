@@ -4,32 +4,30 @@
 
 #include <string>
 
+#include "dimensions.hpp"
+
 class GLFWWrapper {
    public:
-    void initialize(int width, int height, const char *title, bool use_vsync);
-    void terminate();
+    GLFWWrapper(int width, int height, const std::string& title, bool use_vsync);
+    ~GLFWWrapper() noexcept;
 
-    void updateDimensions();
+    GLFWWrapper(const GLFWWrapper&)                = delete;
+    GLFWWrapper& operator=(const GLFWWrapper&)     = delete;
+    GLFWWrapper(GLFWWrapper&&) noexcept            = delete;
+    GLFWWrapper& operator=(GLFWWrapper&&) noexcept = delete;
+
     void beginFrame();
     void fillFrame(float r, float g, float b, float a) const;
     void finishFrame() const;
 
-    bool windowShouldClose() { return glfwWindowShouldClose(m_window) != 0; };
-    void setWindowShouldClose(bool value) { glfwSetWindowShouldClose(m_window, static_cast<int>(value)); }
+    [[nodiscard]] bool windowShouldClose() const noexcept;
+    void               setWindowShouldClose(bool value) noexcept;
 
-    [[nodiscard]] int           width() const noexcept { return m_width; }
-    [[nodiscard]] int           height() const noexcept { return m_height; }
-    [[nodiscard]] GLFWwindow   *window() const noexcept { return m_window; }
-    [[nodiscard]] static double time() noexcept { return glfwGetTime(); }
-    [[nodiscard]] bool          shouldClose() { return glfwWindowShouldClose(m_window) != 0; }
+    [[nodiscard]] GLFWwindow*     window() const noexcept { return m_window; }
+    [[nodiscard]] static double   time() noexcept { return glfwGetTime(); }
+    [[nodiscard]] Dimensions<int> dimensions() const;
 
    private:
-    int         m_width, m_height;
-    bool        m_use_vsync;
-    std::string m_title;
-
-    GLFWmonitor *m_monitor;
-    GLFWwindow  *m_window;
-
-    bool m_initialized;
+    GLFWwindow*  m_window{nullptr};
+    GLFWmonitor* m_monitor{nullptr};
 };
