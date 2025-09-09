@@ -95,7 +95,7 @@ void Renderer::drawBoard(Rect<float> board) {
 
     for (auto square : Squares::all()) {
         ImU32 color = square.light() ? IM_COL32(240, 217, 181, 255) : IM_COL32(181, 136, 99, 255);
-        Rect  rect  = square.normalizedRect().absolute(board.width, board.height);
+        Rect  rect  = square.normalized_rect().absolute(board.width, board.height);
 
         ImVec2 begin = ImVec2(board.x + rect.left(), board.y + rect.top());
         ImVec2 end   = ImVec2(board.x + rect.right(), board.y + rect.bottom());
@@ -109,7 +109,7 @@ void Renderer::drawBoard(Rect<float> board) {
         std::string label(1, static_cast<char>(a_CHAR_INDEX + file.value()));
 
         Square reference_square = Square(file, Ranks::R1);
-        Rect   reference_rect   = reference_square.normalizedRect().absolute(board.width, board.height);
+        Rect   reference_rect   = reference_square.normalized_rect().absolute(board.width, board.height);
 
         float x = board.x + reference_rect.left() + (reference_rect.width / 2) - (CHAR_SIZE.x / 2);
         drawList->AddText(ImVec2(x, board.y - CHAR_SIZE.y - PIECE_MARGIN), IM_WHITE, label.c_str());
@@ -119,7 +119,7 @@ void Renderer::drawBoard(Rect<float> board) {
         std::string label = std::to_string(rank.value() + 1);
 
         Square reference_square = Square(Files::FA, rank);
-        Rect   reference_rect   = reference_square.normalizedRect().absolute(board.width, board.height);
+        Rect   reference_rect   = reference_square.normalized_rect().absolute(board.width, board.height);
 
         float y = board.y + reference_rect.top() + (reference_rect.height / 2) - (CHAR_SIZE.y / 2);
         drawList->AddText(ImVec2(board.x - CHAR_SIZE.x - PIECE_MARGIN, y), IM_WHITE, label.c_str());
@@ -148,7 +148,7 @@ void Renderer::drawPieces(Rect<float> board) {
 
     if (game) {
         for (Square square : Squares::all()) {
-            Rect rect = square.normalizedRect().absolute(board.width, board.height);
+            Rect rect = square.normalized_rect().absolute(board.width, board.height);
 
             ImVec2 begin = ImVec2(board.x + rect.left(), board.y + rect.top());
             ImVec2 end   = ImVec2(board.x + rect.right(), board.y + rect.bottom());
@@ -158,7 +158,7 @@ void Renderer::drawPieces(Rect<float> board) {
             ImVec2 piece_begin = ImVec2(begin.x + PIECE_MARGIN, begin.y + PIECE_MARGIN);
             ImVec2 piece_end   = ImVec2(end.x - PIECE_MARGIN, end.y - PIECE_MARGIN);
 
-            if (piece.hasValue()) {
+            if (piece.has_value()) {
                 drawList->AddImage(m_pieceTextures[piece], piece_begin, piece_end);
             }
         }
@@ -284,7 +284,7 @@ void Renderer::fillFrame(float r, float g, float b, float a) { m_glfw.fillFrame(
 
 void Renderer::initPieceTextures() {
     for (Piece piece : Pieces::all()) {
-        std::string name(1, piece.toChar());
+        std::string name(1, piece.to_char());
         GLuint      texture = loadTexture(ResourceManager::getResource(name + ".png"));
         if (texture == 0) throw std::runtime_error("Failed to load a texture");
         m_pieceTextures[piece] = texture;

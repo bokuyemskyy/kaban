@@ -45,7 +45,7 @@ class Movegen {
             Bitboard attackBB = Bitboards::ZERO;
             for (const auto& direction : directions) {
                 Square destination = square.moved(direction);
-                if (destination.hasValue()) attackBB |= Bitboard::square(destination);
+                if (destination.has_value()) attackBB |= Bitboard::square(destination);
             }
             table[square.value()] = attackBB;
         }
@@ -62,7 +62,7 @@ class Movegen {
     size_t generateMoves(const Position& position, std::array<Move, MAX_MOVES>& /*moveList*/) {
         Bitboard pieces = position.ourOccupancy(PieceTypes::PAWN);
 
-        while (pieces.hasValue()) {
+        while (pieces.has_value()) {
             // for each pawn we do poplsb and generate moves
         }
 
