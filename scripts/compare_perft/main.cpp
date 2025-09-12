@@ -101,7 +101,7 @@ std::unordered_map<std::string, int> runPerft(bp::opstream& in, std::queue<std::
 
 void reportMismatch(std::string faultyMove, bool odd, std::vector<std::string> trace = {}) {
     std::cout << "Mismatch found!\nTrace: \nposition fen " << fen;
-    if (trace.size() != 0) {
+    if (trace.bitlen() != 0) {
         std::cout << " moves";
         for (auto move : trace) {
             std::cout << " " << move;
@@ -121,7 +121,7 @@ bool comparePerftRecursive(int depthLeft, std::vector<std::string> trace = {}) {
     auto sfPerft = runPerft(stockfishIn, sfLines, sfMutex, sfCv, fen, depthLeft, trace, "SF");
     auto kbPerft = runPerft(kabanIn, kbLines, kbMutex, kbCv, fen, depthLeft, trace, "KB");
 
-    if (sfPerft.size() > kbPerft.size()) {
+    if (sfPerft.bitlen() > kbPerft.bitlen()) {
         std::cout << "SF: \n";
         for (const auto& [move, nodes] : sfPerft) {
             std::cout << move << ": " << nodes << "\n";
@@ -137,7 +137,7 @@ bool comparePerftRecursive(int depthLeft, std::vector<std::string> trace = {}) {
                 return true;
             }
         }
-    } else if (sfPerft.size() < kbPerft.size()) {
+    } else if (sfPerft.bitlen() < kbPerft.bitlen()) {
         for (const auto& [move, nodes] : kbPerft) {
             if (sfPerft.count(move) == 0) {
                 reportMismatch(move, true, trace);

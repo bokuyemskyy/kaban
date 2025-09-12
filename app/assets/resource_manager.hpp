@@ -1,75 +1,43 @@
 #pragma once
 
-#include <algorithm>
-#include <string>
+#include <span>
+#include <string_view>
 #include <unordered_map>
 
 #include "resources.hpp"
 
-struct Resource {
-    const unsigned char* data;
-    unsigned int         length;
-};
+using Resource = std::span<const unsigned char>;
 
-/**
- * @brief A class that provides a brigde between the program and its resources
- *
- * it manages file (image, sound) dependencies from resources.hpp
- * resources.hpp is a packed bunch of files from resources/ folder
- * to build resources.hpp there is a shell script pack_resources.sh
- */
 class ResourceManager {
+   public:
+    static const Resource* get(std::string_view filename) {
+        const auto& map = resource_map();
+        auto        it  = map.find(filename);
+        if (it == map.end()) return nullptr;
+        return &it->second;
+    }
+
    private:
-    /**
-     * @brief A function to get the resources map
-     *
-     * a function-local instead of static variable
-     * @return the map reference
-     */
-    static std::unordered_map<std::string, Resource>& getMap() {
-        static std::unordered_map<std::string, Resource> resources;
+    static const std::unordered_map<std::string_view, Resource>& resource_map() {
+        static const std::unordered_map<std::string_view, Resource> resources = {
+            {"p.png", {p_png, p_png_len}},
+            {"P.png", {P_png, P_png_len}},
+            {"n.png", {n_png, n_png_len}},
+            {"N.png", {N_png, N_png_len}},
+            {"b.png", {b_png, b_png_len}},
+            {"B.png", {B_png, B_png_len}},
+            {"r.png", {r_png, r_png_len}},
+            {"R.png", {R_png, R_png_len}},
+            {"q.png", {q_png, q_png_len}},
+            {"Q.png", {Q_png, Q_png_len}},
+            {"k.png", {k_png, k_png_len}},
+            {"K.png", {K_png, K_png_len}},
+            {"mark.png", {mark_png, mark_png_len}},
+            {"last.png", {last_png, last_png_len}},
+            {"round.png", {round_png, round_png_len}},
+            {"capture.mp3", {capture_mp3, capture_mp3_len}},
+            {"move_self.mp3", {move_self_mp3, move_self_mp3_len}},
+        };
         return resources;
     }
-
-   public:
-    /**
-     * @brief retrieves the data of the given file
-     *
-     * @param filename the filename
-     * @return pair: pointer to the first element to array, array's length
-     */
-    static Resource getResource(std::string filename) {
-        std::ranges::replace(filename, '.', '_');
-        std::ranges::replace(filename, '-', '_');
-
-        auto& map = getMap();
-        auto  it  = map.find(filename);
-        if (it == map.end()) return {.data = nullptr, .length = 0};
-        return it->second;
-    }
-    /**
-     * @brief connects resource filename strings to the correspondent data
-     */
-    static void loadResources() {
-        auto& map = getMap();
-        map.emplace("p_png", Resource(p_png, p_png_len));
-        map.emplace("P_png", Resource(P_png, P_png_len));
-        map.emplace("n_png", Resource(n_png, n_png_len));
-        map.emplace("N_png", Resource(N_png, N_png_len));
-        map.emplace("b_png", Resource(b_png, b_png_len));
-        map.emplace("B_png", Resource(B_png, B_png_len));
-        map.emplace("r_png", Resource(r_png, r_png_len));
-        map.emplace("R_png", Resource(R_png, R_png_len));
-        map.emplace("q_png", Resource(q_png, q_png_len));
-        map.emplace("Q_png", Resource(Q_png, Q_png_len));
-        map.emplace("k_png", Resource(k_png, k_png_len));
-        map.emplace("K_png", Resource(K_png, K_png_len));
-        map.emplace("mark_png", Resource(mark_png, mark_png_len));
-        map.emplace("last_png", Resource(last_png, last_png_len));
-        map.emplace("round_png", Resource(round_png, round_png_len));
-        map.emplace("capture_mp3", Resource(capture_mp3, capture_mp3_len));
-        map.emplace("move_self_mp3", Resource(move_self_mp3, move_self_mp3_len));
-    }
-
-    static void init() { loadResources(); }
 };

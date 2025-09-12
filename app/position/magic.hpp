@@ -102,8 +102,8 @@ class Magics {
 
    public:
     static auto generateMagics() {
-        std::array<Magic, Square::number()>      rookMagics{};
-        std::array<Magic, Square::number()>      bishopMagics{};
+        std::array<Magic, Square::count()>       rookMagics{};
+        std::array<Magic, Square::count()>       bishopMagics{};
         std::array<Bitboard, TOTAL_ATTACKS_SIZE> attacks{};
 
         // optimal PRNG seeds from Stockfish to pick the correct magics in the shortest time
@@ -115,7 +115,7 @@ class Magics {
         for (auto square : Squares::all()) {
             Magic& magic        = rookMagics[square.value()];
             magic.premask       = premask(PieceType::ROOK, square);
-            magic.shift         = Square::number() - popcount(magic.premask);
+            magic.shift         = Square::count() - popcount(magic.premask);
             magic.attacksOffset = attacksOffset;
 
             std::array<Bitboard, MAX_OCCUPANCIES> occupancies{};
@@ -157,7 +157,7 @@ class Magics {
         for (auto square : Squares::all()) {
             Magic& magic        = bishopMagics[square.value()];
             magic.premask       = premask(PieceType::BISHOP, square);
-            magic.shift         = Square::number() - popcount(magic.premask);
+            magic.shift         = Square::count() - popcount(magic.premask);
             magic.attacksOffset = attacksOffset;
 
             std::array<Bitboard, MAX_OCCUPANCIES> occupancies{};

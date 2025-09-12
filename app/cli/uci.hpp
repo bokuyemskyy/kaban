@@ -1,27 +1,33 @@
 #pragma once
 
+#include <unistd.h>
+
 #include <chrono>
 #include <iostream>
-#include <thread>
 
-#include "session.hpp"
-
-class UCI {
+class Uci {
    public:
-    void start(Session& session) {
-        std::cout.setf(std::ios::unitbuf);
-        m_session = &session;
-        m_thread  = std::thread([this] { runLoop(); });
-    }
+    Uci() { std::cout.setf(std::ios::unitbuf); }
 
-    void stop() {
-        if (m_thread.joinable()) {
-            m_thread.join();
+    void run() {
+        std::string line;
+        while (!m_shouldQuit) {
+            if (input_available()) {
+                if (std::getline(std::cin, line)) {
+                    if (line == "quit") {
+                        m_shouldQuit = true;
+                        break;
+                    }
+                    process_command(line);
+                }
+            } else {
+                usleep(10000);
+            }
         }
     }
 
    private:
-    static bool inputAvailable() {
+    static bool input_available() {
         fd_set readfds;
         FD_ZERO(&readfds);
         FD_SET(STDIN_FILENO, &readfds);
@@ -29,34 +35,17 @@ class UCI {
         return select(STDIN_FILENO + 1, &readfds, nullptr, nullptr, &timeout) > 0;
     }
 
-    void runLoop() {
-        std::string line;
-        while (!m_session->shouldQuit()) {
-            if (inputAvailable()) {
-                if (std::getline(std::cin, line)) {
-                    if (line == "quit") {
-                        m_session->signalQuit();
-                        break;
-                    }
-                    processCommand(line);
-                }
-            } else {
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            }
-        }
-    }
-
-    void processCommand(const std::string& command) {
+    void process_command(const std::string& command) {
         if (command == "uci") {
             std::cout << "uciok\n";
         } else if (command.starts_with("position")) {
-            handlePosition(command);
+            handle_position(command);
         } else if (command.starts_with("go perft")) {
-            handlePerft(command);
+            handle_perft(command);
         }
     }
 
-    void handlePosition(const std::string& /*command*/) {
+    void handle_position(const std::string& /*command*/) {
         /*m_session->applyToAllGames([&](Game& game) {
             if (command.find("startpos") != std::string::npos) {
                 game.start();
@@ -70,19 +59,18 @@ class UCI {
                 std::string        move;
 
                 while (iss >> move) {
-                    game.doMove(move);
+                    game.do_move(move);
                 }
             }
         });*/
     }
 
-    void handlePerft(const std::string& /*command*/) {
+    void handle_perft(const std::string& /*command*/) {
         // int depth = std::stoi(command.substr(9));
         // m_state->applyToCurrentGame([depth](Game& game) { game.perft(depth); });
     }
 
-    Session*    m_session = nullptr;
-    std::thread m_thread;
+    bool m_shouldQuit{false};
 };
 
 /*
