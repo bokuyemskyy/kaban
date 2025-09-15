@@ -141,4 +141,12 @@ struct Directions {
         return {N, S, E, W, NN, SS, NE, SE, NW, SW, NNE, ENE, ESE, SSE, SSW, WSW, WNW, NNW};
     }
     // clang-format on
+
+    static constexpr std::array<Direction, 2> wpawn() { return {NW, NE}; }
+    static constexpr std::array<Direction, 2> bpawn() { return {SE, SW}; }
+    static constexpr std::array<Direction, 8> knight() { return {NNE, NNW, ENE, WNW, SSE, SSW, ESE, WSW}; }
+    static constexpr std::array<Direction, 4> bishop() { return {NE, NW, SE, SW}; }
+    static constexpr std::array<Direction, 4> rook() { return {N, S, E, W}; }
+    static constexpr std::array<Direction, 8> queen() { return {N, S, E, W, NE, NW, SE, SW}; }
+    static constexpr std::array<Direction, 8> king() { return {N, S, E, W, NE, NW, SE, SW}; }
 };

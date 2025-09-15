@@ -12,7 +12,7 @@ class Bitboard : public StrongValue<Bitboard, uint64_t> {
    public:
     using StrongValue::StrongValue;
 
-    [[nodiscard]] constexpr bool has_value() const { return *this != Bitboard(0); }
+    [[nodiscard]] constexpr bool hasValue() const { return *this != Bitboard(0); }
 
     constexpr Bitboard operator~() const { return Bitboard(~m_value); }
 
@@ -80,15 +80,15 @@ class Bitboard : public StrongValue<Bitboard, uint64_t> {
             std::array<Bitboard, Square::count()> t{};
 
             for (auto square : Squares::all()) {
-                Bitboard diag       = Bitboard(0);
-                File     squareFile = square.file();
-                Rank     squareRank = square.rank();
+                Bitboard diag        = Bitboard(0);
+                File     square_file = square.file();
+                Rank     square_rank = square.rank();
 
                 for (auto rank : Ranks::all()) {
                     for (auto file : Files::all()) {
-                        Square possibleSquare = Square(file, rank);
-                        if (file.value() - rank.value() == squareFile.value() - squareRank.value()) {
-                            diag = diag | Bitboard::square(possibleSquare);
+                        Square possible_square = Square(file, rank);
+                        if (file.value() - rank.value() == square_file.value() - square_rank.value()) {
+                            diag = diag | Bitboard::square(possible_square);
                         }
                     }
                 }
@@ -100,23 +100,23 @@ class Bitboard : public StrongValue<Bitboard, uint64_t> {
         return table[square.value()];
     }
 
-    static constexpr Bitboard anti_diag(Square square) {
+    static constexpr Bitboard antiDiag(Square square) {
         static constexpr auto table = []() constexpr {
             std::array<Bitboard, Square::count()> t{};
             for (auto square : Squares::all()) {
-                Bitboard antiDiag   = Bitboard(0);
-                File     squareFile = square.file();
-                Rank     squareRank = square.rank();
+                Bitboard anti_diag   = Bitboard(0);
+                File     square_file = square.file();
+                Rank     square_rank = square.rank();
 
                 for (auto rank : Ranks::all()) {
                     for (auto file : Files::all()) {
-                        Square possibleSquare = Square(file, rank);
-                        if (file.value() + rank.value() == squareFile.value() + squareRank.value()) {
-                            antiDiag = antiDiag | Bitboard::square(possibleSquare);
+                        Square possible_square = Square(file, rank);
+                        if (file.value() + rank.value() == square_file.value() + square_rank.value()) {
+                            anti_diag = anti_diag | Bitboard::square(possible_square);
                         }
                     }
                 }
-                t[square.value()] = antiDiag;
+                t[square.value()] = anti_diag;
             }
             return t;
         }();
@@ -124,33 +124,33 @@ class Bitboard : public StrongValue<Bitboard, uint64_t> {
     }
 
     template <size_t N>
-    static constexpr std::array<Bitboard, Square::count()> pseudo_attacks(const std::array<Direction, N>& directions) {
+    static constexpr std::array<Bitboard, Square::count()> pseudoAttacks(const std::array<Direction, N>& directions) {
         std::array<Bitboard, Square::count()> table{};
 
         for (auto square : Squares::all()) {
-            Bitboard pseudoAttacks = Bitboard(0);
+            Bitboard pseudo_attacks = Bitboard(0);
             for (const auto& direction : directions) {
-                Square destination = square.moved(direction);
-                if (destination.has_value()) pseudoAttacks |= Bitboard::square(destination);
+                Square destination = square.shifted(direction);
+                if (destination.hasValue()) pseudo_attacks |= Bitboard::square(destination);
             }
-            table[square.value()] = pseudoAttacks;
+            table[square.value()] = pseudo_attacks;
         }
 
         return table;
     }
 
     template <size_t N>
-    static constexpr Bitboard sliding_attacks(Square from, const std::array<Direction, N>& directions,
-                                              Bitboard occupancy) {
+    static constexpr Bitboard slidingAttacks(Square from, const std::array<Direction, N>& directions,
+                                             Bitboard occupancy) {
         Bitboard attacks = Bitboard(0);
 
         for (const auto& direction : directions) {
             Square square = from;
             while (true) {
-                square.move(direction);
-                if (!square.has_value()) break;
+                square = square.shifted(direction);
+                if (!square.hasValue()) break;
                 attacks |= Bitboard::square(square);
-                if ((occupancy & Bitboard::square(square)).has_value()) break;
+                if ((occupancy & Bitboard::square(square)).hasValue()) break;
             }
         }
         return attacks;

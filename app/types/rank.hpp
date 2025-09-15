@@ -11,22 +11,20 @@ class Rank : public StrongValue<Rank, uint8_t> {
     using StrongValue::StrongValue;
 
     static constexpr ValueType   count() noexcept { return static_cast<ValueType>(8); }
-    [[nodiscard]] constexpr bool has_value() const { return value() < count(); }
-    static constexpr uint8_t     bitlen() { return 3; }
-    static constexpr ValueType   bitmask() { return static_cast<ValueType>((ValueType(1) << bitlen()) - 1); }
+    [[nodiscard]] constexpr bool hasValue() const { return value() < count(); }
+    static constexpr uint8_t     bitlength() { return 3; }
+    static constexpr ValueType   bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
 
     static constexpr uint8_t distance(Rank from, Rank to) noexcept {
         return from.value() > to.value() ? from.value() - to.value() : to.value() - from.value();
     }
 
-    static constexpr Rank from_char(char c) noexcept {
+    static constexpr Rank fromChar(char c) noexcept {
         if (c >= '1' && c <= '8') return Rank(static_cast<uint8_t>(c - '1'));
         return Rank();
     }
 
-    [[nodiscard]] constexpr char to_char() const noexcept {
-        return has_value() ? static_cast<char>('1' + value()) : '?';
-    }
+    [[nodiscard]] constexpr char toChar() const noexcept { return hasValue() ? static_cast<char>('1' + value()) : '?'; }
 
     constexpr Rank operator+(int offset) const noexcept {
         return Rank(static_cast<uint8_t>(static_cast<int>(value()) + offset));

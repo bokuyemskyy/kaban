@@ -18,6 +18,5 @@ class StrongValue {
         return lhs.value() <=> rhs.value();
     }
 
-   protected:
     T m_value{};
 };

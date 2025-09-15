@@ -18,7 +18,7 @@ class Move : StrongValue<Move, uint16_t> {
 
     [[nodiscard]] constexpr Square to() const { return Square((m_value >> TO_SHIFT) & Square::bitmask()); }
 
-    [[nodiscard]] constexpr MoveType move_type() const {
+    [[nodiscard]] constexpr MoveType moveType() const {
         return MoveType((m_value >> MOVETYPE_SHIFT) & MoveType::bitmask());
     }
 
@@ -26,11 +26,11 @@ class Move : StrongValue<Move, uint16_t> {
         return Promotion((m_value >> PROMOTION_SHIFT) & Promotion::bitmask());
     }
 
-    [[nodiscard]] constexpr bool has_value() const { return m_value != 0; }
+    [[nodiscard]] constexpr bool hasValue() const { return m_value != 0; }
 
    private:
     static constexpr int FROM_SHIFT      = 0;
-    static constexpr int TO_SHIFT        = Square::bitlen();
-    static constexpr int MOVETYPE_SHIFT  = 2 * Square::bitlen();
-    static constexpr int PROMOTION_SHIFT = (2 * Square::bitlen()) + MoveType::bitlen();
+    static constexpr int TO_SHIFT        = Square::bitlength();
+    static constexpr int MOVETYPE_SHIFT  = 2 * Square::bitlength();
+    static constexpr int PROMOTION_SHIFT = (2 * Square::bitlength()) + MoveType::bitlength();
 };

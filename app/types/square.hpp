@@ -17,22 +17,22 @@ class Square : public StrongValue<Square, uint8_t> {
     using StrongValue::StrongValue;
 
     static constexpr ValueType   count() noexcept { return static_cast<ValueType>(64); }
-    [[nodiscard]] constexpr bool has_value() const { return value() < count(); }
-    static constexpr uint8_t     bitlen() { return 6; }
-    static constexpr ValueType   bitmask() { return static_cast<ValueType>((ValueType(1) << bitlen()) - 1); }
+    [[nodiscard]] constexpr bool hasValue() const { return value() < count(); }
+    static constexpr uint8_t     bitlength() { return 6; }
+    static constexpr ValueType   bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
 
     constexpr Square(File file, Rank rank) noexcept
-        : StrongValue(static_cast<uint8_t>((rank.value() << File::bitlen()) | file.value())) {}
+        : StrongValue(static_cast<uint8_t>((rank.value() << File::bitlength()) | file.value())) {}
 
     [[nodiscard]] constexpr File file() const noexcept { return File(value() & File::bitmask()); }
 
-    [[nodiscard]] constexpr Rank rank() const noexcept { return Rank(value() >> File::bitlen()); }
+    [[nodiscard]] constexpr Rank rank() const noexcept { return Rank(value() >> File::bitlength()); }
 
-    static constexpr Square from_string(const std::string& str) {
-        return Square(File::from_char(str[0]), Rank::from_char(str[1]));
+    static constexpr Square fromString(const std::string& str) {
+        return Square(File::fromChar(str[0]), Rank::fromChar(str[1]));
     }
 
-    [[nodiscard]] constexpr std::string to_string() const { return {file().to_char(), rank().to_char()}; }
+    [[nodiscard]] constexpr std::string toString() const { return {file().toChar(), rank().toChar()}; }
 
     [[nodiscard]] constexpr bool light() const noexcept { return ((file().value() + rank().value()) % 2) == 1; }
 
@@ -56,20 +56,15 @@ class Square : public StrongValue<Square, uint8_t> {
         return table[from.value()][to.value()];
     }
 
-    [[nodiscard]] constexpr Square moved(const Direction& direction) const noexcept {
+    [[nodiscard]] constexpr Square shifted(const Direction& direction) const noexcept {
         File newFile = file() + direction.horizontal();
         Rank newRank = rank() + direction.vertical();
 
-        if (!newFile.has_value() || !newRank.has_value()) {
+        if (!newFile.hasValue() || !newRank.hasValue()) {
             return Square(Values::NONE);
         }
 
         return Square(newFile, newRank);
-    }
-
-    constexpr Square& move(const Direction& direction) noexcept {
-        *this = moved(direction);
-        return *this;
     }
 
    private:

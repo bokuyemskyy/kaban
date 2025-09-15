@@ -14,25 +14,25 @@ class Piece : public StrongValue<Piece, uint8_t> {
     using StrongValue::StrongValue;
 
     static constexpr ValueType   count() noexcept { return static_cast<ValueType>(12); }
-    [[nodiscard]] constexpr bool has_value() const { return value() < 16; }
-    static constexpr uint8_t     bitlen() { return 6; }
-    static constexpr ValueType   bitmask() { return static_cast<ValueType>((ValueType(1) << bitlen()) - 1); }
+    [[nodiscard]] constexpr bool hasValue() const { return value() < 16; }
+    static constexpr uint8_t     bitlength() { return 6; }
+    static constexpr ValueType   bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
 
     explicit constexpr Piece(Color color, PieceType pieceType) noexcept
-        : StrongValue(static_cast<uint8_t>((color.value() << PieceType::bitlen()) | pieceType.value())) {}
+        : StrongValue(static_cast<uint8_t>((color.value() << PieceType::bitlength()) | pieceType.value())) {}
 
-    [[nodiscard]] constexpr Color color() const noexcept { return Color(m_value >> PieceType::bitlen()); }
+    [[nodiscard]] constexpr Color color() const noexcept { return Color(m_value >> PieceType::bitlength()); }
 
-    [[nodiscard]] constexpr PieceType piece_type() const noexcept { return PieceType(m_value & PieceType::bitmask()); }
+    [[nodiscard]] constexpr PieceType pieceType() const noexcept { return PieceType(m_value & PieceType::bitmask()); }
 
-    static constexpr Piece from_char(char c) noexcept {
+    static constexpr Piece fromChar(char c) noexcept {
         Color     color      = isupper(static_cast<unsigned char>(c)) ? Colors::WHITE : Colors::BLACK;
-        PieceType piece_type = PieceType::from_char(c);
+        PieceType piece_type = PieceType::fromChar(c);
         return Piece(color, piece_type);
     }
 
-    [[nodiscard]] constexpr char to_char() const noexcept {
-        return color() == Colors::WHITE ? toupper(piece_type().to_char()) : piece_type().to_char();
+    [[nodiscard]] constexpr char toChar() const noexcept {
+        return color() == Colors::WHITE ? toupper(pieceType().toChar()) : pieceType().toChar();
     }
 };
 
