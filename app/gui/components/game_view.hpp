@@ -19,8 +19,7 @@ class GameView : IGuiComponent {
         ImGui::GetStyle().ItemSpacing.x = ITEM_SPACING;
 
         ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetFrameHeight()));
-        ImGui::SetNextWindowSize(
-            ImVec2(m_context.io.DisplaySize.x, m_context.io.DisplaySize.y - ImGui::GetFrameHeight()));
+        ImGui::SetNextWindowSize(ImVec2(m_ctx.io.DisplaySize.x, m_ctx.io.DisplaySize.y - ImGui::GetFrameHeight()));
 
         ImGui::Begin("GameView", nullptr,
                      ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
@@ -53,7 +52,7 @@ class GameView : IGuiComponent {
     }
 
    private:
-    BoardView      m_boardView{m_context};
-    GameInfo       m_gameInfo{m_context};
-    CapturedPieces m_capturedPieces{m_context};
+    BoardView      m_boardView{m_ctx};
+    GameInfo       m_gameInfo{m_ctx};
+    CapturedPieces m_capturedPieces{m_ctx};
 };
