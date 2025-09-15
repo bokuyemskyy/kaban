@@ -18,17 +18,6 @@ class Gui {
           m_context{.state          = m_state,
                     .io             = m_imgui.io(),
                     .engine         = engine,
-<<<<<<< HEAD
-                    .textureManager = m_textureManager,
-                    .windowRegistry = m_windowRegistry},
-          m_mainMenu(m_context),
-          m_demoWindow(m_context),
-          m_gameView(m_context) {
-        updateTime();
-    }
-    void run() {
-        while (!m_context.state.shouldClose && !m_glfw.shouldClose()) {
-=======
                     .textureManager = m_texture_manager,
                     .windowRegistry = m_window_registry},
           m_main_menu(m_context),
@@ -38,7 +27,6 @@ class Gui {
     }
     void run() {
         while (!m_context.state.should_close && !m_glfw.shouldClose()) {
->>>>>>> bb3ac70 (refactor: consistent code style)
             updateTime();
 
             m_imgui.beginFrame();
@@ -50,11 +38,7 @@ class Gui {
             m_game_view.draw();
             if (m_context.state.show_demo_window) m_demo_window.draw();
 
-<<<<<<< HEAD
-            for (const auto& name : m_windowRegistry.get()) m_imgui.keepWindowInBounds(name.c_str());
-=======
             for (const auto& name : m_window_registry.get()) m_imgui.keepWindowInBounds(name.c_str());
->>>>>>> bb3ac70 (refactor: consistent code style)
 
             m_imgui.finishFrame();
             m_glfw.finishFrame();
@@ -63,15 +47,9 @@ class Gui {
 
    private:
     void updateTime() {
-<<<<<<< HEAD
-        m_currentTime = GlfwWrapper::time();
-        m_deltaTime   = m_currentTime - m_lastTime;
-        m_lastTime    = m_currentTime;
-=======
         m_current_time = GlfwWrapper::time();
         m_delta_time   = m_current_time - m_last_time;
         m_last_time    = m_current_time;
->>>>>>> bb3ac70 (refactor: consistent code style)
     };
 
     GlfwWrapper  m_glfw;
