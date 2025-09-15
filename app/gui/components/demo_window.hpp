@@ -8,7 +8,7 @@ class DemoWindow : IGuiComponent {
    public:
     using IGuiComponent::IGuiComponent;
     void draw() override {
-        ImGui::ShowDemoWindow(&m_ctx.state.showDemoWindow);
+        ImGui::ShowDemoWindow(&m_ctx.state.show_demo_window);
         m_ctx.windowRegistry.add("Dear ImGui Demo");
     }
 };
