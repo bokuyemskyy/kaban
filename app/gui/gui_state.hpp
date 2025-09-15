@@ -2,7 +2,7 @@
 
 #include "square.hpp"
 struct GuiState {
-    bool   shouldClose     = false;
-    bool   showDemoWindow  = false;
-    Square selected_square = Squares::NONE;
+    bool   should_close     = false;
+    bool   show_demo_window = false;
+    Square selected_square  = Squares::NONE;
 };

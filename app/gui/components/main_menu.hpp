@@ -18,7 +18,7 @@ class MainMenu : IGuiComponent {
                 if (ImGui::MenuItem("Save Game")) {
                 }
                 if (ImGui::MenuItem("Exit")) {
-                    m_ctx.state.shouldClose = true;
+                    m_ctx.state.should_close = true;
                 }
                 ImGui::EndMenu();
             }

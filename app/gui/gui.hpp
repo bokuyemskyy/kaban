@@ -18,6 +18,7 @@ class Gui {
           m_context{.state          = m_state,
                     .io             = m_imgui.io(),
                     .engine         = engine,
+<<<<<<< HEAD
                     .textureManager = m_textureManager,
                     .windowRegistry = m_windowRegistry},
           m_mainMenu(m_context),
@@ -27,18 +28,33 @@ class Gui {
     }
     void run() {
         while (!m_context.state.shouldClose && !m_glfw.shouldClose()) {
+=======
+                    .textureManager = m_texture_manager,
+                    .windowRegistry = m_window_registry},
+          m_main_menu(m_context),
+          m_demo_window(m_context),
+          m_game_view(m_context) {
+        updateTime();
+    }
+    void run() {
+        while (!m_context.state.should_close && !m_glfw.shouldClose()) {
+>>>>>>> bb3ac70 (refactor: consistent code style)
             updateTime();
 
             m_imgui.beginFrame();
             m_glfw.fillFrame();
 
-            m_windowRegistry.clear();
+            m_window_registry.clear();
 
-            m_mainMenu.draw();
-            m_gameView.draw();
-            if (m_context.state.showDemoWindow) m_demoWindow.draw();
+            m_main_menu.draw();
+            m_game_view.draw();
+            if (m_context.state.show_demo_window) m_demo_window.draw();
 
+<<<<<<< HEAD
             for (const auto& name : m_windowRegistry.get()) m_imgui.keepWindowInBounds(name.c_str());
+=======
+            for (const auto& name : m_window_registry.get()) m_imgui.keepWindowInBounds(name.c_str());
+>>>>>>> bb3ac70 (refactor: consistent code style)
 
             m_imgui.finishFrame();
             m_glfw.finishFrame();
@@ -47,25 +63,31 @@ class Gui {
 
    private:
     void updateTime() {
+<<<<<<< HEAD
         m_currentTime = GlfwWrapper::time();
         m_deltaTime   = m_currentTime - m_lastTime;
         m_lastTime    = m_currentTime;
+=======
+        m_current_time = GlfwWrapper::time();
+        m_delta_time   = m_current_time - m_last_time;
+        m_last_time    = m_current_time;
+>>>>>>> bb3ac70 (refactor: consistent code style)
     };
 
     GlfwWrapper  m_glfw;
     ImGuiWrapper m_imgui;
 
     GuiState       m_state;
-    TextureManager m_textureManager;
-    WindowRegistry m_windowRegistry;
+    TextureManager m_texture_manager;
+    WindowRegistry m_window_registry;
 
     GuiContext m_context;
 
-    MainMenu   m_mainMenu;
-    DemoWindow m_demoWindow;
-    GameView   m_gameView;
+    MainMenu   m_main_menu;
+    DemoWindow m_demo_window;
+    GameView   m_game_view;
 
-    double m_lastTime    = 0;
-    double m_deltaTime   = 0;
-    double m_currentTime = 0;
+    double m_last_time    = 0;
+    double m_delta_time   = 0;
+    double m_current_time = 0;
 };
