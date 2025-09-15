@@ -14,12 +14,13 @@
 #include "piece.hpp"
 #include "rank.hpp"
 #include "square.hpp"
+#include "undo_info.hpp"
 
-void Position::set_from_fen(const std::string &fen) {
+void Position::setPosition(const std::string &fen) {
     for (Square square : Squares::all()) {
         unset(square);
     }
-    m_sideToMove = Colors::WHITE;
+    m_stm = Colors::WHITE;
 
     std::stringstream ss(fen);
     std::string       argument;
@@ -39,7 +40,7 @@ void Position::set_from_fen(const std::string &fen) {
                         current_file += num;
                     } else {
                         Square s = Square(File(current_file), Rank(current_rank));
-                        Piece  p = Piece::from_char(c);
+                        Piece  p = Piece::fromChar(c);
                         set(s, p);
                         ++current_file;
                     }
@@ -48,9 +49,9 @@ void Position::set_from_fen(const std::string &fen) {
             }
             case 1:
                 if (argument == "b")
-                    m_sideToMove = Colors::BLACK;
+                    m_stm = Colors::BLACK;
                 else
-                    m_sideToMove = Colors::WHITE;
+                    m_stm = Colors::WHITE;
                 break;
             default:
                 break;
@@ -59,7 +60,7 @@ void Position::set_from_fen(const std::string &fen) {
     }
 }
 
-std::string Position::to_fen() const {
+std::string Position::toFen() const {
     std::stringstream fen;
 
     for (int r = Rank::count() - 1; r >= 0; r--) {
@@ -68,14 +69,14 @@ std::string Position::to_fen() const {
             Square s = Square(File(f), Rank(r));
             Piece  p = m_board[s.value()];
 
-            if (p.has_value()) {
+            if (p.hasValue()) {
                 ++empty;
             } else {
                 if (empty > 0) {
                     fen << empty;
                     empty = 0;
                 }
-                fen << p.to_char();
+                fen << p.toChar();
             }
         }
         if (empty > 0) {
@@ -90,73 +91,67 @@ std::string Position::to_fen() const {
 void Position::set(Square square, Piece piece) {
     unset(square);
     m_color[piece.color().value()] |= Bitboard::square(square);
-    m_pieceType[piece.piece_type().value()] |= Bitboard::square(square);
+    m_pieceType[piece.pieceType().value()] |= Bitboard::square(square);
     m_board[square.value()] = piece;
 }
 
 void Position::unset(Square square) {
     Piece set_piece = at(square);
-    if (!at(square).has_value()) return;
+    if (!at(square).hasValue()) return;
     m_color[set_piece.color().value()] &= ~Bitboard::square(square);
-    m_pieceType[set_piece.piece_type().value()] &= ~Bitboard::square(square);
+    m_pieceType[set_piece.pieceType().value()] &= ~Bitboard::square(square);
     m_board[square.value()] = Pieces::NONE;
 }
 
-void Position::do_move(const Move move) {
+UndoInfo Position::makeMove(const Move move) {
+    UndoInfo undo_info = {m_castling, m_en_passant, m_halfmove};
+
     Square from = move.from();
     Square to   = move.to();
 
-    Bitboard moveBitboard = Bitboard::square(from) | Bitboard::square(to);
+    Piece moved    = at(from);
+    Piece captured = at(to);
 
-    // m_deltas.emplace_back(Delta(m_board[to], m_castling, 0, m_halfmoves));
-    // m_moves.emplace_back(move);
-
-    /*if (m_board[to.value()] != Piece::NONE) {
-        Bitboard maskBB = ~Bitboard::square(to);
-        m_color[m_board[to.value()].color()] &= maskBB;
-        m_pieceType[m_board[to.value()].piece_type()] &= maskBB;
+    if (captured.hasValue()) {
+        Bitboard to_mask = Bitboard::square(to);
+        m_color[captured.color().value()] &= ~to_mask;
+        m_pieceType[captured.pieceType().value()] &= ~to_mask;
     }
 
-    m_color[m_board[from.value()].color()] ^= moveBB;
-    m_pieceType[m_board[from.value()].piece_type()] ^= moveBB;
-*/
-    m_board[to.value()] = m_board[from.value()];
-    // m_board[from.value()] = Piece::NONE;
+    Bitboard move_mask    = Bitboard::square(from) | Bitboard::square(to);
+    m_board[to.value()]   = moved;
+    m_board[from.value()] = Pieces::NONE;
+    m_color[moved.color().value()] ^= move_mask;
+    m_pieceType[moved.pieceType().value()] ^= move_mask;
 
-    m_sideToMove.flip();
+    m_stm.flip();
+
+    undo_info.setCaptured(captured);
+    return undo_info;
 }
 
-void Position::undo_move(Move move, UndoInfo undoInfo) {
-    // if (m_deltas.empty() || m_moves.empty()) return;
+void Position::unmakeMove(Move move, UndoInfo undo_info) {
+    Square from = move.from();
+    Square to   = move.to();
 
-    // Delta delta = m_deltas.back();
-    // Move move = m_moves.back();
+    Piece moved    = at(to);
+    Piece captured = undo_info.captured();
 
-    // m_deltas.pop_back();
-    // m_moves.pop_back();
+    Bitboard move_mask    = Bitboard::square(from) | Bitboard::square(to);
+    m_board[to.value()]   = captured;
+    m_board[from.value()] = moved;
+    m_color[moved.color().value()] ^= move_mask;
+    m_pieceType[moved.pieceType().value()] ^= move_mask;
 
-    // Square from = move.from();
-    // Square to   = move.to();
+    if (captured.hasValue()) {
+        Bitboard to_mask = Bitboard::square(to);
+        m_color[captured.color().value()] |= to_mask;
+        m_pieceType[captured.pieceType().value()] |= to_mask;
+    }
 
-    // Bitboard moveBB = Bitboard::square(from) | Bitboard::square(to);
+    m_castling   = undo_info.castling();
+    m_en_passant = undo_info.enPassant();
+    m_halfmove   = undo_info.halfmove();
 
-    // Piece movedPiece = m_board[to.value()];
-    //  Piece capturedPiece = getCaptured(delta);
-
-    // m_board[from.value()] = movedPiece;
-    //  m_board[to]   = capturedPiece;
-
-    // m_color[movedPiece.color().value()] ^= moveBB;
-    // m_pieceType[movedPiece.piece_type().value()] ^= moveBB;
-
-    /*if (capturedPiece != Piece::NONE) {
-        Bitboard toBB = squareBB(to);
-        m_color[getColor(capturedPiece)] |= toBB;
-        m_pieceType[getPieceType(capturedPiece)] |= toBB;
-    }*/
-
-    // m_castling  = getCastling(delta);
-    // m_halfmoves = getHalfmoves(delta);
-
-    // m_sideToMove = !m_sideToMove;
+    m_stm.flip();
 }
