@@ -8,8 +8,8 @@ class Halfmove : public StrongValue<Halfmove, uint8_t> {
    public:
     using StrongValue::StrongValue;
 
-    static constexpr uint8_t   bitlen() { return 7; }
-    static constexpr ValueType bitmask() { return static_cast<ValueType>((ValueType(1) << bitlen()) - 1); }
+    static constexpr uint8_t   bitlength() { return 7; }
+    static constexpr ValueType bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
 
     constexpr Halfmove& operator++() noexcept {
         ++m_value;
