@@ -53,16 +53,16 @@ class Castling : public StrongValue<Castling, uint8_t> {
 };
 
 struct Castlings {
-    // clang-format off
-    #define C(name) \
-        static constexpr Castling name { Castling::Values::name }
+    static constexpr Castling W_KING_SIDE{Castling::Values::W_KING_SIDE};
+    static constexpr Castling W_QUEEN_SIDE{Castling::Values::W_QUEEN_SIDE};
+    static constexpr Castling B_KING_SIDE{Castling::Values::B_KING_SIDE};
+    static constexpr Castling B_QUEEN_SIDE{Castling::Values::B_QUEEN_SIDE};
 
-        C(W_KING_SIDE); C(W_QUEEN_SIDE); C(B_KING_SIDE); C(B_QUEEN_SIDE);
-        C(W_SIDE); C(B_SIDE); C(ANY);
-    #undef C
+    static constexpr Castling W_SIDE{Castling::Values::W_SIDE};
+    static constexpr Castling B_SIDE{Castling::Values::B_SIDE};
+    static constexpr Castling ANY{Castling::Values::ANY};
 
     static constexpr std::array<Castling, Castling::count()> all() {
         return {W_KING_SIDE, W_QUEEN_SIDE, B_KING_SIDE, B_QUEEN_SIDE};
     }
-    // clang-format on
 };

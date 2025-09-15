@@ -4,6 +4,7 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <span>
 
 #include "square.hpp"
 #include "strong_value.hpp"
@@ -123,8 +124,7 @@ class Bitboard : public StrongValue<Bitboard, uint64_t> {
         return table[square.value()];
     }
 
-    template <size_t N>
-    static constexpr std::array<Bitboard, Square::count()> pseudoAttacks(const std::array<Direction, N>& directions) {
+    static constexpr std::array<Bitboard, Square::count()> pseudoAttacks(const std::span<const Direction>& directions) {
         std::array<Bitboard, Square::count()> table{};
 
         for (auto square : Squares::all()) {
@@ -139,8 +139,7 @@ class Bitboard : public StrongValue<Bitboard, uint64_t> {
         return table;
     }
 
-    template <size_t N>
-    static constexpr Bitboard slidingAttacks(Square from, const std::array<Direction, N>& directions,
+    static constexpr Bitboard slidingAttacks(Square from, const std::span<const Direction>& directions,
                                              Bitboard occupancy) {
         Bitboard attacks = Bitboard(0);
 

@@ -80,18 +80,16 @@ class Magics {
 
     constexpr Bitboard premask(PieceType piece_type, Square square) {
         assert(piece_type == PieceTypes::BISHOP || piece_type == PieceTypes::ROOK);
+        Bitboard edges;
         if (piece_type == PieceTypes::BISHOP) {
-            Bitboard edges = (Bitboard::rank(Ranks::R1) | Bitboard::rank(Ranks::R8) | Bitboard::file(Files::FA) |
-                              Bitboard::file(Files::FH));
+            edges = (Bitboard::rank(Ranks::R1) | Bitboard::rank(Ranks::R8) | Bitboard::file(Files::FA) |
+                     Bitboard::file(Files::FH));
 
-            return Bitboard::slidingAttacks(square, Directions::bishop(), Bitboards::ZERO) & ~edges;
         } else {
-            Bitboard edges =
-                ((Bitboard::rank(Ranks::R1) | Bitboard::rank(Ranks::R8)) & ~Bitboard::rank(square.rank())) |
-                ((Bitboard::file(Files::FA) | Bitboard::file(Files::FH)) & ~Bitboard::file(square.file()));
-
-            return Bitboard::slidingAttacks(square, Directions::rook(), Bitboards::ZERO) & ~edges;
+            edges = ((Bitboard::rank(Ranks::R1) | Bitboard::rank(Ranks::R8)) & ~Bitboard::rank(square.rank())) |
+                    ((Bitboard::file(Files::FA) | Bitboard::file(Files::FH)) & ~Bitboard::file(square.file()));
         }
+        return Bitboard::slidingAttacks(square, piece_type.directions(), Bitboards::ZERO) & ~edges;
     }
 
     template <size_t N>
@@ -122,10 +120,7 @@ class Magics {
             Bitboard possible_occupancy = Bitboards::ZERO;
             do {
                 occupancies[size] = possible_occupancy;
-                if (piece_type == PieceTypes::BISHOP)
-                    reference[size] = Bitboard::slidingAttacks(square, Directions::bishop(), possible_occupancy);
-                else
-                    reference[size] = Bitboard::slidingAttacks(square, Directions::rook(), possible_occupancy);
+                reference[size]   = Bitboard::slidingAttacks(square, piece_type.directions(), possible_occupancy);
                 size++;
                 possible_occupancy =
                     Bitboard(possible_occupancy.value() - magic_entry.premask.value()) & magic_entry.premask;
