@@ -16,10 +16,11 @@ class Square : public StrongValue<Square, uint8_t> {
    public:
     using StrongValue::StrongValue;
 
-    static constexpr ValueType   count() noexcept { return static_cast<ValueType>(64); }
     [[nodiscard]] constexpr bool hasValue() const { return value() < count(); }
-    static constexpr uint8_t     bitlength() { return 6; }
-    static constexpr ValueType   bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
+
+    static constexpr ValueType count() noexcept { return static_cast<ValueType>(64); }
+    static constexpr uint8_t   bitlength() { return 6; }
+    static constexpr ValueType bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
 
     constexpr Square(File file, Rank rank) noexcept
         : StrongValue(static_cast<uint8_t>((rank.value() << File::bitlength()) | file.value())) {}

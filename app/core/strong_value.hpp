@@ -1,5 +1,4 @@
 #pragma once
-#include <bit>
 
 template <typename Derived, typename T>
 class StrongValue {

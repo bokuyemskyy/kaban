@@ -30,10 +30,10 @@ enum class GenerationType : uint8_t {
 
 class Position {
    public:
-    Position(const std::string& fen = DEFAULT_FEN) { setPosition(fen); }
+    Position(const std::string& fen = DEFAULT_FEN) { fromFen(fen); }
 
-    void setPosition(const std::string& fen = DEFAULT_FEN);
-    void clear() { setPosition(""); };
+    void fromFen(const std::string& fen = DEFAULT_FEN);
+    void clear() { fromFen(""); };
 
     [[nodiscard]] std::string toFen() const;
 
@@ -127,10 +127,10 @@ class Position {
     template <PieceType PT>
     [[nodiscard]] constexpr Bitboard pseudoAttacks(Square square) const {
         if constexpr (PT == PieceTypes::KNIGHT) {
-            static constexpr auto table = Bitboard::pseudoAttacks(Directions::knight());
+            static constexpr auto table = Bitboard::pseudoAttacks(PieceTypes::KNIGHT.directions());
             return table[square.value()];
         } else if constexpr (PT == PieceTypes::KING) {
-            static constexpr auto table = Bitboard::pseudoAttacks(Directions::king());
+            static constexpr auto table = Bitboard::pseudoAttacks(PieceTypes::KING.directions());
             return table[square.value()];
         } else if constexpr (PT == PieceTypes::BISHOP) {
             return m_magics.lookup<PieceTypes::BISHOP>(square, occupancy<Side::BOTH>());
@@ -145,10 +145,10 @@ class Position {
     template <Color C>
     [[nodiscard]] constexpr Bitboard pawnAttacks(Square square) const {
         if constexpr (C == Colors::WHITE) {
-            static constexpr auto table = Bitboard::pseudoAttacks(Directions::wpawn());
+            static constexpr auto table = Bitboard::pseudoAttacks(PieceTypes::PAWN.directions(Colors::WHITE));
             return table[square.value()];
         } else {
-            static constexpr auto table = Bitboard::pseudoAttacks(Directions::bpawn());
+            static constexpr auto table = Bitboard::pseudoAttacks(PieceTypes::PAWN.directions(Colors::BLACK));
             return table[square.value()];
         }
     }

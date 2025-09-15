@@ -1,15 +1,3 @@
-#pragma once
-
-#include <array>
-#include <cstddef>
-#include <cstdint>
-#include <iostream>
-#include <vector>
-
-#include "bitboard.hpp"
-#include "piece.hpp"
-#include "position.hpp"
-#include "square.hpp"
 /*
 class Movegen {
    public:

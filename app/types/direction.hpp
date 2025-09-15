@@ -127,26 +127,29 @@ class Direction : public StrongValue<Direction, int8_t> {
 };
 
 struct Directions {
-    // clang-format off
-    #define D(name) \
-        static constexpr Direction name { Direction::Values::name }
+    static constexpr Direction N{Direction::Values::N};
+    static constexpr Direction S{Direction::Values::S};
+    static constexpr Direction E{Direction::Values::E};
+    static constexpr Direction W{Direction::Values::W};
 
-        D(N); D(S); D(E); D(W);
-        D(NN); D(SS);
-        D(NE); D(SE); D(NW); D(SW);
-        D(NNE); D(ENE); D(ESE); D(SSE); D(SSW); D(WSW); D(WNW); D(NNW);
-    #undef D
+    static constexpr Direction NN{Direction::Values::NN};
+    static constexpr Direction SS{Direction::Values::SS};
+
+    static constexpr Direction NE{Direction::Values::NE};
+    static constexpr Direction SE{Direction::Values::SE};
+    static constexpr Direction NW{Direction::Values::NW};
+    static constexpr Direction SW{Direction::Values::SW};
+
+    static constexpr Direction NNE{Direction::Values::NNE};
+    static constexpr Direction ENE{Direction::Values::ENE};
+    static constexpr Direction ESE{Direction::Values::ESE};
+    static constexpr Direction SSE{Direction::Values::SSE};
+    static constexpr Direction SSW{Direction::Values::SSW};
+    static constexpr Direction WSW{Direction::Values::WSW};
+    static constexpr Direction WNW{Direction::Values::WNW};
+    static constexpr Direction NNW{Direction::Values::NNW};
 
     static constexpr std::array<Direction, Direction::count()> all() {
         return {N, S, E, W, NN, SS, NE, SE, NW, SW, NNE, ENE, ESE, SSE, SSW, WSW, WNW, NNW};
     }
-    // clang-format on
-
-    static constexpr std::array<Direction, 2> wpawn() { return {NW, NE}; }
-    static constexpr std::array<Direction, 2> bpawn() { return {SE, SW}; }
-    static constexpr std::array<Direction, 8> knight() { return {NNE, NNW, ENE, WNW, SSE, SSW, ESE, WSW}; }
-    static constexpr std::array<Direction, 4> bishop() { return {NE, NW, SE, SW}; }
-    static constexpr std::array<Direction, 4> rook() { return {N, S, E, W}; }
-    static constexpr std::array<Direction, 8> queen() { return {N, S, E, W, NE, NW, SE, SW}; }
-    static constexpr std::array<Direction, 8> king() { return {N, S, E, W, NE, NW, SE, SW}; }
 };

@@ -16,11 +16,11 @@ class GlfwWrapper {
     GlfwWrapper(GlfwWrapper&&) noexcept            = delete;
     GlfwWrapper& operator=(GlfwWrapper&&) noexcept = delete;
 
-    void fill_frame(float r = 0, float g = 0, float b = 0, float a = 1) const;
-    void finish_frame() const;
+    void fillFrame(float r = 0, float g = 0, float b = 0, float a = 1) const;
+    void finishFrame() const;
 
-    [[nodiscard]] bool should_close() const noexcept;
-    void               set_should_close(bool value) noexcept;
+    [[nodiscard]] bool shouldClose() const noexcept;
+    void               setShouldClose(bool value) noexcept;
 
     [[nodiscard]] GLFWwindow*     window() const noexcept { return m_window; }
     [[nodiscard]] static double   time() noexcept { return glfwGetTime(); }
