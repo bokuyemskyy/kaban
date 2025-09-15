@@ -5,21 +5,22 @@
 #include <cstdint>
 
 #include "strong_value.hpp"
+
 class PieceType : public StrongValue<PieceType, uint8_t> {
    public:
     using StrongValue::StrongValue;
 
     static constexpr ValueType count() noexcept { return static_cast<ValueType>(6); }
-    static constexpr uint8_t   bitlen() { return 3; }
-    static constexpr ValueType bitmask() { return static_cast<ValueType>((ValueType(1) << bitlen()) - 1); }
+    static constexpr uint8_t   bitlength() { return 3; }
+    static constexpr ValueType bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
 
-    static constexpr PieceType from_char(char c) {
+    static constexpr PieceType fromChar(char c) {
         c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
         for (uint8_t i = 0; i < count(); ++i)
             if (chars[i] == c) return PieceType(i);
         return PieceType();
     }
-    [[nodiscard]] constexpr char to_char() const { return chars[m_value]; }
+    [[nodiscard]] constexpr char toChar() const { return chars[m_value]; }
 
    private:
     static constexpr std::array<char, 6> chars = {'p', 'n', 'b', 'r', 'q', 'k'};

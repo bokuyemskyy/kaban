@@ -11,22 +11,20 @@ class File : public StrongValue<File, uint8_t> {
     using StrongValue::StrongValue;
 
     static constexpr ValueType   count() noexcept { return static_cast<ValueType>(8); }
-    [[nodiscard]] constexpr bool has_value() const { return value() < count(); }
-    static constexpr uint8_t     bitlen() { return 3; }
-    static constexpr ValueType   bitmask() { return static_cast<ValueType>((ValueType(1) << bitlen()) - 1); }
+    [[nodiscard]] constexpr bool hasValue() const { return value() < count(); }
+    static constexpr uint8_t     bitlength() { return 3; }
+    static constexpr ValueType   bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
 
     static constexpr uint8_t distance(File from, File to) noexcept {
         return from.value() > to.value() ? from.value() - to.value() : to.value() - from.value();
     }
 
-    static constexpr File from_char(char c) noexcept {
+    static constexpr File fromChar(char c) noexcept {
         if (c >= 'a' && c <= 'h') return File(static_cast<uint8_t>(c - 'a'));
         return File();
     }
 
-    [[nodiscard]] constexpr char to_char() const noexcept {
-        return has_value() ? static_cast<char>('a' + value()) : '?';
-    }
+    [[nodiscard]] constexpr char toChar() const noexcept { return hasValue() ? static_cast<char>('a' + value()) : '?'; }
 
     constexpr File operator+(int offset) const noexcept {
         return File(static_cast<uint8_t>(static_cast<int>(value()) + offset));

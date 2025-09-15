@@ -19,17 +19,17 @@ class UndoInfo : public StrongValue<UndoInfo, uint32_t> {
 
     [[nodiscard]] constexpr Castling castling() const { return Castling(m_value >> CASTLING_SHIFT); }
 
-    [[nodiscard]] constexpr EnPassant en_passant() const { return EnPassant(m_value >> EN_PASSANT_SHIFT); }
+    [[nodiscard]] constexpr EnPassant enPassant() const { return EnPassant(m_value >> EN_PASSANT_SHIFT); }
 
     [[nodiscard]] constexpr Halfmove halfmove() const { return Halfmove(m_value >> HALFMOVE_SHIFT); }
 
     [[nodiscard]] constexpr Piece captured() const { return Piece(m_value >> CAPTURED_SHIFT); }
 
-    constexpr void set_captured(Piece captured) { m_value |= (captured.value() << CAPTURED_SHIFT); }
+    constexpr void setCaptured(Piece captured) { m_value |= (captured.value() << CAPTURED_SHIFT); }
 
    private:
     static constexpr int CASTLING_SHIFT   = 0;
-    static constexpr int EN_PASSANT_SHIFT = CASTLING_SHIFT + Castling::bitlen();
-    static constexpr int HALFMOVE_SHIFT   = EN_PASSANT_SHIFT + EnPassant::bitlen();
-    static constexpr int CAPTURED_SHIFT   = HALFMOVE_SHIFT + Halfmove::bitlen();
+    static constexpr int EN_PASSANT_SHIFT = CASTLING_SHIFT + Castling::bitlength();
+    static constexpr int HALFMOVE_SHIFT   = EN_PASSANT_SHIFT + EnPassant::bitlength();
+    static constexpr int CAPTURED_SHIFT   = HALFMOVE_SHIFT + Halfmove::bitlength();
 };

@@ -10,8 +10,8 @@ class Promotion : public StrongValue<Promotion, uint8_t> {
     using StrongValue::StrongValue;
 
     static constexpr ValueType count() noexcept { return static_cast<ValueType>(5); }
-    static constexpr uint8_t   bitlen() { return 3; }
-    static constexpr ValueType bitmask() { return static_cast<ValueType>((ValueType(1) << bitlen()) - 1); }
+    static constexpr uint8_t   bitlength() { return 3; }
+    static constexpr ValueType bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
 
    private:
     // clang-format off
