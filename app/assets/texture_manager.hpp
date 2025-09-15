@@ -13,7 +13,7 @@ class TextureManager {
    public:
     TextureManager() {
         for (Piece piece : Pieces::all()) {
-            std::string     name(1, piece.to_char());
+            std::string     name(1, piece.toChar());
             const Resource* resource = ResourceManager::get(name + ".png");
             if (!resource) throw std::runtime_error("Texture not found");
 
