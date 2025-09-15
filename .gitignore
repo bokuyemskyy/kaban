@@ -1,63 +1,48 @@
-########## IGNORE NO-EXTENSION FILES (BINARIES) ##########
+######## BINARIES ########
 *
 !*.*
 !*/
 
-########## CMAKE ##########
+######## VSCODE ########
+.vscode/
 
+######## CMAKE ########
 /build/
 /out/
 
-########## CLANG ##########
-
+######## CLANG ########
 /.cache/
 
-########## IMGUI ##########
-
+######## IMGUI ########
 imgui.ini
 
-########## DOXYGEN ##########
-
+######## DOXYGEN ########
 !Doxyfile
 
-########## VCPKG ##########
-
+######## VCPKG ########
 /vcpkg_installed/
-/vcpkg/
 
-########## C++ GENERAL ##########
+######## GIT ########
+!README
+!LICENSE
 
+######## C++ ########
 *.d
-
 *.slo
 *.lo
 *.o
 *.obj
-
 *.gch
 *.pch
-
 *.so
 *.dylib
 *.dll
-
 *.mod
 *.smod
-
 *.lai
 *.la
 *.a
 *.lib
-
 *.exe
 *.out
 *.app
-
-########## GIT ##########
-
-!README
-!LICENSE
-
-
-
-1
