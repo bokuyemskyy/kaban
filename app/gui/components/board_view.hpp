@@ -1,5 +1,6 @@
 #include <imgui.h>
 
+#include <algorithm>
 #include <cmath>
 
 #include "engine.hpp"
@@ -21,15 +22,15 @@ class BoardView : IGuiComponent {
     using IGuiComponent::IGuiComponent;
 
     void draw() override {
-        handle_input();
+        handleInput();
 
-        Rect<float>  panel   = calculate_panel();
-        BoardMetrics metrics = board_metrics(panel);
+        Rect<float>  panel   = calculatePanel();
+        BoardMetrics metrics = boardMetrics(panel);
 
         squares(metrics);
         highlights(metrics);
         labels(metrics);
-        player_names(panel);
+        playerNames(panel);
         pieces(metrics);
     }
 
@@ -40,13 +41,13 @@ class BoardView : IGuiComponent {
         float  squareSize;
     };
 
-    Rect<float> calculate_panel() {
+    Rect<float> calculatePanel() {
         ImVec2 panelMin  = ImGui::GetCursorScreenPos();
         ImVec2 availSize = ImGui::GetContentRegionAvail();
         return Rect(panelMin.x, panelMin.y, availSize.x, availSize.y);
     }
 
-    BoardMetrics board_metrics(const Rect<float>& panel) {
+    BoardMetrics boardMetrics(const Rect<float>& panel) {
         const int WINDOW_PADDING = ImGui::GetStyle().WindowPadding.x;
         const int FONT_SIZE      = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
         ImVec2    availSize(panel.width, panel.height);
@@ -57,24 +58,54 @@ class BoardView : IGuiComponent {
         return BoardMetrics{.origin = origin, .size = boardSize, .squareSize = boardSize / 8.0f};
     }
 
-    void handle_input() {
-        ImGuiIO& io = m_context.io;
-        if (!ImGui::IsWindowHovered() || !ImGui::IsMouseClicked(0)) return;
+    void handleInput() {
+        if (!ImGui::IsWindowHovered()) return;
 
-        Rect<float>  panel   = calculate_panel();
-        BoardMetrics metrics = board_metrics(panel);
+        Rect<float>  panel   = calculatePanel();
+        BoardMetrics metrics = boardMetrics(panel);
 
-        ImVec2 mouse = io.MousePos;
-        float  relX  = mouse.x - metrics.origin.x;
-        float  relY  = mouse.y - metrics.origin.y;
+        Square& selected = m_ctx.state.selected_square;
 
-        File file = File(std::floor(relX / metrics.squareSize));
-        Rank rank = Rank(7 - std::floor(relY / metrics.squareSize));
+        if (ImGui::IsKeyPressed(ImGuiKey_LeftArrow)) {
+            m_ctx.engine.unmakeMove();
+            selected = Squares::NONE;
+            return;
+        }
 
-        if (file.has_value() && rank.has_value() && m_context.engine.at(Square(file, rank)) != Pieces::NONE) {
-            m_context.state.selectedSquare = Square(file, rank);
-        } else {
-            m_context.state.selectedSquare = Squares::NONE;
+        ImGuiIO& io = m_ctx.io;
+
+        if (ImGui::IsMouseClicked(0)) {
+            ImVec2 mouse = io.MousePos;
+
+            float rel_x = mouse.x - metrics.origin.x;
+            float rel_y = mouse.y - metrics.origin.y;
+
+            File file = File(std::floor(rel_x / metrics.squareSize));
+            Rank rank = Rank(7 - std::floor(rel_y / metrics.squareSize));
+
+            if (!file.hasValue() || !rank.hasValue()) {
+                selected = Squares::NONE;
+                return;
+            }
+
+            Square clicked(file, rank);
+
+            if (selected.hasValue()) {
+                auto moves = m_ctx.engine.moves(selected);
+                auto it    = std::ranges::find_if(moves, [&](const Move& m) { return m.to() == clicked; });
+                if (it != moves.end()) {
+                    m_ctx.engine.makeMove(*it);
+                    selected = Squares::NONE;
+                } else if (m_ctx.engine.at(clicked).hasValue()) {
+                    selected = clicked;
+                } else {
+                    selected = Squares::NONE;
+                }
+            } else {
+                if (m_ctx.engine.at(clicked).hasValue()) {
+                    selected = clicked;
+                }
+            }
         }
     }
 
@@ -95,10 +126,10 @@ class BoardView : IGuiComponent {
     void highlights(const BoardMetrics& metrics) {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-        auto selectedSquare = m_context.state.selectedSquare;
-        if (selectedSquare.has_value()) {
+        auto selected = m_ctx.state.selected_square;
+        if (selected.hasValue()) {
             const float THICKNESS = 0.05f * metrics.squareSize;
-            Rect        rect      = selectedSquare.normalized_rect().absolute(metrics.size, metrics.size);
+            Rect        rect      = selected.normalized_rect().absolute(metrics.size, metrics.size);
 
             ImVec2 begin(metrics.origin.x + rect.left() + THICKNESS * 0.3f,
                          metrics.origin.y + rect.top() + THICKNESS * 0.3f);
@@ -107,7 +138,7 @@ class BoardView : IGuiComponent {
 
             drawList->AddRect(begin, end, IM_WHITE, 0.0f, 0, THICKNESS);
 
-            for (const auto& move : m_context.engine.moves(selectedSquare)) {
+            for (const auto& move : m_ctx.engine.moves(selected)) {
                 Rect rect = move.to().normalized_rect().absolute(metrics.size, metrics.size);
 
                 ImVec2 begin(metrics.origin.x + rect.left(), metrics.origin.y + rect.top());
@@ -115,7 +146,7 @@ class BoardView : IGuiComponent {
 
                 ImVec2 center((begin.x + end.x) * 0.5f, (begin.y + end.y) * 0.5f);
 
-                if (m_context.engine.at(move.to()) == Pieces::NONE) {
+                if (m_ctx.engine.at(move.to()) == Pieces::NONE) {
                     float radius = 0.08f * (end.x - begin.x);
                     drawList->AddCircleFilled(center, radius, IM_WHITE, 32);
                 } else {
@@ -151,7 +182,7 @@ class BoardView : IGuiComponent {
         }
     }
 
-    void player_names(const Rect<float>& panel) {
+    void playerNames(const Rect<float>& panel) {
         ImDrawList* drawList  = ImGui::GetWindowDrawList();
         int         FONT_SIZE = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
 
@@ -168,9 +199,9 @@ class BoardView : IGuiComponent {
             ImVec2 begin(metrics.origin.x + rect.left() + PIECE_MARGIN, metrics.origin.y + rect.top() + PIECE_MARGIN);
             ImVec2 end(metrics.origin.x + rect.right() - PIECE_MARGIN, metrics.origin.y + rect.bottom() - PIECE_MARGIN);
 
-            Piece piece = m_context.engine.board().at(square.value());
-            if (piece.has_value()) {
-                drawList->AddImage(m_context.textureManager.get(piece), begin, end);
+            Piece piece = m_ctx.engine.board().at(square.value());
+            if (piece.hasValue()) {
+                drawList->AddImage(m_ctx.textureManager.get(piece), begin, end);
             }
         }
     }
