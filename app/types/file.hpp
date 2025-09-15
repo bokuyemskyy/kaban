@@ -45,13 +45,14 @@ class File : public StrongValue<File, uint8_t> {
 };
 
 struct Files {
-    // clang-format off
-    #define F(name) \
-        static constexpr File name { File::Values::name }
-
-        F(FA); F(FB); F(FC); F(FD); F(FE); F(FF); F(FG); F(FH);
-    #undef F
+    static constexpr File FA{File::Values::FA};
+    static constexpr File FB{File::Values::FB};
+    static constexpr File FC{File::Values::FC};
+    static constexpr File FD{File::Values::FD};
+    static constexpr File FE{File::Values::FE};
+    static constexpr File FF{File::Values::FF};
+    static constexpr File FG{File::Values::FG};
+    static constexpr File FH{File::Values::FH};
 
     static constexpr std::array<File, File::count()> all() { return {FA, FB, FC, FD, FE, FF, FG, FH}; }
-    // clang-format on
 };

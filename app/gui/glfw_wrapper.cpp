@@ -40,20 +40,20 @@ Dimensions<int> GlfwWrapper::dimensions() const {
     return dimensions;
 }
 
-void GlfwWrapper::finish_frame() const {
+void GlfwWrapper::finishFrame() const {
     glfwSwapBuffers(m_window);
     glfwPollEvents();
 }
 
-void GlfwWrapper::fill_frame(float r, float g, float b, float a) const {
+void GlfwWrapper::fillFrame(float r, float g, float b, float a) const {
     const auto dims = dimensions();
     glViewport(0, 0, dims.width, dims.height);
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-bool GlfwWrapper::should_close() const noexcept { return glfwWindowShouldClose(m_window) != 0; }
+bool GlfwWrapper::shouldClose() const noexcept { return glfwWindowShouldClose(m_window) != 0; }
 
-void GlfwWrapper::set_should_close(bool value) noexcept {
+void GlfwWrapper::setShouldClose(bool value) noexcept {
     glfwSetWindowShouldClose(m_window, value ? GLFW_TRUE : GLFW_FALSE);
 }

@@ -10,10 +10,11 @@ class Rank : public StrongValue<Rank, uint8_t> {
    public:
     using StrongValue::StrongValue;
 
-    static constexpr ValueType   count() noexcept { return static_cast<ValueType>(8); }
     [[nodiscard]] constexpr bool hasValue() const { return value() < count(); }
-    static constexpr uint8_t     bitlength() { return 3; }
-    static constexpr ValueType   bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
+
+    static constexpr ValueType count() noexcept { return static_cast<ValueType>(8); }
+    static constexpr uint8_t   bitlength() { return 3; }
+    static constexpr ValueType bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
 
     static constexpr uint8_t distance(Rank from, Rank to) noexcept {
         return from.value() > to.value() ? from.value() - to.value() : to.value() - from.value();
@@ -45,13 +46,14 @@ class Rank : public StrongValue<Rank, uint8_t> {
 };
 
 struct Ranks {
-    // clang-format off
-    #define R(name) \
-        static constexpr Rank name { Rank::Values::name }
-
-        R(R1); R(R2); R(R3); R(R4); R(R5); R(R6); R(R7); R(R8);
-    #undef R
+    static constexpr Rank R1{Rank::Values::R1};
+    static constexpr Rank R2{Rank::Values::R2};
+    static constexpr Rank R3{Rank::Values::R3};
+    static constexpr Rank R4{Rank::Values::R4};
+    static constexpr Rank R5{Rank::Values::R5};
+    static constexpr Rank R6{Rank::Values::R6};
+    static constexpr Rank R7{Rank::Values::R7};
+    static constexpr Rank R8{Rank::Values::R8};
 
     static constexpr std::array<Rank, Rank::count()> all() { return {R1, R2, R3, R4, R5, R6, R7, R8}; }
-    // clang-format on
 };

@@ -23,14 +23,14 @@ class Gui {
           m_mainMenu(m_context),
           m_demoWindow(m_context),
           m_gameView(m_context) {
-        update_time();
+        updateTime();
     }
     void run() {
-        while (!m_context.state.shouldClose && !m_glfw.should_close()) {
-            update_time();
+        while (!m_context.state.shouldClose && !m_glfw.shouldClose()) {
+            updateTime();
 
-            m_imgui.begin_frame();
-            m_glfw.fill_frame();
+            m_imgui.beginFrame();
+            m_glfw.fillFrame();
 
             m_windowRegistry.clear();
 
@@ -38,15 +38,15 @@ class Gui {
             m_gameView.draw();
             if (m_context.state.showDemoWindow) m_demoWindow.draw();
 
-            for (const auto& name : m_windowRegistry.get()) m_imgui.keep_window_in_bounds(name.c_str());
+            for (const auto& name : m_windowRegistry.get()) m_imgui.keepWindowInBounds(name.c_str());
 
-            m_imgui.finish_frame();
-            m_glfw.finish_frame();
+            m_imgui.finishFrame();
+            m_glfw.finishFrame();
         }
     }
 
    private:
-    void update_time() {
+    void updateTime() {
         m_currentTime = GlfwWrapper::time();
         m_deltaTime   = m_currentTime - m_lastTime;
         m_lastTime    = m_currentTime;

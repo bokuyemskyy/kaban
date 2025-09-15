@@ -12,7 +12,8 @@
 
 class Engine {
    public:
-    void setPosition(const std::string& fen) { m_position.setPosition(fen); }
+    void newGame() { m_position.fromFen(); }
+    void setPosition(const std::string& fen) { m_position.fromFen(fen); }
 
     uint64_t perft(int depth) { return 0; /*m_position.perft(depth);*/ }
 

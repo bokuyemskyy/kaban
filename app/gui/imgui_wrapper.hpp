@@ -37,12 +37,12 @@ class ImGuiWrapper {
 
     [[nodiscard]] Dimensions<int> dimensions() const;
 
-    void begin_frame();
-    void finish_frame();
+    void beginFrame();
+    void finishFrame();
 
     [[nodiscard]] ImGuiIO &io() const { return ImGui::GetIO(); }
 
-    void keep_window_in_bounds(const char *windowName) const;
+    void keepWindowInBounds(const char *windowName) const;
 
    private:
     GLFWwindow *m_window{nullptr};

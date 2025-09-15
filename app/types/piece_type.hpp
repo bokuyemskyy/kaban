@@ -1,9 +1,13 @@
 #pragma once
 
 #include <array>
+#include <cassert>
 #include <cctype>
 #include <cstdint>
+#include <span>
 
+#include "color.hpp"
+#include "direction.hpp"
 #include "strong_value.hpp"
 
 class PieceType : public StrongValue<PieceType, uint8_t> {
@@ -21,6 +25,47 @@ class PieceType : public StrongValue<PieceType, uint8_t> {
         return PieceType();
     }
     [[nodiscard]] constexpr char toChar() const { return chars[m_value]; }
+
+    constexpr std::span<const Direction> directions(Color color) const {
+        assert(value() == PAWN);
+
+        static constexpr std::array<Direction, 2> WHITE_PAWN_DIRECTIONS = {Directions::NW, Directions::NE};
+        static constexpr std::array<Direction, 2> BLACK_PAWN_DIRECTIONS = {Directions::SE, Directions::SW};
+
+        return color == Colors::WHITE ? WHITE_PAWN_DIRECTIONS : BLACK_PAWN_DIRECTIONS;
+    }
+
+    constexpr std::span<const Direction> directions() const {
+        assert(value() != PAWN);
+
+        static constexpr std::array<Direction, 8> KNIGHT_DIRECTIONS = {
+            Directions::NNE, Directions::NNW, Directions::ENE, Directions::WNW,
+            Directions::SSE, Directions::SSW, Directions::ESE, Directions::WSW};
+        static constexpr std::array<Direction, 4> BISHOP_DIRECTIONS = {Directions::NE, Directions::NW, Directions::SE,
+                                                                       Directions::SW};
+        static constexpr std::array<Direction, 4> ROOK_DIRECTIONS   = {Directions::N, Directions::S, Directions::E,
+                                                                       Directions::W};
+        static constexpr std::array<Direction, 8> QUEEN_DIRECTIONS  = {Directions::N,  Directions::S,  Directions::E,
+                                                                       Directions::W,  Directions::NE, Directions::NW,
+                                                                       Directions::SE, Directions::SW};
+        static constexpr std::array<Direction, 8> KING_DIRECTIONS   = {Directions::N,  Directions::S,  Directions::E,
+                                                                       Directions::W,  Directions::NE, Directions::NW,
+                                                                       Directions::SE, Directions::SW};
+
+        switch (value()) {
+            case KNIGHT:
+                return KNIGHT_DIRECTIONS;
+            case BISHOP:
+                return BISHOP_DIRECTIONS;
+            case ROOK:
+                return ROOK_DIRECTIONS;
+            case QUEEN:
+                return QUEEN_DIRECTIONS;
+            case KING:
+            default:
+                return KING_DIRECTIONS;
+        }
+    }
 
    private:
     static constexpr std::array<char, 6> chars = {'p', 'n', 'b', 'r', 'q', 'k'};

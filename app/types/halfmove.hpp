@@ -21,5 +21,5 @@ class Halfmove : public StrongValue<Halfmove, uint8_t> {
         return *this;
     }
 
-    [[nodiscard]] constexpr bool is_draw() const noexcept { return m_value >= 100; }
+    [[nodiscard]] constexpr bool isDraw() const noexcept { return m_value >= 100; }
 };

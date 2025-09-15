@@ -52,13 +52,13 @@ ImGuiWrapper::~ImGuiWrapper() noexcept {
     ImGui::DestroyContext();
 }
 
-void ImGuiWrapper::begin_frame() {
+void ImGuiWrapper::beginFrame() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 }
 
-void ImGuiWrapper::finish_frame() {
+void ImGuiWrapper::finishFrame() {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -68,7 +68,7 @@ Dimensions<int> ImGuiWrapper::dimensions() const {
     return Dimensions{static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y)};
 }
 
-void ImGuiWrapper::keep_window_in_bounds(const char *windowName) const {
+void ImGuiWrapper::keepWindowInBounds(const char *windowName) const {
     ImGuiWindow *window = ImGui::FindWindowByName(windowName);
 
     auto   frame_dimensions = dimensions();

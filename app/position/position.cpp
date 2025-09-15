@@ -16,7 +16,7 @@
 #include "square.hpp"
 #include "undo_info.hpp"
 
-void Position::setPosition(const std::string &fen) {
+void Position::fromFen(const std::string &fen) {
     for (Square square : Squares::all()) {
         unset(square);
     }
