@@ -12,7 +12,9 @@ class Halfmove : public StrongValue<Halfmove, uint8_t> {
     static constexpr ValueType bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
 
     constexpr Halfmove& operator++() noexcept {
-        ++m_value;
+        if (m_value < 100) {
+            ++m_value;
+        }
         return *this;
     }
 

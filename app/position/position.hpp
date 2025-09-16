@@ -1,5 +1,9 @@
 #pragma once
 
+#include <chrono>
+#include <cmath>
+#include <iostream>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -12,6 +16,7 @@
 #include "halfmove.hpp"
 #include "magic.hpp"
 #include "move.hpp"
+#include "move_flag.hpp"
 #include "piece.hpp"
 #include "piece_type.hpp"
 #include "square.hpp"
@@ -49,49 +54,107 @@ class Position {
     [[nodiscard]] bool isLegal() const;
 
     template <GenerationType GT>
-    std::vector<Move> generateMoves() const {
-        std::vector<Move> moves{};
+    std::vector<Move> generateMoves() {
+        if constexpr (GT == GenerationType::ALL) {
+            std::vector<Move> moves{};
+            if (m_stm == Colors::WHITE)
+                generatePawnMoves<Colors::WHITE>(occupancy<Side::US>(PieceTypes::PAWN), moves);
+            else
+                generatePawnMoves<Colors::BLACK>(occupancy<Side::US>(PieceTypes::PAWN), moves);
 
-        if (m_stm == Colors::WHITE)
-            generatePawnMoves<Colors::WHITE>(occupancy<Side::US>(PieceTypes::PAWN), moves);
-        else
-            generatePawnMoves<Colors::BLACK>(occupancy<Side::US>(PieceTypes::PAWN), moves);
-
-        generatePieceMoves<PieceTypes::KNIGHT>(occupancy<Side::US>(PieceTypes::KNIGHT), moves);
-        generatePieceMoves<PieceTypes::BISHOP>(occupancy<Side::US>(PieceTypes::BISHOP), moves);
-        generatePieceMoves<PieceTypes::ROOK>(occupancy<Side::US>(PieceTypes::ROOK), moves);
-        generatePieceMoves<PieceTypes::QUEEN>(occupancy<Side::US>(PieceTypes::QUEEN), moves);
-        generatePieceMoves<PieceTypes::KING>(occupancy<Side::US>(PieceTypes::KING), moves);
-
-        return moves;
-    }
+            generatePieceMoves<PieceTypes::KNIGHT>(occupancy<Side::US>(PieceTypes::KNIGHT), moves);
+            generatePieceMoves<PieceTypes::BISHOP>(occupancy<Side::US>(PieceTypes::BISHOP), moves);
+            generatePieceMoves<PieceTypes::ROOK>(occupancy<Side::US>(PieceTypes::ROOK), moves);
+            generatePieceMoves<PieceTypes::QUEEN>(occupancy<Side::US>(PieceTypes::QUEEN), moves);
+            generatePieceMoves<PieceTypes::KING>(occupancy<Side::US>(PieceTypes::KING), moves);
+            return moves;
+        } else if constexpr (GT == GenerationType::LEGAL) {
+            std::vector<Move> legal_moves;
+            for (const auto& move : generateMoves<GenerationType::ALL>()) {
+                UndoInfo undo_info = makeMove(move);
+                if (isLegal()) legal_moves.push_back(move);
+                unmakeMove(move, undo_info);
+            }
+            return legal_moves;
+        }
+    };
 
     template <GenerationType GT>
-    std::vector<Move> generateMoves(Square square) const {
-        std::vector<Move> moves{};
-        auto              piece = at(square);
-        if (!piece.hasValue() || piece.color() != m_stm) return moves;
+    std::vector<Move> generateMoves(Square square) {
+        if constexpr (GT == GenerationType::ALL) {
+            std::vector<Move> moves{};
+            auto              piece = at(square);
+            if (!piece.hasValue() || piece.color() != m_stm) return moves;
 
-        auto piece_type = piece.pieceType();
-        auto piece_mask = Bitboard::square(square);
+            auto piece_type = piece.pieceType();
+            auto piece_mask = Bitboard::square(square);
 
-        if (piece_type == PieceTypes::PAWN) {
-            if (m_stm == Colors::WHITE)
-                generatePawnMoves<Colors::WHITE>(occupancy<Side::US>(PieceTypes::PAWN) & piece_mask, moves);
-            else
-                generatePawnMoves<Colors::BLACK>(occupancy<Side::US>(PieceTypes::PAWN) & piece_mask, moves);
-        } else if (piece_type == PieceTypes::KNIGHT) {
-            generatePieceMoves<PieceTypes::KNIGHT>(occupancy<Side::US>(PieceTypes::KNIGHT) & piece_mask, moves);
-        } else if (piece_type == PieceTypes::BISHOP) {
-            generatePieceMoves<PieceTypes::BISHOP>(occupancy<Side::US>(PieceTypes::BISHOP) & piece_mask, moves);
-        } else if (piece_type == PieceTypes::ROOK) {
-            generatePieceMoves<PieceTypes::ROOK>(occupancy<Side::US>(PieceTypes::ROOK) & piece_mask, moves);
-        } else if (piece_type == PieceTypes::QUEEN) {
-            generatePieceMoves<PieceTypes::QUEEN>(occupancy<Side::US>(PieceTypes::QUEEN) & piece_mask, moves);
-        } else if (piece_type == PieceTypes::KING) {
-            generatePieceMoves<PieceTypes::KING>(occupancy<Side::US>(PieceTypes::KING) & piece_mask, moves);
+            if (piece_type == PieceTypes::PAWN) {
+                if (m_stm == Colors::WHITE)
+                    generatePawnMoves<Colors::WHITE>(occupancy<Side::US>(PieceTypes::PAWN) & piece_mask, moves);
+                else
+                    generatePawnMoves<Colors::BLACK>(occupancy<Side::US>(PieceTypes::PAWN) & piece_mask, moves);
+            } else if (piece_type == PieceTypes::KNIGHT) {
+                generatePieceMoves<PieceTypes::KNIGHT>(occupancy<Side::US>(PieceTypes::KNIGHT) & piece_mask, moves);
+            } else if (piece_type == PieceTypes::BISHOP) {
+                generatePieceMoves<PieceTypes::BISHOP>(occupancy<Side::US>(PieceTypes::BISHOP) & piece_mask, moves);
+            } else if (piece_type == PieceTypes::ROOK) {
+                generatePieceMoves<PieceTypes::ROOK>(occupancy<Side::US>(PieceTypes::ROOK) & piece_mask, moves);
+            } else if (piece_type == PieceTypes::QUEEN) {
+                generatePieceMoves<PieceTypes::QUEEN>(occupancy<Side::US>(PieceTypes::QUEEN) & piece_mask, moves);
+            } else if (piece_type == PieceTypes::KING) {
+                generatePieceMoves<PieceTypes::KING>(occupancy<Side::US>(PieceTypes::KING) & piece_mask, moves);
+            }
+            return moves;
+        } else if constexpr (GT == GenerationType::LEGAL) {
+            std::vector<Move> legal_moves;
+            for (const auto& move : generateMoves<GenerationType::ALL>(square)) {
+                UndoInfo undo_info = makeMove(move);
+                if (isLegal()) legal_moves.push_back(move);
+                unmakeMove(move, undo_info);
+            }
+            return legal_moves;
         }
-        return moves;
+    }
+
+    uint64_t perftRoot(int depth) {
+        using Clock = std::chrono::high_resolution_clock;
+        auto start  = Clock::now();
+
+        uint64_t total = 0;
+        for (const auto& move : generateMoves<GenerationType::ALL>()) {
+            UndoInfo undo = makeMove(move);
+            if (isLegal()) {
+                uint64_t nodes = (depth == 1) ? 1 : perft(depth - 1);
+                std::cout << move.from().toString() << move.to().toString() << ": " << nodes << std::endl;
+                total += nodes;
+            }
+            unmakeMove(move, undo);
+        }
+
+        auto                          end     = Clock::now();
+        std::chrono::duration<double> elapsed = end - start;
+        std::cout << "Total nodes: " << total << "\n";
+        std::cout << "Elapsed time: " << elapsed.count() << " seconds\n";
+        std::cout << "Nodes per second: " << std::floor(total / elapsed.count()) << std::endl;
+
+        return total;
+    }
+
+    uint64_t perft(int depth) {
+        uint64_t nodes = 0;
+        for (const auto& move : generateMoves<GenerationType::ALL>()) {
+            UndoInfo undo_info = makeMove(move);
+            if (isLegal()) [[likely]] {
+                if (depth == 1) {
+                    nodes++;
+                } else {
+                    nodes += perft(depth - 1);
+                }
+            }
+            unmakeMove(move, undo_info);
+        }
+        return nodes;
     }
 
     template <Side S>
@@ -161,19 +224,36 @@ class Position {
             Bitboard attacks = pawnAttacks<C>(from) & occupancy<Side::THEM>();
             while (attacks.hasValue()) moves.emplace_back(Move(from, poplsb(attacks)));
 
-            Bitboard push;
-            if constexpr (C == Colors::WHITE) {
-                push = Bitboard::square(from.shifted(Directions::N)) & ~occupancy<Side::BOTH>();
-                if ((from.rank() == Ranks::R2) && push.hasValue()) {
-                    push |= push << Directions::N.value();
-                }
-            } else {
-                push = Bitboard::square(from.shifted(Directions::S)) & ~occupancy<Side::BOTH>();
-                if ((from.rank() == Ranks::R7) && push.hasValue()) {
-                    push |= push >> -Directions::S.value();
+            if (m_en_passant.hasValue()) {
+                if constexpr (C == Colors::WHITE) {
+                    if ((pawnAttacks<C>(from) & Bitboard::square(Square(m_en_passant.file(), Ranks::R6))).hasValue()) {
+                        moves.emplace_back(Move(from, Square(m_en_passant.file(), Ranks::R6), MoveFlags::EN_PASSANT));
+                    }
+                } else {
+                    if ((pawnAttacks<C>(from) & Bitboard::square(Square(m_en_passant.file(), Ranks::R3))).hasValue()) {
+                        moves.emplace_back(Move(from, Square(m_en_passant.file(), Ranks::R3), MoveFlags::EN_PASSANT));
+                    }
                 }
             }
-            while (push.hasValue()) moves.emplace_back(Move(from, poplsb(push)));
+
+            Square single_push = from.shifted(C == Colors::WHITE ? Directions::N : Directions::S);
+            if ((Bitboard::square(single_push) & ~occupancy<Side::BOTH>()).hasValue()) {
+                moves.emplace_back(Move(from, single_push));
+
+                if constexpr (C == Colors::WHITE) {
+                    if (from.rank() == Ranks::R2) {
+                        Square double_push = single_push.shifted(Directions::N);
+                        if ((Bitboard::square(double_push) & ~occupancy<Side::BOTH>()).hasValue())
+                            moves.emplace_back(Move(from, double_push, MoveFlags::PAWN_DOUBLE_PUSH));
+                    }
+                } else {
+                    if (from.rank() == Ranks::R7) {
+                        Square double_push = single_push.shifted(Directions::S);
+                        if ((Bitboard::square(double_push) & ~occupancy<Side::BOTH>()).hasValue())
+                            moves.emplace_back(Move(from, double_push, MoveFlags::PAWN_DOUBLE_PUSH));
+                    }
+                }
+            }
         }
     }
 
@@ -188,7 +268,7 @@ class Position {
         }
     }
 
-    static constexpr auto DEFAULT_FEN       = "rnbqkbnr/pppppppp/8/8/8/5p2/1P3PPP/RNBQKBNR w";
+    static constexpr auto DEFAULT_FEN       = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w";
     static constexpr int  MAX_DEPTH         = 64;
     static constexpr int  MAX_MOVES_PER_POS = 256;
 };

@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 #include <cassert>
+#include <deque>
 #include <iostream>
 #include <ostream>
 #include <sstream>
@@ -46,51 +47,70 @@ class Uci {
     }
 
     void processCommand(const std::string& command) {
-        std::istringstream       iss(command);
-        std::vector<std::string> tokens;
-        std::string              token;
+        std::istringstream      iss(command);
+        std::deque<std::string> tokens;
+        std::string             token;
         while (iss >> token) tokens.push_back(token);
+        if (tokens.empty()) return;
 
-        if (tokens[0] == "uci") {
+        const std::string& cmd = tokens.front();
+        tokens.pop_front();
+
+        if (cmd == "uci") {
             std::cout << "id name " << AppInfo::NAME << " " << AppInfo::VERSION << std::endl;
             std::cout << "id author " << AppInfo::AUTHOR << std::endl;
             std::cout << "uciok\n";
-        } else if (tokens[0] == "isready") {
+        } else if (cmd == "isready") {
             std::cout << "readyok" << std::endl;
-        } else if (tokens[0] == "ucinewgame") {
+        } else if (cmd == "ucinewgame") {
             m_engine.newGame();
-        } else if (tokens[0] == "position") {
-            handlePosition(command);
-        } else if (tokens[0] == "go") {
-            handlePerft(command);
+        } else if (cmd == "position") {
+            positions(tokens);
+        } else if (cmd == "go") {
+            go(tokens);
         } else {
-            std::cout << "Unknown command: \"" << command << "\"." << std::endl;
+            std::cerr << "Unknown command: \"" << command << "\"." << std::endl;
         }
     }
 
-    void handlePosition(const std::string& /*command*/) {
-        /*m_session->applyToAllGames([&](Game& game) {
-            if (command.find("startpos") != std::string::npos) {
-                game.start();
-            } else if (command.find("fen") != std::string::npos) {
-                // to parse fen
-            }
+    void positions(std::deque<std::string>& tokens) {
+        if (tokens.empty()) return;
 
-            size_t movesPos = command.find("moves");
-            if (movesPos != std::string::npos) {
-                std::istringstream iss(command.substr(movesPos + 6));
-                std::string        move;
-
-                while (iss >> move) {
-                    game.do_move(move);
-                }
+        if (tokens.front() == "startpos") {
+            m_engine.newGame();
+            tokens.pop_front();
+        } else if (tokens.front() == "fen") {
+            tokens.pop_front();
+            std::string fen;
+            for (int i = 0; i < 6 && !tokens.empty(); ++i) {
+                fen += tokens.front() + " ";
+                tokens.pop_front();
             }
-        });*/
+            m_engine.fromFen(fen);
+        }
+
+        if (!tokens.empty() && tokens.front() == "moves") {
+            tokens.pop_front();
+            while (!tokens.empty()) {
+                m_engine.makeMove(tokens.front());
+                tokens.pop_front();
+            }
+        }
     }
 
-    void handlePerft(const std::string& /*command*/) {
-        // int depth = std::stoi(command.substr(9));
-        // m_state->applyToCurrentGame([depth](Game& game) { game.perft(depth); });
+    void go(std::deque<std::string>& tokens) {
+        if (tokens.empty()) return;
+
+        if (tokens.front() == "perft") {
+            tokens.pop_front();
+            int depth = 1;
+            if (!tokens.empty()) {
+                depth = std::stoi(tokens.front());
+                tokens.pop_front();
+            }
+            std::cout << "Running perft" << std::endl;
+            m_engine.perft(depth);
+        }
     }
 
     bool m_shouldQuit{false};

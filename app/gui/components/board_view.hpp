@@ -131,26 +131,26 @@ class BoardView : IGuiComponent {
             const float THICKNESS = 0.05f * metrics.squareSize;
             Rect        rect      = selected.normalized_rect().absolute(metrics.size, metrics.size);
 
-            ImVec2 begin(metrics.origin.x + rect.left() + THICKNESS * 0.3f,
-                         metrics.origin.y + rect.top() + THICKNESS * 0.3f);
-            ImVec2 end(metrics.origin.x + rect.right() - THICKNESS * 0.3f,
-                       metrics.origin.y + rect.bottom() - THICKNESS * 0.3f);
+            ImVec2 begin(metrics.origin.x + rect.left() + THICKNESS * 0.25f,
+                         metrics.origin.y + rect.top() + THICKNESS * 0.25f);
+            ImVec2 end(metrics.origin.x + rect.right() - THICKNESS * 0.25f,
+                       metrics.origin.y + rect.bottom() - THICKNESS * 0.25f);
 
             drawList->AddRect(begin, end, IM_WHITE, 0.0f, 0, THICKNESS);
 
             for (const auto& move : m_ctx.engine.moves(selected)) {
-                Rect rect = move.to().normalized_rect().absolute(metrics.size, metrics.size);
+                Rect move_rect = move.to().normalized_rect().absolute(metrics.size, metrics.size);
 
-                ImVec2 begin(metrics.origin.x + rect.left(), metrics.origin.y + rect.top());
-                ImVec2 end(metrics.origin.x + rect.right(), metrics.origin.y + rect.bottom());
+                ImVec2 move_begin(metrics.origin.x + move_rect.left(), metrics.origin.y + move_rect.top());
+                ImVec2 move_end(metrics.origin.x + move_rect.right(), metrics.origin.y + move_rect.bottom());
 
-                ImVec2 center((begin.x + end.x) * 0.5f, (begin.y + end.y) * 0.5f);
+                ImVec2 center((move_begin.x + move_end.x) * 0.5f, (move_begin.y + move_end.y) * 0.5f);
 
                 if (m_ctx.engine.at(move.to()) == Pieces::NONE) {
-                    float radius = 0.08f * (end.x - begin.x);
+                    float radius = 0.08f * (move_end.x - move_begin.x);
                     drawList->AddCircleFilled(center, radius, IM_WHITE, 32);
                 } else {
-                    float radius = 0.5f * (end.x - begin.x) - THICKNESS * 0.3f;
+                    float radius = 0.5f * (move_end.x - move_begin.x) - THICKNESS * 0.25f;
                     drawList->AddCircle(center, radius, IM_REDDISH, 32, THICKNESS);
                 }
             }

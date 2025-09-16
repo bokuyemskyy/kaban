@@ -16,7 +16,7 @@
     }
   ],
   "buildPresets": [
-    { "name": "debug",   "configurePreset": "default", "configuration": "Debug"   },
-    { "name": "release", "configurePreset": "default", "configuration": "Release" }
+    { "name": "release", "configurePreset": "default", "configuration": "Release" },
+    { "name": "debug",   "configurePreset": "default", "configuration": "Debug"   }
   ]
 }
