@@ -17,13 +17,10 @@ class UndoInfo : public StrongValue<UndoInfo, uint32_t> {
                       static_cast<uint32_t>(en_passant.value()) << EN_PASSANT_SHIFT |
                       static_cast<uint32_t>(halfmove.value()) << HALFMOVE_SHIFT) {}
 
-    [[nodiscard]] constexpr Castling castling() const { return Castling(m_value >> CASTLING_SHIFT); }
-
-    [[nodiscard]] constexpr EnPassant enPassant() const { return EnPassant(m_value >> EN_PASSANT_SHIFT); }
-
-    [[nodiscard]] constexpr Halfmove halfmove() const { return Halfmove(m_value >> HALFMOVE_SHIFT); }
-
-    [[nodiscard]] constexpr Piece captured() const { return Piece(m_value >> CAPTURED_SHIFT); }
+    constexpr Castling  castling() const { return Castling((m_value >> CASTLING_SHIFT) & Castling::bitmask()); }
+    constexpr EnPassant enPassant() const { return EnPassant((m_value >> EN_PASSANT_SHIFT) & EnPassant::bitmask()); }
+    constexpr Halfmove  halfmove() const { return Halfmove((m_value >> HALFMOVE_SHIFT) & Halfmove::bitmask()); }
+    constexpr Piece     captured() const { return Piece((m_value >> CAPTURED_SHIFT) & Piece::bitmask()); }
 
     constexpr void setCaptured(Piece captured) { m_value |= (captured.value() << CAPTURED_SHIFT); }
 

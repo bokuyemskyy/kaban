@@ -10,6 +10,10 @@
 /build/
 /out/
 
+######## PROFILER ######## 
+perf.data
+perf.data.old
+
 ######## CLANG ########
 /.cache/
 

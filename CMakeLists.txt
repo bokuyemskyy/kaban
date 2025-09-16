@@ -19,15 +19,15 @@ endforeach()
 
 # compile options for code clarity 
 add_compile_options(
-   #-Wall
-    #-Werror
-    #-Wextra
-    #-Wundef
-    #-Wunused
-    #-Weffc++
-    #-Wshadow
-    #-Wformat
-    #-Wcomment
+    -Wall
+    -Werror
+    -Wextra
+    -Wundef
+    -Wunused
+    -Weffc++
+    -Wshadow
+    -Wformat
+    -Wcomment
     #-Wpedantic
     #-Wnarrowing
     #-Wcast-align
