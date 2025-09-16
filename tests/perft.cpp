@@ -6,7 +6,7 @@
 
 TEST(Perft, PerftMicroset) {
     Engine engine;
-    engine.setPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w");
+    engine.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w");
     EXPECT_EQ(engine.perft(1), 20);
     EXPECT_EQ(engine.perft(2), 400);
     EXPECT_EQ(engine.perft(3), 8902);
@@ -14,11 +14,11 @@ TEST(Perft, PerftMicroset) {
 
 TEST(Perft, PerftMegaset) {
     Engine engine;
-    engine.setPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+    engine.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
     EXPECT_EQ(engine.perft(4), 197281);
     EXPECT_EQ(engine.perft(6), 119060324);
 
-    engine.setPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    engine.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     EXPECT_EQ(engine.perft(1), 20);
     EXPECT_EQ(engine.perft(2), 400);
     EXPECT_EQ(engine.perft(3), 8902);
@@ -26,14 +26,14 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4865609);
     EXPECT_EQ(engine.perft(6), 119060324);
 
-    engine.setPosition("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+    engine.fromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
     EXPECT_EQ(engine.perft(1), 48);
     EXPECT_EQ(engine.perft(2), 2039);
     EXPECT_EQ(engine.perft(3), 97862);
     EXPECT_EQ(engine.perft(4), 4085603);
     EXPECT_EQ(engine.perft(5), 193690690);
 
-    engine.setPosition("4k3/8/8/8/8/8/8/4K2R w K - 0 1");
+    engine.fromFen("4k3/8/8/8/8/8/8/4K2R w K - 0 1");
     EXPECT_EQ(engine.perft(1), 15);
     EXPECT_EQ(engine.perft(2), 66);
     EXPECT_EQ(engine.perft(3), 1197);
@@ -41,7 +41,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 133987);
     EXPECT_EQ(engine.perft(6), 764643);
 
-    engine.setPosition("4k3/8/8/8/8/8/8/R3K3 w Q - 0 1");
+    engine.fromFen("4k3/8/8/8/8/8/8/R3K3 w Q - 0 1");
     EXPECT_EQ(engine.perft(1), 16);
     EXPECT_EQ(engine.perft(2), 71);
     EXPECT_EQ(engine.perft(3), 1287);
@@ -49,7 +49,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 145232);
     EXPECT_EQ(engine.perft(6), 846648);
 
-    engine.setPosition("4k2r/8/8/8/8/8/8/4K3 w k - 0 1");
+    engine.fromFen("4k2r/8/8/8/8/8/8/4K3 w k - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 75);
     EXPECT_EQ(engine.perft(3), 459);
@@ -57,7 +57,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 47635);
     EXPECT_EQ(engine.perft(6), 899442);
 
-    engine.setPosition("r3k3/8/8/8/8/8/8/4K3 w q - 0 1");
+    engine.fromFen("r3k3/8/8/8/8/8/8/4K3 w q - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 80);
     EXPECT_EQ(engine.perft(3), 493);
@@ -65,7 +65,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 52710);
     EXPECT_EQ(engine.perft(6), 1001523);
 
-    engine.setPosition("4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1");
+    engine.fromFen("4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1");
     EXPECT_EQ(engine.perft(1), 26);
     EXPECT_EQ(engine.perft(2), 112);
     EXPECT_EQ(engine.perft(3), 3189);
@@ -73,7 +73,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 532933);
     EXPECT_EQ(engine.perft(6), 2788982);
 
-    engine.setPosition("r3k2r/8/8/8/8/8/8/4K3 w kq - 0 1");
+    engine.fromFen("r3k2r/8/8/8/8/8/8/4K3 w kq - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 130);
     EXPECT_EQ(engine.perft(3), 782);
@@ -81,7 +81,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 118882);
     EXPECT_EQ(engine.perft(6), 3517770);
 
-    engine.setPosition("8/8/8/8/8/8/6k1/4K2R w K - 0 1");
+    engine.fromFen("8/8/8/8/8/8/6k1/4K2R w K - 0 1");
     EXPECT_EQ(engine.perft(1), 12);
     EXPECT_EQ(engine.perft(2), 38);
     EXPECT_EQ(engine.perft(3), 564);
@@ -89,7 +89,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 37735);
     EXPECT_EQ(engine.perft(6), 185867);
 
-    engine.setPosition("8/8/8/8/8/8/1k6/R3K3 w Q - 0 1");
+    engine.fromFen("8/8/8/8/8/8/1k6/R3K3 w Q - 0 1");
     EXPECT_EQ(engine.perft(1), 15);
     EXPECT_EQ(engine.perft(2), 65);
     EXPECT_EQ(engine.perft(3), 1018);
@@ -97,7 +97,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 80619);
     EXPECT_EQ(engine.perft(6), 413018);
 
-    engine.setPosition("4k2r/6K1/8/8/8/8/8/8 w k - 0 1");
+    engine.fromFen("4k2r/6K1/8/8/8/8/8/8 w k - 0 1");
     EXPECT_EQ(engine.perft(1), 3);
     EXPECT_EQ(engine.perft(2), 32);
     EXPECT_EQ(engine.perft(3), 134);
@@ -105,7 +105,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 10485);
     EXPECT_EQ(engine.perft(6), 179869);
 
-    engine.setPosition("r3k3/1K6/8/8/8/8/8/8 w q - 0 1");
+    engine.fromFen("r3k3/1K6/8/8/8/8/8/8 w q - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 49);
     EXPECT_EQ(engine.perft(3), 243);
@@ -113,7 +113,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 20780);
     EXPECT_EQ(engine.perft(6), 367724);
 
-    engine.setPosition("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
+    engine.fromFen("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
     EXPECT_EQ(engine.perft(1), 26);
     EXPECT_EQ(engine.perft(2), 568);
     EXPECT_EQ(engine.perft(3), 13744);
@@ -121,7 +121,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7594526);
     EXPECT_EQ(engine.perft(6), 179862938);
 
-    engine.setPosition("r3k2r/8/8/8/8/8/8/1R2K2R w Kkq - 0 1");
+    engine.fromFen("r3k2r/8/8/8/8/8/8/1R2K2R w Kkq - 0 1");
     EXPECT_EQ(engine.perft(1), 25);
     EXPECT_EQ(engine.perft(2), 567);
     EXPECT_EQ(engine.perft(3), 14095);
@@ -129,7 +129,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 8153719);
     EXPECT_EQ(engine.perft(6), 195629489);
 
-    engine.setPosition("r3k2r/8/8/8/8/8/8/2R1K2R w Kkq - 0 1");
+    engine.fromFen("r3k2r/8/8/8/8/8/8/2R1K2R w Kkq - 0 1");
     EXPECT_EQ(engine.perft(1), 25);
     EXPECT_EQ(engine.perft(2), 548);
     EXPECT_EQ(engine.perft(3), 13502);
@@ -137,7 +137,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7736373);
     EXPECT_EQ(engine.perft(6), 184411439);
 
-    engine.setPosition("r3k2r/8/8/8/8/8/8/R3K1R1 w Qkq - 0 1");
+    engine.fromFen("r3k2r/8/8/8/8/8/8/R3K1R1 w Qkq - 0 1");
     EXPECT_EQ(engine.perft(1), 25);
     EXPECT_EQ(engine.perft(2), 547);
     EXPECT_EQ(engine.perft(3), 13579);
@@ -145,7 +145,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7878456);
     EXPECT_EQ(engine.perft(6), 189224276);
 
-    engine.setPosition("1r2k2r/8/8/8/8/8/8/R3K2R w KQk - 0 1");
+    engine.fromFen("1r2k2r/8/8/8/8/8/8/R3K2R w KQk - 0 1");
     EXPECT_EQ(engine.perft(1), 26);
     EXPECT_EQ(engine.perft(2), 583);
     EXPECT_EQ(engine.perft(3), 14252);
@@ -153,7 +153,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 8198901);
     EXPECT_EQ(engine.perft(6), 198328929);
 
-    engine.setPosition("2r1k2r/8/8/8/8/8/8/R3K2R w KQk - 0 1");
+    engine.fromFen("2r1k2r/8/8/8/8/8/8/R3K2R w KQk - 0 1");
     EXPECT_EQ(engine.perft(1), 25);
     EXPECT_EQ(engine.perft(2), 560);
     EXPECT_EQ(engine.perft(3), 13592);
@@ -161,7 +161,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7710115);
     EXPECT_EQ(engine.perft(6), 185959088);
 
-    engine.setPosition("r3k1r1/8/8/8/8/8/8/R3K2R w KQq - 0 1");
+    engine.fromFen("r3k1r1/8/8/8/8/8/8/R3K2R w KQq - 0 1");
     EXPECT_EQ(engine.perft(1), 25);
     EXPECT_EQ(engine.perft(2), 560);
     EXPECT_EQ(engine.perft(3), 13607);
@@ -169,7 +169,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7848606);
     EXPECT_EQ(engine.perft(6), 190755813);
 
-    engine.setPosition("4k3/8/8/8/8/8/8/4K2R b K - 0 1");
+    engine.fromFen("4k3/8/8/8/8/8/8/4K2R b K - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 75);
     EXPECT_EQ(engine.perft(3), 459);
@@ -177,7 +177,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 47635);
     EXPECT_EQ(engine.perft(6), 899442);
 
-    engine.setPosition("4k3/8/8/8/8/8/8/R3K3 b Q - 0 1");
+    engine.fromFen("4k3/8/8/8/8/8/8/R3K3 b Q - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 80);
     EXPECT_EQ(engine.perft(3), 493);
@@ -185,7 +185,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 52710);
     EXPECT_EQ(engine.perft(6), 1001523);
 
-    engine.setPosition("4k2r/8/8/8/8/8/8/4K3 b k - 0 1");
+    engine.fromFen("4k2r/8/8/8/8/8/8/4K3 b k - 0 1");
     EXPECT_EQ(engine.perft(1), 15);
     EXPECT_EQ(engine.perft(2), 66);
     EXPECT_EQ(engine.perft(3), 1197);
@@ -193,7 +193,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 133987);
     EXPECT_EQ(engine.perft(6), 764643);
 
-    engine.setPosition("r3k3/8/8/8/8/8/8/4K3 b q - 0 1");
+    engine.fromFen("r3k3/8/8/8/8/8/8/4K3 b q - 0 1");
     EXPECT_EQ(engine.perft(1), 16);
     EXPECT_EQ(engine.perft(2), 71);
     EXPECT_EQ(engine.perft(3), 1287);
@@ -201,7 +201,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 145232);
     EXPECT_EQ(engine.perft(6), 846648);
 
-    engine.setPosition("4k3/8/8/8/8/8/8/R3K2R b KQ - 0 1");
+    engine.fromFen("4k3/8/8/8/8/8/8/R3K2R b KQ - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 130);
     EXPECT_EQ(engine.perft(3), 782);
@@ -209,7 +209,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 118882);
     EXPECT_EQ(engine.perft(6), 3517770);
 
-    engine.setPosition("r3k2r/8/8/8/8/8/8/4K3 b kq - 0 1");
+    engine.fromFen("r3k2r/8/8/8/8/8/8/4K3 b kq - 0 1");
     EXPECT_EQ(engine.perft(1), 26);
     EXPECT_EQ(engine.perft(2), 112);
     EXPECT_EQ(engine.perft(3), 3189);
@@ -217,7 +217,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 532933);
     EXPECT_EQ(engine.perft(6), 2788982);
 
-    engine.setPosition("8/8/8/8/8/8/6k1/4K2R b K - 0 1");
+    engine.fromFen("8/8/8/8/8/8/6k1/4K2R b K - 0 1");
     EXPECT_EQ(engine.perft(1), 3);
     EXPECT_EQ(engine.perft(2), 32);
     EXPECT_EQ(engine.perft(3), 134);
@@ -225,7 +225,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 10485);
     EXPECT_EQ(engine.perft(6), 179869);
 
-    engine.setPosition("8/8/8/8/8/8/1k6/R3K3 b Q - 0 1");
+    engine.fromFen("8/8/8/8/8/8/1k6/R3K3 b Q - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 49);
     EXPECT_EQ(engine.perft(3), 243);
@@ -233,7 +233,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 20780);
     EXPECT_EQ(engine.perft(6), 367724);
 
-    engine.setPosition("4k2r/6K1/8/8/8/8/8/8 b k - 0 1");
+    engine.fromFen("4k2r/6K1/8/8/8/8/8/8 b k - 0 1");
     EXPECT_EQ(engine.perft(1), 12);
     EXPECT_EQ(engine.perft(2), 38);
     EXPECT_EQ(engine.perft(3), 564);
@@ -241,7 +241,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 37735);
     EXPECT_EQ(engine.perft(6), 185867);
 
-    engine.setPosition("r3k3/1K6/8/8/8/8/8/8 b q - 0 1");
+    engine.fromFen("r3k3/1K6/8/8/8/8/8/8 b q - 0 1");
     EXPECT_EQ(engine.perft(1), 15);
     EXPECT_EQ(engine.perft(2), 65);
     EXPECT_EQ(engine.perft(3), 1018);
@@ -249,7 +249,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 80619);
     EXPECT_EQ(engine.perft(6), 413018);
 
-    engine.setPosition("r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 0 1");
+    engine.fromFen("r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 0 1");
     EXPECT_EQ(engine.perft(1), 26);
     EXPECT_EQ(engine.perft(2), 568);
     EXPECT_EQ(engine.perft(3), 13744);
@@ -257,7 +257,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7594526);
     EXPECT_EQ(engine.perft(6), 179862938);
 
-    engine.setPosition("r3k2r/8/8/8/8/8/8/1R2K2R b Kkq - 0 1");
+    engine.fromFen("r3k2r/8/8/8/8/8/8/1R2K2R b Kkq - 0 1");
     EXPECT_EQ(engine.perft(1), 26);
     EXPECT_EQ(engine.perft(2), 583);
     EXPECT_EQ(engine.perft(3), 14252);
@@ -265,7 +265,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 8198901);
     EXPECT_EQ(engine.perft(6), 198328929);
 
-    engine.setPosition("r3k2r/8/8/8/8/8/8/2R1K2R b Kkq - 0 1");
+    engine.fromFen("r3k2r/8/8/8/8/8/8/2R1K2R b Kkq - 0 1");
     EXPECT_EQ(engine.perft(1), 25);
     EXPECT_EQ(engine.perft(2), 560);
     EXPECT_EQ(engine.perft(3), 13592);
@@ -273,7 +273,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7710115);
     EXPECT_EQ(engine.perft(6), 185959088);
 
-    engine.setPosition("r3k2r/8/8/8/8/8/8/R3K1R1 b Qkq - 0 1");
+    engine.fromFen("r3k2r/8/8/8/8/8/8/R3K1R1 b Qkq - 0 1");
     EXPECT_EQ(engine.perft(1), 25);
     EXPECT_EQ(engine.perft(2), 560);
     EXPECT_EQ(engine.perft(3), 13607);
@@ -281,7 +281,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7848606);
     EXPECT_EQ(engine.perft(6), 190755813);
 
-    engine.setPosition("1r2k2r/8/8/8/8/8/8/R3K2R b KQk - 0 1");
+    engine.fromFen("1r2k2r/8/8/8/8/8/8/R3K2R b KQk - 0 1");
     EXPECT_EQ(engine.perft(1), 25);
     EXPECT_EQ(engine.perft(2), 567);
     EXPECT_EQ(engine.perft(3), 14095);
@@ -289,7 +289,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 8153719);
     EXPECT_EQ(engine.perft(6), 195629489);
 
-    engine.setPosition("2r1k2r/8/8/8/8/8/8/R3K2R b KQk - 0 1");
+    engine.fromFen("2r1k2r/8/8/8/8/8/8/R3K2R b KQk - 0 1");
     EXPECT_EQ(engine.perft(1), 25);
     EXPECT_EQ(engine.perft(2), 548);
     EXPECT_EQ(engine.perft(3), 13502);
@@ -297,7 +297,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7736373);
     EXPECT_EQ(engine.perft(6), 184411439);
 
-    engine.setPosition("r3k1r1/8/8/8/8/8/8/R3K2R b KQq - 0 1");
+    engine.fromFen("r3k1r1/8/8/8/8/8/8/R3K2R b KQq - 0 1");
     EXPECT_EQ(engine.perft(1), 25);
     EXPECT_EQ(engine.perft(2), 547);
     EXPECT_EQ(engine.perft(3), 13579);
@@ -305,7 +305,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7878456);
     EXPECT_EQ(engine.perft(6), 189224276);
 
-    engine.setPosition("8/1n4N1/2k5/8/8/5K2/1N4n1/8 w - - 0 1");
+    engine.fromFen("8/1n4N1/2k5/8/8/5K2/1N4n1/8 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 14);
     EXPECT_EQ(engine.perft(2), 195);
     EXPECT_EQ(engine.perft(3), 2760);
@@ -313,7 +313,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 570726);
     EXPECT_EQ(engine.perft(6), 8107539);
 
-    engine.setPosition("8/1k6/8/5N2/8/4n3/8/2K5 w - - 0 1");
+    engine.fromFen("8/1k6/8/5N2/8/4n3/8/2K5 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 11);
     EXPECT_EQ(engine.perft(2), 156);
     EXPECT_EQ(engine.perft(3), 1636);
@@ -321,7 +321,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 223507);
     EXPECT_EQ(engine.perft(6), 2594412);
 
-    engine.setPosition("8/8/4k3/3Nn3/3nN3/4K3/8/8 w - - 0 1");
+    engine.fromFen("8/8/4k3/3Nn3/3nN3/4K3/8/8 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 19);
     EXPECT_EQ(engine.perft(2), 289);
     EXPECT_EQ(engine.perft(3), 4442);
@@ -329,7 +329,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1198299);
     EXPECT_EQ(engine.perft(6), 19870403);
 
-    engine.setPosition("K7/8/2n5/1n6/8/8/8/k6N w - - 0 1");
+    engine.fromFen("K7/8/2n5/1n6/8/8/8/k6N w - - 0 1");
     EXPECT_EQ(engine.perft(1), 3);
     EXPECT_EQ(engine.perft(2), 51);
     EXPECT_EQ(engine.perft(3), 345);
@@ -337,7 +337,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 38348);
     EXPECT_EQ(engine.perft(6), 588695);
 
-    engine.setPosition("k7/8/2N5/1N6/8/8/8/K6n w - - 0 1");
+    engine.fromFen("k7/8/2N5/1N6/8/8/8/K6n w - - 0 1");
     EXPECT_EQ(engine.perft(1), 17);
     EXPECT_EQ(engine.perft(2), 54);
     EXPECT_EQ(engine.perft(3), 835);
@@ -345,7 +345,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 92250);
     EXPECT_EQ(engine.perft(6), 688780);
 
-    engine.setPosition("8/1n4N1/2k5/8/8/5K2/1N4n1/8 b - - 0 1");
+    engine.fromFen("8/1n4N1/2k5/8/8/5K2/1N4n1/8 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 15);
     EXPECT_EQ(engine.perft(2), 193);
     EXPECT_EQ(engine.perft(3), 2816);
@@ -353,7 +353,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 582642);
     EXPECT_EQ(engine.perft(6), 8503277);
 
-    engine.setPosition("8/1k6/8/5N2/8/4n3/8/2K5 b - - 0 1");
+    engine.fromFen("8/1k6/8/5N2/8/4n3/8/2K5 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 16);
     EXPECT_EQ(engine.perft(2), 180);
     EXPECT_EQ(engine.perft(3), 2290);
@@ -361,7 +361,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 288141);
     EXPECT_EQ(engine.perft(6), 3147566);
 
-    engine.setPosition("8/8/3K4/3Nn3/3nN3/4k3/8/8 b - - 0 1");
+    engine.fromFen("8/8/3K4/3Nn3/3nN3/4k3/8/8 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 68);
     EXPECT_EQ(engine.perft(3), 1118);
@@ -369,7 +369,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 281190);
     EXPECT_EQ(engine.perft(6), 4405103);
 
-    engine.setPosition("K7/8/2n5/1n6/8/8/8/k6N b - - 0 1");
+    engine.fromFen("K7/8/2n5/1n6/8/8/8/k6N b - - 0 1");
     EXPECT_EQ(engine.perft(1), 17);
     EXPECT_EQ(engine.perft(2), 54);
     EXPECT_EQ(engine.perft(3), 835);
@@ -377,7 +377,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 92250);
     EXPECT_EQ(engine.perft(6), 688780);
 
-    engine.setPosition("k7/8/2N5/1N6/8/8/8/K6n b - - 0 1");
+    engine.fromFen("k7/8/2N5/1N6/8/8/8/K6n b - - 0 1");
     EXPECT_EQ(engine.perft(1), 3);
     EXPECT_EQ(engine.perft(2), 51);
     EXPECT_EQ(engine.perft(3), 345);
@@ -385,7 +385,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 38348);
     EXPECT_EQ(engine.perft(6), 588695);
 
-    engine.setPosition("B6b/8/8/8/2K5/4k3/8/b6B w - - 0 1");
+    engine.fromFen("B6b/8/8/8/2K5/4k3/8/b6B w - - 0 1");
     EXPECT_EQ(engine.perft(1), 17);
     EXPECT_EQ(engine.perft(2), 278);
     EXPECT_EQ(engine.perft(3), 4607);
@@ -393,7 +393,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1320507);
     EXPECT_EQ(engine.perft(6), 22823890);
 
-    engine.setPosition("8/8/1B6/7b/7k/8/2B1b3/7K w - - 0 1");
+    engine.fromFen("8/8/1B6/7b/7k/8/2B1b3/7K w - - 0 1");
     EXPECT_EQ(engine.perft(1), 21);
     EXPECT_EQ(engine.perft(2), 316);
     EXPECT_EQ(engine.perft(3), 5744);
@@ -401,7 +401,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1713368);
     EXPECT_EQ(engine.perft(6), 28861171);
 
-    engine.setPosition("k7/B7/1B6/1B6/8/8/8/K6b w - - 0 1");
+    engine.fromFen("k7/B7/1B6/1B6/8/8/8/K6b w - - 0 1");
     EXPECT_EQ(engine.perft(1), 21);
     EXPECT_EQ(engine.perft(2), 144);
     EXPECT_EQ(engine.perft(3), 3242);
@@ -409,7 +409,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 787524);
     EXPECT_EQ(engine.perft(6), 7881673);
 
-    engine.setPosition("K7/b7/1b6/1b6/8/8/8/k6B w - - 0 1");
+    engine.fromFen("K7/b7/1b6/1b6/8/8/8/k6B w - - 0 1");
     EXPECT_EQ(engine.perft(1), 7);
     EXPECT_EQ(engine.perft(2), 143);
     EXPECT_EQ(engine.perft(3), 1416);
@@ -417,7 +417,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 310862);
     EXPECT_EQ(engine.perft(6), 7382896);
 
-    engine.setPosition("B6b/8/8/8/2K5/5k2/8/b6B b - - 0 1");
+    engine.fromFen("B6b/8/8/8/2K5/5k2/8/b6B b - - 0 1");
     EXPECT_EQ(engine.perft(1), 6);
     EXPECT_EQ(engine.perft(2), 106);
     EXPECT_EQ(engine.perft(3), 1829);
@@ -425,7 +425,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 530585);
     EXPECT_EQ(engine.perft(6), 9250746);
 
-    engine.setPosition("8/8/1B6/7b/7k/8/2B1b3/7K b - - 0 1");
+    engine.fromFen("8/8/1B6/7b/7k/8/2B1b3/7K b - - 0 1");
     EXPECT_EQ(engine.perft(1), 17);
     EXPECT_EQ(engine.perft(2), 309);
     EXPECT_EQ(engine.perft(3), 5133);
@@ -433,7 +433,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1591064);
     EXPECT_EQ(engine.perft(6), 29027891);
 
-    engine.setPosition("k7/B7/1B6/1B6/8/8/8/K6b b - - 0 1");
+    engine.fromFen("k7/B7/1B6/1B6/8/8/8/K6b b - - 0 1");
     EXPECT_EQ(engine.perft(1), 7);
     EXPECT_EQ(engine.perft(2), 143);
     EXPECT_EQ(engine.perft(3), 1416);
@@ -441,7 +441,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 310862);
     EXPECT_EQ(engine.perft(6), 7382896);
 
-    engine.setPosition("K7/b7/1b6/1b6/8/8/8/k6B b - - 0 1");
+    engine.fromFen("K7/b7/1b6/1b6/8/8/8/k6B b - - 0 1");
     EXPECT_EQ(engine.perft(1), 21);
     EXPECT_EQ(engine.perft(2), 144);
     EXPECT_EQ(engine.perft(3), 3242);
@@ -449,7 +449,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 787524);
     EXPECT_EQ(engine.perft(6), 7881673);
 
-    engine.setPosition("7k/RR6/8/8/8/8/rr6/7K w - - 0 1");
+    engine.fromFen("7k/RR6/8/8/8/8/rr6/7K w - - 0 1");
     EXPECT_EQ(engine.perft(1), 19);
     EXPECT_EQ(engine.perft(2), 275);
     EXPECT_EQ(engine.perft(3), 5300);
@@ -457,7 +457,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 2161211);
     EXPECT_EQ(engine.perft(6), 44956585);
 
-    engine.setPosition("R6r/8/8/2K5/5k2/8/8/r6R w - - 0 1");
+    engine.fromFen("R6r/8/8/2K5/5k2/8/8/r6R w - - 0 1");
     EXPECT_EQ(engine.perft(1), 36);
     EXPECT_EQ(engine.perft(2), 1027);
     EXPECT_EQ(engine.perft(3), 29215);
@@ -465,7 +465,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 20506480);
     EXPECT_EQ(engine.perft(6), 525169084);
 
-    engine.setPosition("7k/RR6/8/8/8/8/rr6/7K b - - 0 1");
+    engine.fromFen("7k/RR6/8/8/8/8/rr6/7K b - - 0 1");
     EXPECT_EQ(engine.perft(1), 19);
     EXPECT_EQ(engine.perft(2), 275);
     EXPECT_EQ(engine.perft(3), 5300);
@@ -473,7 +473,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 2161211);
     EXPECT_EQ(engine.perft(6), 44956585);
 
-    engine.setPosition("R6r/8/8/2K5/5k2/8/8/r6R b - - 0 1");
+    engine.fromFen("R6r/8/8/2K5/5k2/8/8/r6R b - - 0 1");
     EXPECT_EQ(engine.perft(1), 36);
     EXPECT_EQ(engine.perft(2), 1027);
     EXPECT_EQ(engine.perft(3), 29227);
@@ -481,7 +481,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 20521342);
     EXPECT_EQ(engine.perft(6), 524966748);
 
-    engine.setPosition("6kq/8/8/8/8/8/8/7K w - - 0 1");
+    engine.fromFen("6kq/8/8/8/8/8/8/7K w - - 0 1");
     EXPECT_EQ(engine.perft(1), 2);
     EXPECT_EQ(engine.perft(2), 36);
     EXPECT_EQ(engine.perft(3), 143);
@@ -489,7 +489,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 14893);
     EXPECT_EQ(engine.perft(6), 391507);
 
-    engine.setPosition("6KQ/8/8/8/8/8/8/7k b - - 0 1");
+    engine.fromFen("6KQ/8/8/8/8/8/8/7k b - - 0 1");
     EXPECT_EQ(engine.perft(1), 2);
     EXPECT_EQ(engine.perft(2), 36);
     EXPECT_EQ(engine.perft(3), 143);
@@ -497,7 +497,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 14893);
     EXPECT_EQ(engine.perft(6), 391507);
 
-    engine.setPosition("K7/8/8/3Q4/4q3/8/8/7k w - - 0 1");
+    engine.fromFen("K7/8/8/3Q4/4q3/8/8/7k w - - 0 1");
     EXPECT_EQ(engine.perft(1), 6);
     EXPECT_EQ(engine.perft(2), 35);
     EXPECT_EQ(engine.perft(3), 495);
@@ -505,7 +505,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 166741);
     EXPECT_EQ(engine.perft(6), 3370175);
 
-    engine.setPosition("6qk/8/8/8/8/8/8/7K b - - 0 1");
+    engine.fromFen("6qk/8/8/8/8/8/8/7K b - - 0 1");
     EXPECT_EQ(engine.perft(1), 22);
     EXPECT_EQ(engine.perft(2), 43);
     EXPECT_EQ(engine.perft(3), 1015);
@@ -513,7 +513,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 105749);
     EXPECT_EQ(engine.perft(6), 419369);
 
-    engine.setPosition("6KQ/8/8/8/8/8/8/7k b - - 0 1");
+    engine.fromFen("6KQ/8/8/8/8/8/8/7k b - - 0 1");
     EXPECT_EQ(engine.perft(1), 2);
     EXPECT_EQ(engine.perft(2), 36);
     EXPECT_EQ(engine.perft(3), 143);
@@ -521,7 +521,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 14893);
     EXPECT_EQ(engine.perft(6), 391507);
 
-    engine.setPosition("K7/8/8/3Q4/4q3/8/8/7k b - - 0 1");
+    engine.fromFen("K7/8/8/3Q4/4q3/8/8/7k b - - 0 1");
     EXPECT_EQ(engine.perft(1), 6);
     EXPECT_EQ(engine.perft(2), 35);
     EXPECT_EQ(engine.perft(3), 495);
@@ -529,7 +529,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 166741);
     EXPECT_EQ(engine.perft(6), 3370175);
 
-    engine.setPosition("8/8/8/8/8/K7/P7/k7 w - - 0 1");
+    engine.fromFen("8/8/8/8/8/K7/P7/k7 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 3);
     EXPECT_EQ(engine.perft(2), 7);
     EXPECT_EQ(engine.perft(3), 43);
@@ -537,7 +537,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1347);
     EXPECT_EQ(engine.perft(6), 6249);
 
-    engine.setPosition("8/8/8/8/8/7K/7P/7k w - - 0 1");
+    engine.fromFen("8/8/8/8/8/7K/7P/7k w - - 0 1");
     EXPECT_EQ(engine.perft(1), 3);
     EXPECT_EQ(engine.perft(2), 7);
     EXPECT_EQ(engine.perft(3), 43);
@@ -545,7 +545,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1347);
     EXPECT_EQ(engine.perft(6), 6249);
 
-    engine.setPosition("K7/p7/k7/8/8/8/8/8 w - - 0 1");
+    engine.fromFen("K7/p7/k7/8/8/8/8/8 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 1);
     EXPECT_EQ(engine.perft(2), 3);
     EXPECT_EQ(engine.perft(3), 12);
@@ -553,7 +553,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 342);
     EXPECT_EQ(engine.perft(6), 2343);
 
-    engine.setPosition("7K/7p/7k/8/8/8/8/8 w - - 0 1");
+    engine.fromFen("7K/7p/7k/8/8/8/8/8 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 1);
     EXPECT_EQ(engine.perft(2), 3);
     EXPECT_EQ(engine.perft(3), 12);
@@ -561,7 +561,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 342);
     EXPECT_EQ(engine.perft(6), 2343);
 
-    engine.setPosition("8/2k1p3/3pP3/3P2K1/8/8/8/8 w - - 0 1");
+    engine.fromFen("8/2k1p3/3pP3/3P2K1/8/8/8/8 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 7);
     EXPECT_EQ(engine.perft(2), 35);
     EXPECT_EQ(engine.perft(3), 210);
@@ -569,7 +569,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7028);
     EXPECT_EQ(engine.perft(6), 34834);
 
-    engine.setPosition("8/8/8/8/8/K7/P7/k7 b - - 0 1");
+    engine.fromFen("8/8/8/8/8/K7/P7/k7 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 1);
     EXPECT_EQ(engine.perft(2), 3);
     EXPECT_EQ(engine.perft(3), 12);
@@ -577,7 +577,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 342);
     EXPECT_EQ(engine.perft(6), 2343);
 
-    engine.setPosition("8/8/8/8/8/7K/7P/7k b - - 0 1");
+    engine.fromFen("8/8/8/8/8/7K/7P/7k b - - 0 1");
     EXPECT_EQ(engine.perft(1), 1);
     EXPECT_EQ(engine.perft(2), 3);
     EXPECT_EQ(engine.perft(3), 12);
@@ -585,7 +585,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 342);
     EXPECT_EQ(engine.perft(6), 2343);
 
-    engine.setPosition("K7/p7/k7/8/8/8/8/8 b - - 0 1");
+    engine.fromFen("K7/p7/k7/8/8/8/8/8 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 3);
     EXPECT_EQ(engine.perft(2), 7);
     EXPECT_EQ(engine.perft(3), 43);
@@ -593,7 +593,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1347);
     EXPECT_EQ(engine.perft(6), 6249);
 
-    engine.setPosition("7K/7p/7k/8/8/8/8/8 b - - 0 1");
+    engine.fromFen("7K/7p/7k/8/8/8/8/8 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 3);
     EXPECT_EQ(engine.perft(2), 7);
     EXPECT_EQ(engine.perft(3), 43);
@@ -601,7 +601,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1347);
     EXPECT_EQ(engine.perft(6), 6249);
 
-    engine.setPosition("8/2k1p3/3pP3/3P2K1/8/8/8/8 b - - 0 1");
+    engine.fromFen("8/2k1p3/3pP3/3P2K1/8/8/8/8 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 35);
     EXPECT_EQ(engine.perft(3), 182);
@@ -609,7 +609,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 5408);
     EXPECT_EQ(engine.perft(6), 34822);
 
-    engine.setPosition("8/8/8/8/8/4k3/4P3/4K3 w - - 0 1");
+    engine.fromFen("8/8/8/8/8/4k3/4P3/4K3 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 2);
     EXPECT_EQ(engine.perft(2), 8);
     EXPECT_EQ(engine.perft(3), 44);
@@ -617,7 +617,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1814);
     EXPECT_EQ(engine.perft(6), 11848);
 
-    engine.setPosition("4k3/4p3/4K3/8/8/8/8/8 b - - 0 1");
+    engine.fromFen("4k3/4p3/4K3/8/8/8/8/8 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 2);
     EXPECT_EQ(engine.perft(2), 8);
     EXPECT_EQ(engine.perft(3), 44);
@@ -625,7 +625,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1814);
     EXPECT_EQ(engine.perft(6), 11848);
 
-    engine.setPosition("8/8/7k/7p/7P/7K/8/8 w - - 0 1");
+    engine.fromFen("8/8/7k/7p/7P/7K/8/8 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 3);
     EXPECT_EQ(engine.perft(2), 9);
     EXPECT_EQ(engine.perft(3), 57);
@@ -633,7 +633,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1969);
     EXPECT_EQ(engine.perft(6), 10724);
 
-    engine.setPosition("8/8/k7/p7/P7/K7/8/8 w - - 0 1");
+    engine.fromFen("8/8/k7/p7/P7/K7/8/8 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 3);
     EXPECT_EQ(engine.perft(2), 9);
     EXPECT_EQ(engine.perft(3), 57);
@@ -641,7 +641,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1969);
     EXPECT_EQ(engine.perft(6), 10724);
 
-    engine.setPosition("8/8/3k4/3p4/3P4/3K4/8/8 w - - 0 1");
+    engine.fromFen("8/8/3k4/3p4/3P4/3K4/8/8 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 25);
     EXPECT_EQ(engine.perft(3), 180);
@@ -649,7 +649,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 8296);
     EXPECT_EQ(engine.perft(6), 53138);
 
-    engine.setPosition("8/3k4/3p4/8/3P4/3K4/8/8 w - - 0 1");
+    engine.fromFen("8/3k4/3p4/8/3P4/3K4/8/8 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 8);
     EXPECT_EQ(engine.perft(2), 61);
     EXPECT_EQ(engine.perft(3), 483);
@@ -657,7 +657,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 23599);
     EXPECT_EQ(engine.perft(6), 157093);
 
-    engine.setPosition("8/8/3k4/3p4/8/3P4/3K4/8 w - - 0 1");
+    engine.fromFen("8/8/3k4/3p4/8/3P4/3K4/8 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 8);
     EXPECT_EQ(engine.perft(2), 61);
     EXPECT_EQ(engine.perft(3), 411);
@@ -665,7 +665,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 21637);
     EXPECT_EQ(engine.perft(6), 158065);
 
-    engine.setPosition("k7/8/3p4/8/3P4/8/8/7K w - - 0 1");
+    engine.fromFen("k7/8/3p4/8/3P4/8/8/7K w - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 15);
     EXPECT_EQ(engine.perft(3), 90);
@@ -673,7 +673,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 3450);
     EXPECT_EQ(engine.perft(6), 20960);
 
-    engine.setPosition("8/8/7k/7p/7P/7K/8/8 b - - 0 1");
+    engine.fromFen("8/8/7k/7p/7P/7K/8/8 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 3);
     EXPECT_EQ(engine.perft(2), 9);
     EXPECT_EQ(engine.perft(3), 57);
@@ -681,7 +681,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1969);
     EXPECT_EQ(engine.perft(6), 10724);
 
-    engine.setPosition("8/8/k7/p7/P7/K7/8/8 b - - 0 1");
+    engine.fromFen("8/8/k7/p7/P7/K7/8/8 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 3);
     EXPECT_EQ(engine.perft(2), 9);
     EXPECT_EQ(engine.perft(3), 57);
@@ -689,7 +689,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1969);
     EXPECT_EQ(engine.perft(6), 10724);
 
-    engine.setPosition("8/8/3k4/3p4/3P4/3K4/8/8 b - - 0 1");
+    engine.fromFen("8/8/3k4/3p4/3P4/3K4/8/8 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 25);
     EXPECT_EQ(engine.perft(3), 180);
@@ -697,7 +697,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 8296);
     EXPECT_EQ(engine.perft(6), 53138);
 
-    engine.setPosition("8/3k4/3p4/8/3P4/3K4/8/8 b - - 0 1");
+    engine.fromFen("8/3k4/3p4/8/3P4/3K4/8/8 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 8);
     EXPECT_EQ(engine.perft(2), 61);
     EXPECT_EQ(engine.perft(3), 411);
@@ -705,7 +705,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 21637);
     EXPECT_EQ(engine.perft(6), 158065);
 
-    engine.setPosition("8/8/3k4/3p4/8/3P4/3K4/8 b - - 0 1");
+    engine.fromFen("8/8/3k4/3p4/8/3P4/3K4/8 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 8);
     EXPECT_EQ(engine.perft(2), 61);
     EXPECT_EQ(engine.perft(3), 483);
@@ -713,7 +713,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 23599);
     EXPECT_EQ(engine.perft(6), 157093);
 
-    engine.setPosition("k7/8/3p4/8/3P4/8/8/7K b - - 0 1");
+    engine.fromFen("k7/8/3p4/8/3P4/8/8/7K b - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 15);
     EXPECT_EQ(engine.perft(3), 89);
@@ -721,7 +721,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 3309);
     EXPECT_EQ(engine.perft(6), 21104);
 
-    engine.setPosition("7k/3p4/8/8/3P4/8/8/K7 w - - 0 1");
+    engine.fromFen("7k/3p4/8/8/3P4/8/8/K7 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 19);
     EXPECT_EQ(engine.perft(3), 117);
@@ -729,7 +729,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4661);
     EXPECT_EQ(engine.perft(6), 32191);
 
-    engine.setPosition("7k/8/8/3p4/8/8/3P4/K7 w - - 0 1");
+    engine.fromFen("7k/8/8/3p4/8/8/3P4/K7 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 19);
     EXPECT_EQ(engine.perft(3), 116);
@@ -737,7 +737,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4786);
     EXPECT_EQ(engine.perft(6), 30980);
 
-    engine.setPosition("k7/8/8/7p/6P1/8/8/K7 w - - 0 1");
+    engine.fromFen("k7/8/8/7p/6P1/8/8/K7 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 22);
     EXPECT_EQ(engine.perft(3), 139);
@@ -745,7 +745,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 6112);
     EXPECT_EQ(engine.perft(6), 41874);
 
-    engine.setPosition("k7/8/7p/8/8/6P1/8/K7 w - - 0 1");
+    engine.fromFen("k7/8/7p/8/8/6P1/8/K7 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 16);
     EXPECT_EQ(engine.perft(3), 101);
@@ -753,7 +753,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4354);
     EXPECT_EQ(engine.perft(6), 29679);
 
-    engine.setPosition("k7/8/8/6p1/7P/8/8/K7 w - - 0 1");
+    engine.fromFen("k7/8/8/6p1/7P/8/8/K7 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 22);
     EXPECT_EQ(engine.perft(3), 139);
@@ -761,7 +761,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 6112);
     EXPECT_EQ(engine.perft(6), 41874);
 
-    engine.setPosition("k7/8/6p1/8/8/7P/8/K7 w - - 0 1");
+    engine.fromFen("k7/8/6p1/8/8/7P/8/K7 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 16);
     EXPECT_EQ(engine.perft(3), 101);
@@ -769,7 +769,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4354);
     EXPECT_EQ(engine.perft(6), 29679);
 
-    engine.setPosition("k7/8/8/3p4/4p3/8/8/7K w - - 0 1");
+    engine.fromFen("k7/8/8/3p4/4p3/8/8/7K w - - 0 1");
     EXPECT_EQ(engine.perft(1), 3);
     EXPECT_EQ(engine.perft(2), 15);
     EXPECT_EQ(engine.perft(3), 84);
@@ -777,7 +777,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 3013);
     EXPECT_EQ(engine.perft(6), 22886);
 
-    engine.setPosition("k7/8/3p4/8/8/4P3/8/7K w - - 0 1");
+    engine.fromFen("k7/8/3p4/8/8/4P3/8/7K w - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 16);
     EXPECT_EQ(engine.perft(3), 101);
@@ -785,7 +785,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4271);
     EXPECT_EQ(engine.perft(6), 28662);
 
-    engine.setPosition("7k/3p4/8/8/3P4/8/8/K7 b - - 0 1");
+    engine.fromFen("7k/3p4/8/8/3P4/8/8/K7 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 19);
     EXPECT_EQ(engine.perft(3), 117);
@@ -793,7 +793,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 5014);
     EXPECT_EQ(engine.perft(6), 32167);
 
-    engine.setPosition("7k/8/8/3p4/8/8/3P4/K7 b - - 0 1");
+    engine.fromFen("7k/8/8/3p4/8/8/3P4/K7 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 19);
     EXPECT_EQ(engine.perft(3), 117);
@@ -801,7 +801,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4658);
     EXPECT_EQ(engine.perft(6), 30749);
 
-    engine.setPosition("k7/8/8/7p/6P1/8/8/K7 b - - 0 1");
+    engine.fromFen("k7/8/8/7p/6P1/8/8/K7 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 22);
     EXPECT_EQ(engine.perft(3), 139);
@@ -809,7 +809,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 6112);
     EXPECT_EQ(engine.perft(6), 41874);
 
-    engine.setPosition("k7/8/7p/8/8/6P1/8/K7 b - - 0 1");
+    engine.fromFen("k7/8/7p/8/8/6P1/8/K7 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 16);
     EXPECT_EQ(engine.perft(3), 101);
@@ -817,7 +817,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4354);
     EXPECT_EQ(engine.perft(6), 29679);
 
-    engine.setPosition("k7/8/8/6p1/7P/8/8/K7 b - - 0 1");
+    engine.fromFen("k7/8/8/6p1/7P/8/8/K7 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 22);
     EXPECT_EQ(engine.perft(3), 139);
@@ -825,7 +825,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 6112);
     EXPECT_EQ(engine.perft(6), 41874);
 
-    engine.setPosition("k7/8/6p1/8/8/7P/8/K7 b - - 0 1");
+    engine.fromFen("k7/8/6p1/8/8/7P/8/K7 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 16);
     EXPECT_EQ(engine.perft(3), 101);
@@ -833,7 +833,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4354);
     EXPECT_EQ(engine.perft(6), 29679);
 
-    engine.setPosition("k7/8/8/3p4/4p3/8/8/7K b - - 0 1");
+    engine.fromFen("k7/8/8/3p4/4p3/8/8/7K b - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 15);
     EXPECT_EQ(engine.perft(3), 102);
@@ -841,7 +841,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4337);
     EXPECT_EQ(engine.perft(6), 22579);
 
-    engine.setPosition("k7/8/3p4/8/8/4P3/8/7K b - - 0 1");
+    engine.fromFen("k7/8/3p4/8/8/4P3/8/7K b - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 16);
     EXPECT_EQ(engine.perft(3), 101);
@@ -849,7 +849,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4271);
     EXPECT_EQ(engine.perft(6), 28662);
 
-    engine.setPosition("7k/8/8/p7/1P6/8/8/7K w - - 0 1");
+    engine.fromFen("7k/8/8/p7/1P6/8/8/7K w - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 22);
     EXPECT_EQ(engine.perft(3), 139);
@@ -857,7 +857,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 6112);
     EXPECT_EQ(engine.perft(6), 41874);
 
-    engine.setPosition("7k/8/p7/8/8/1P6/8/7K w - - 0 1");
+    engine.fromFen("7k/8/p7/8/8/1P6/8/7K w - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 16);
     EXPECT_EQ(engine.perft(3), 101);
@@ -865,7 +865,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4354);
     EXPECT_EQ(engine.perft(6), 29679);
 
-    engine.setPosition("7k/8/8/1p6/P7/8/8/7K w - - 0 1");
+    engine.fromFen("7k/8/8/1p6/P7/8/8/7K w - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 22);
     EXPECT_EQ(engine.perft(3), 139);
@@ -873,7 +873,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 6112);
     EXPECT_EQ(engine.perft(6), 41874);
 
-    engine.setPosition("7k/8/1p6/8/8/P7/8/7K w - - 0 1");
+    engine.fromFen("7k/8/1p6/8/8/P7/8/7K w - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 16);
     EXPECT_EQ(engine.perft(3), 101);
@@ -881,7 +881,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4354);
     EXPECT_EQ(engine.perft(6), 29679);
 
-    engine.setPosition("k7/7p/8/8/8/8/6P1/K7 w - - 0 1");
+    engine.fromFen("k7/7p/8/8/8/8/6P1/K7 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 25);
     EXPECT_EQ(engine.perft(3), 161);
@@ -889,7 +889,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7574);
     EXPECT_EQ(engine.perft(6), 55338);
 
-    engine.setPosition("k7/6p1/8/8/8/8/7P/K7 w - - 0 1");
+    engine.fromFen("k7/6p1/8/8/8/8/7P/K7 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 25);
     EXPECT_EQ(engine.perft(3), 161);
@@ -897,7 +897,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7574);
     EXPECT_EQ(engine.perft(6), 55338);
 
-    engine.setPosition("3k4/3pp3/8/8/8/8/3PP3/3K4 w - - 0 1");
+    engine.fromFen("3k4/3pp3/8/8/8/8/3PP3/3K4 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 7);
     EXPECT_EQ(engine.perft(2), 49);
     EXPECT_EQ(engine.perft(3), 378);
@@ -905,7 +905,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 24122);
     EXPECT_EQ(engine.perft(6), 199002);
 
-    engine.setPosition("7k/8/8/p7/1P6/8/8/7K b - - 0 1");
+    engine.fromFen("7k/8/8/p7/1P6/8/8/7K b - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 22);
     EXPECT_EQ(engine.perft(3), 139);
@@ -913,7 +913,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 6112);
     EXPECT_EQ(engine.perft(6), 41874);
 
-    engine.setPosition("7k/8/p7/8/8/1P6/8/7K b - - 0 1");
+    engine.fromFen("7k/8/p7/8/8/1P6/8/7K b - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 16);
     EXPECT_EQ(engine.perft(3), 101);
@@ -921,7 +921,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4354);
     EXPECT_EQ(engine.perft(6), 29679);
 
-    engine.setPosition("7k/8/8/1p6/P7/8/8/7K b - - 0 1");
+    engine.fromFen("7k/8/8/1p6/P7/8/8/7K b - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 22);
     EXPECT_EQ(engine.perft(3), 139);
@@ -929,7 +929,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 6112);
     EXPECT_EQ(engine.perft(6), 41874);
 
-    engine.setPosition("7k/8/1p6/8/8/P7/8/7K b - - 0 1");
+    engine.fromFen("7k/8/1p6/8/8/P7/8/7K b - - 0 1");
     EXPECT_EQ(engine.perft(1), 4);
     EXPECT_EQ(engine.perft(2), 16);
     EXPECT_EQ(engine.perft(3), 101);
@@ -937,7 +937,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 4354);
     EXPECT_EQ(engine.perft(6), 29679);
 
-    engine.setPosition("k7/7p/8/8/8/8/6P1/K7 b - - 0 1");
+    engine.fromFen("k7/7p/8/8/8/8/6P1/K7 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 25);
     EXPECT_EQ(engine.perft(3), 161);
@@ -945,7 +945,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7574);
     EXPECT_EQ(engine.perft(6), 55338);
 
-    engine.setPosition("k7/6p1/8/8/8/8/7P/K7 b - - 0 1");
+    engine.fromFen("k7/6p1/8/8/8/8/7P/K7 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 5);
     EXPECT_EQ(engine.perft(2), 25);
     EXPECT_EQ(engine.perft(3), 161);
@@ -953,7 +953,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 7574);
     EXPECT_EQ(engine.perft(6), 55338);
 
-    engine.setPosition("3k4/3pp3/8/8/8/8/3PP3/3K4 b - - 0 1");
+    engine.fromFen("3k4/3pp3/8/8/8/8/3PP3/3K4 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 7);
     EXPECT_EQ(engine.perft(2), 49);
     EXPECT_EQ(engine.perft(3), 378);
@@ -961,7 +961,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 24122);
     EXPECT_EQ(engine.perft(6), 199002);
 
-    engine.setPosition("8/Pk6/8/8/8/8/6Kp/8 w - - 0 1");
+    engine.fromFen("8/Pk6/8/8/8/8/6Kp/8 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 11);
     EXPECT_EQ(engine.perft(2), 97);
     EXPECT_EQ(engine.perft(3), 887);
@@ -969,7 +969,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 90606);
     EXPECT_EQ(engine.perft(6), 1030499);
 
-    engine.setPosition("n1n5/1Pk5/8/8/8/8/5Kp1/5N1N w - - 0 1");
+    engine.fromFen("n1n5/1Pk5/8/8/8/8/5Kp1/5N1N w - - 0 1");
     EXPECT_EQ(engine.perft(1), 24);
     EXPECT_EQ(engine.perft(2), 421);
     EXPECT_EQ(engine.perft(3), 7421);
@@ -977,7 +977,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 2193768);
     EXPECT_EQ(engine.perft(6), 37665329);
 
-    engine.setPosition("8/PPPk4/8/8/8/8/4Kppp/8 w - - 0 1");
+    engine.fromFen("8/PPPk4/8/8/8/8/4Kppp/8 w - - 0 1");
     EXPECT_EQ(engine.perft(1), 18);
     EXPECT_EQ(engine.perft(2), 270);
     EXPECT_EQ(engine.perft(3), 4699);
@@ -985,7 +985,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1533145);
     EXPECT_EQ(engine.perft(6), 28859283);
 
-    engine.setPosition("n1n5/PPPk4/8/8/8/8/4Kppp/5N1N w - - 0 1");
+    engine.fromFen("n1n5/PPPk4/8/8/8/8/4Kppp/5N1N w - - 0 1");
     EXPECT_EQ(engine.perft(1), 24);
     EXPECT_EQ(engine.perft(2), 496);
     EXPECT_EQ(engine.perft(3), 9483);
@@ -993,7 +993,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 3605103);
     EXPECT_EQ(engine.perft(6), 71179139);
 
-    engine.setPosition("8/Pk6/8/8/8/8/6Kp/8 b - - 0 1");
+    engine.fromFen("8/Pk6/8/8/8/8/6Kp/8 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 11);
     EXPECT_EQ(engine.perft(2), 97);
     EXPECT_EQ(engine.perft(3), 887);
@@ -1001,7 +1001,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 90606);
     EXPECT_EQ(engine.perft(6), 1030499);
 
-    engine.setPosition("n1n5/1Pk5/8/8/8/8/5Kp1/5N1N b - - 0 1");
+    engine.fromFen("n1n5/1Pk5/8/8/8/8/5Kp1/5N1N b - - 0 1");
     EXPECT_EQ(engine.perft(1), 24);
     EXPECT_EQ(engine.perft(2), 421);
     EXPECT_EQ(engine.perft(3), 7421);
@@ -1009,7 +1009,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 2193768);
     EXPECT_EQ(engine.perft(6), 37665329);
 
-    engine.setPosition("8/PPPk4/8/8/8/8/4Kppp/8 b - - 0 1");
+    engine.fromFen("8/PPPk4/8/8/8/8/4Kppp/8 b - - 0 1");
     EXPECT_EQ(engine.perft(1), 18);
     EXPECT_EQ(engine.perft(2), 270);
     EXPECT_EQ(engine.perft(3), 4699);
@@ -1017,7 +1017,7 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(5), 1533145);
     EXPECT_EQ(engine.perft(6), 28859283);
 
-    engine.setPosition("n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1");
+    engine.fromFen("n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1");
     EXPECT_EQ(engine.perft(1), 24);
     EXPECT_EQ(engine.perft(2), 496);
     EXPECT_EQ(engine.perft(3), 9483);

@@ -25,26 +25,26 @@ class GameView : IGuiComponent {
                      ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                          ImGuiWindowFlags_NoBringToFrontOnFocus);
 
-        ImVec2 availSpace     = ImGui::GetContentRegionAvail();
-        float  leftPanelWidth = availSpace.x * LEFT_PANEL_RATIO;
-        float  boardHeight    = availSpace.y * VERTICAL_BOARD_RATIO;
+        ImVec2 available_space  = ImGui::GetContentRegionAvail();
+        float  left_panel_width = available_space.x * LEFT_PANEL_RATIO;
+        float  board_height     = available_space.y * VERTICAL_BOARD_RATIO;
 
-        ImGui::BeginChild("LeftPanel", ImVec2(leftPanelWidth, availSpace.y), 0);
+        ImGui::BeginChild("LeftPanel", ImVec2(left_panel_width, available_space.y), 0);
         {
-            ImGui::BeginChild("BoardView", ImVec2(0, boardHeight), 1);
-            m_boardView.draw();
+            ImGui::BeginChild("BoardView", ImVec2(0, board_height), 1);
+            m_board_view.draw();
             ImGui::EndChild();
 
             ImGui::BeginChild("LostPieces", ImVec2(0, 0), 1);
-            m_capturedPieces.draw();
+            m_captured_pieces.draw();
             ImGui::EndChild();
         }
         ImGui::EndChild();
 
         ImGui::SameLine();
-        ImGui::BeginChild("RightPanel", ImVec2(0, availSpace.y), 1);
+        ImGui::BeginChild("RightPanel", ImVec2(0, available_space.y), 1);
         {
-            m_gameInfo.draw();
+            m_game_info.draw();
         }
         ImGui::EndChild();
 
@@ -52,7 +52,7 @@ class GameView : IGuiComponent {
     }
 
    private:
-    BoardView      m_boardView{m_ctx};
-    GameInfo       m_gameInfo{m_ctx};
-    CapturedPieces m_capturedPieces{m_ctx};
+    BoardView      m_board_view{m_ctx};
+    GameInfo       m_game_info{m_ctx};
+    CapturedPieces m_captured_pieces{m_ctx};
 };

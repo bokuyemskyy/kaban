@@ -26,7 +26,7 @@ class PieceType : public StrongValue<PieceType, uint8_t> {
     }
     [[nodiscard]] constexpr char toChar() const { return chars[m_value]; }
 
-    constexpr std::span<const Direction> directions(Color color) const {
+    [[nodiscard]] constexpr std::span<const Direction> directions(Color color) const {
         assert(value() == PAWN);
 
         static constexpr std::array<Direction, 2> WHITE_PAWN_DIRECTIONS = {Directions::NW, Directions::NE};
@@ -35,7 +35,7 @@ class PieceType : public StrongValue<PieceType, uint8_t> {
         return color == Colors::WHITE ? WHITE_PAWN_DIRECTIONS : BLACK_PAWN_DIRECTIONS;
     }
 
-    constexpr std::span<const Direction> directions() const {
+    [[nodiscard]] constexpr std::span<const Direction> directions() const {
         assert(value() != PAWN);
 
         static constexpr std::array<Direction, 8> KNIGHT_DIRECTIONS = {

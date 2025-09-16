@@ -10,13 +10,16 @@
 #include <string>
 
 #include "bitboard.hpp"
+#include "color.hpp"
 #include "file.hpp"
+#include "move_flag.hpp"
 #include "piece.hpp"
+#include "piece_type.hpp"
 #include "rank.hpp"
 #include "square.hpp"
 #include "undo_info.hpp"
 
-void Position::fromFen(const std::string &fen) {
+void Position::fromFen(const std::string& fen) {
     for (Square square : Squares::all()) {
         unset(square);
     }
@@ -106,23 +109,39 @@ void Position::unset(Square square) {
 UndoInfo Position::makeMove(const Move move) {
     UndoInfo undo_info = {m_castling, m_en_passant, m_halfmove};
 
-    Square from = move.from();
-    Square to   = move.to();
+    Square from  = move.from();
+    Square to    = move.to();
+    Piece  moved = at(from);
 
-    Piece moved    = at(from);
-    Piece captured = at(to);
+    Piece captured = Pieces::NONE;
 
-    if (captured.hasValue()) {
-        Bitboard to_mask = Bitboard::square(to);
-        m_color[captured.color().value()] &= ~to_mask;
-        m_pieceType[captured.pieceType().value()] &= ~to_mask;
+    if (move.flag() == MoveFlags::EN_PASSANT) {
+        Square captured_square           = Square(to.file(), (m_stm == Colors::WHITE ? Ranks::R5 : Ranks::R4));
+        captured                         = at(captured_square);
+        m_board[captured_square.value()] = Pieces::NONE;
+        Bitboard mask                    = Bitboard::square(captured_square);
+        m_color[captured.color().value()] &= ~mask;
+        m_pieceType[captured.pieceType().value()] &= ~mask;
+    } else {
+        captured = at(to);
+        if (captured.hasValue()) {
+            Bitboard mask = Bitboard::square(to);
+            m_color[captured.color().value()] &= ~mask;
+            m_pieceType[captured.pieceType().value()] &= ~mask;
+        }
     }
 
-    Bitboard move_mask    = Bitboard::square(from) | Bitboard::square(to);
     m_board[to.value()]   = moved;
     m_board[from.value()] = Pieces::NONE;
+    Bitboard move_mask    = Bitboard::square(from) | Bitboard::square(to);
     m_color[moved.color().value()] ^= move_mask;
     m_pieceType[moved.pieceType().value()] ^= move_mask;
+
+    if (move.flag() == MoveFlags::PAWN_DOUBLE_PUSH) {
+        m_en_passant.set(to.file());
+    } else {
+        m_en_passant.clear();
+    }
 
     m_stm.flip();
 
@@ -131,27 +150,60 @@ UndoInfo Position::makeMove(const Move move) {
 }
 
 void Position::unmakeMove(Move move, UndoInfo undo_info) {
-    Square from = move.from();
-    Square to   = move.to();
+    m_stm.flip();
 
-    Piece moved    = at(to);
-    Piece captured = undo_info.captured();
+    Square from  = move.from();
+    Square to    = move.to();
+    Piece  moved = at(to);
 
-    Bitboard move_mask    = Bitboard::square(from) | Bitboard::square(to);
-    m_board[to.value()]   = captured;
     m_board[from.value()] = moved;
+    Bitboard move_mask    = Bitboard::square(from) | Bitboard::square(to);
     m_color[moved.color().value()] ^= move_mask;
     m_pieceType[moved.pieceType().value()] ^= move_mask;
 
+    Piece captured = undo_info.captured();
+
     if (captured.hasValue()) {
-        Bitboard to_mask = Bitboard::square(to);
-        m_color[captured.color().value()] |= to_mask;
-        m_pieceType[captured.pieceType().value()] |= to_mask;
+        if (move.flag() == MoveFlags::EN_PASSANT) {
+            Square captured_square           = Square(to.file(), (m_stm == Colors::WHITE ? Ranks::R5 : Ranks::R4));
+            m_board[captured_square.value()] = captured;
+            Bitboard mask                    = Bitboard::square(captured_square);
+            m_color[captured.color().value()] |= mask;
+            m_pieceType[captured.pieceType().value()] |= mask;
+
+            m_board[to.value()] = Pieces::NONE;
+        } else {
+            m_board[to.value()] = captured;
+            Bitboard mask       = Bitboard::square(to);
+            m_color[captured.color().value()] |= mask;
+            m_pieceType[captured.pieceType().value()] |= mask;
+        }
+    } else {
+        m_board[to.value()] = Pieces::NONE;
     }
 
     m_castling   = undo_info.castling();
     m_en_passant = undo_info.enPassant();
     m_halfmove   = undo_info.halfmove();
+}
 
-    m_stm.flip();
+[[nodiscard]] bool Position::isLegal() const {
+    Square king = lsb(occupancy<Side::THEM>(PieceTypes::KING));
+
+    Bitboard attackers = Bitboards::ZERO;
+
+    if (m_stm == Colors::WHITE) {
+        attackers |= pawnAttacks<Colors::BLACK>(king) & occupancy<Side::US>(PieceTypes::PAWN);
+    } else {
+        attackers |= pawnAttacks<Colors::WHITE>(king) & occupancy<Side::US>(PieceTypes::PAWN);
+    }
+    attackers |= pseudoAttacks<PieceTypes::KING>(king) & occupancy<Side::US>(PieceTypes::KING);
+    attackers |= pseudoAttacks<PieceTypes::KNIGHT>(king) & occupancy<Side::US>(PieceTypes::KNIGHT);
+    attackers |= pseudoAttacks<PieceTypes::BISHOP>(king) &
+                 (occupancy<Side::US>(PieceTypes::BISHOP) | occupancy<Side::US>(PieceTypes::QUEEN));
+
+    attackers |= pseudoAttacks<PieceTypes::ROOK>(king) &
+                 (occupancy<Side::US>(PieceTypes::ROOK) | occupancy<Side::US>(PieceTypes::QUEEN));
+
+    return attackers == Bitboards::ZERO;
 }
