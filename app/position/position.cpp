@@ -94,7 +94,7 @@ std::string Position::toFen() const {
 void Position::set(Square square, Piece piece) {
     unset(square);
     m_color[piece.color().value()] |= Bitboard::square(square);
-    m_pieceType[piece.pieceType().value()] |= Bitboard::square(square);
+    m_piece_type[piece.pieceType().value()] |= Bitboard::square(square);
     m_board[square.value()] = piece;
 }
 
@@ -102,7 +102,7 @@ void Position::unset(Square square) {
     Piece set_piece = at(square);
     if (!at(square).hasValue()) return;
     m_color[set_piece.color().value()] &= ~Bitboard::square(square);
-    m_pieceType[set_piece.pieceType().value()] &= ~Bitboard::square(square);
+    m_piece_type[set_piece.pieceType().value()] &= ~Bitboard::square(square);
     m_board[square.value()] = Pieces::NONE;
 }
 
@@ -121,13 +121,13 @@ UndoInfo Position::makeMove(const Move move) {
         m_board[captured_square.value()] = Pieces::NONE;
         Bitboard mask                    = Bitboard::square(captured_square);
         m_color[captured.color().value()] &= ~mask;
-        m_pieceType[captured.pieceType().value()] &= ~mask;
+        m_piece_type[captured.pieceType().value()] &= ~mask;
     } else {
         captured = at(to);
         if (captured.hasValue()) {
             Bitboard mask = Bitboard::square(to);
             m_color[captured.color().value()] &= ~mask;
-            m_pieceType[captured.pieceType().value()] &= ~mask;
+            m_piece_type[captured.pieceType().value()] &= ~mask;
         }
     }
 
@@ -135,7 +135,7 @@ UndoInfo Position::makeMove(const Move move) {
     m_board[from.value()] = Pieces::NONE;
     Bitboard move_mask    = Bitboard::square(from) | Bitboard::square(to);
     m_color[moved.color().value()] ^= move_mask;
-    m_pieceType[moved.pieceType().value()] ^= move_mask;
+    m_piece_type[moved.pieceType().value()] ^= move_mask;
 
     if (move.flag() == MoveFlags::PAWN_DOUBLE_PUSH) {
         m_en_passant.set(to.file());
@@ -159,7 +159,7 @@ void Position::unmakeMove(Move move, UndoInfo undo_info) {
     m_board[from.value()] = moved;
     Bitboard move_mask    = Bitboard::square(from) | Bitboard::square(to);
     m_color[moved.color().value()] ^= move_mask;
-    m_pieceType[moved.pieceType().value()] ^= move_mask;
+    m_piece_type[moved.pieceType().value()] ^= move_mask;
 
     Piece captured = undo_info.captured();
 
@@ -169,14 +169,14 @@ void Position::unmakeMove(Move move, UndoInfo undo_info) {
             m_board[captured_square.value()] = captured;
             Bitboard mask                    = Bitboard::square(captured_square);
             m_color[captured.color().value()] |= mask;
-            m_pieceType[captured.pieceType().value()] |= mask;
+            m_piece_type[captured.pieceType().value()] |= mask;
 
             m_board[to.value()] = Pieces::NONE;
         } else {
             m_board[to.value()] = captured;
             Bitboard mask       = Bitboard::square(to);
             m_color[captured.color().value()] |= mask;
-            m_pieceType[captured.pieceType().value()] |= mask;
+            m_piece_type[captured.pieceType().value()] |= mask;
         }
     } else {
         m_board[to.value()] = Pieces::NONE;
@@ -190,20 +190,22 @@ void Position::unmakeMove(Move move, UndoInfo undo_info) {
 [[nodiscard]] bool Position::isLegal() const {
     Square king = lsb(occupancy<Side::THEM>(PieceTypes::KING));
 
-    Bitboard attackers = Bitboards::ZERO;
-
     if (m_stm == Colors::WHITE) {
-        attackers |= pawnAttacks<Colors::BLACK>(king) & occupancy<Side::US>(PieceTypes::PAWN);
+        if ((pawnAttacks<Colors::BLACK>(king) & occupancy<Side::US>(PieceTypes::PAWN)).hasValue()) return false;
     } else {
-        attackers |= pawnAttacks<Colors::WHITE>(king) & occupancy<Side::US>(PieceTypes::PAWN);
+        if ((pawnAttacks<Colors::WHITE>(king) & occupancy<Side::US>(PieceTypes::PAWN)).hasValue()) return false;
     }
-    attackers |= pseudoAttacks<PieceTypes::KING>(king) & occupancy<Side::US>(PieceTypes::KING);
-    attackers |= pseudoAttacks<PieceTypes::KNIGHT>(king) & occupancy<Side::US>(PieceTypes::KNIGHT);
-    attackers |= pseudoAttacks<PieceTypes::BISHOP>(king) &
-                 (occupancy<Side::US>(PieceTypes::BISHOP) | occupancy<Side::US>(PieceTypes::QUEEN));
+    if ((pseudoAttacks<PieceTypes::KING>(king) & occupancy<Side::US>(PieceTypes::KING)).hasValue()) return false;
+    if ((pseudoAttacks<PieceTypes::KNIGHT>(king) & occupancy<Side::US>(PieceTypes::KNIGHT)).hasValue()) return false;
+    if ((pseudoAttacks<PieceTypes::BISHOP>(king) &
+         (occupancy<Side::US>(PieceTypes::BISHOP) | occupancy<Side::US>(PieceTypes::QUEEN)))
+            .hasValue())
+        return false;
 
-    attackers |= pseudoAttacks<PieceTypes::ROOK>(king) &
-                 (occupancy<Side::US>(PieceTypes::ROOK) | occupancy<Side::US>(PieceTypes::QUEEN));
+    if ((pseudoAttacks<PieceTypes::ROOK>(king) &
+         (occupancy<Side::US>(PieceTypes::ROOK) | occupancy<Side::US>(PieceTypes::QUEEN)))
+            .hasValue())
+        return false;
 
-    return attackers == Bitboards::ZERO;
+    return true;
 }
