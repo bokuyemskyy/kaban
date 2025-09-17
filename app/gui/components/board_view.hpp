@@ -91,8 +91,9 @@ class BoardView : IGuiComponent {
             Square clicked(file, rank);
 
             if (selected.hasValue()) {
-                auto moves = m_ctx.engine.moves(selected);
-                auto it    = std::ranges::find_if(moves, [&](const Move& m) { return m.to() == clicked; });
+                auto moves = m_ctx.engine.moves();
+                auto it    = std::ranges::find_if(
+                    moves, [&](const Move& m) { return m.from() == selected && m.to() == clicked; });
                 if (it != moves.end()) {
                     m_ctx.engine.makeMove(*it);
                     selected = Squares::NONE;
@@ -138,7 +139,9 @@ class BoardView : IGuiComponent {
 
             drawList->AddRect(begin, end, IM_WHITE, 0.0f, 0, THICKNESS);
 
-            for (const auto& move : m_ctx.engine.moves(selected)) {
+            for (const auto& move : m_ctx.engine.moves()) {
+                if (move.from() != selected) continue;
+
                 Rect move_rect = move.to().normalized_rect().absolute(metrics.size, metrics.size);
 
                 ImVec2 move_begin(metrics.origin.x + move_rect.left(), metrics.origin.y + move_rect.top());

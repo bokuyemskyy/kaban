@@ -7,6 +7,7 @@
 
 #include "move.hpp"
 #include "move_flag.hpp"
+#include "move_list.hpp"
 #include "position.hpp"
 #include "square.hpp"
 #include "undo_info.hpp"
@@ -21,14 +22,13 @@ class Engine {
 
     [[nodiscard]] auto board() const { return m_position.board(); }
     [[nodiscard]] auto at(Square square) { return m_position.at(square); }
-    [[nodiscard]] auto moves() { return m_position.generateMoves<GenerationType::LEGAL>(); }
-    [[nodiscard]] auto moves(Square square) { return m_position.generateMoves<GenerationType::LEGAL>(square); }
+    [[nodiscard]] auto moves() { return MoveList<GenerationType::LEGAL>(m_position); }
 
     void makeMove(Move move) {
-        auto moves = m_position.generateMoves<GenerationType::LEGAL>();
-        auto it =
-            std::ranges::find_if(moves, [&](const Move& m) { return m.from() == move.from() && m.to() == move.to(); });
-        if (it != moves.end()) {
+        auto move_list = MoveList<GenerationType::LEGAL>(m_position);
+        auto it        = std::ranges::find_if(move_list,
+                                              [&](const Move& m) { return m.from() == move.from() && m.to() == move.to(); });
+        if (it != move_list.end()) {
             auto undo_info = m_position.makeMove(*it);
             m_history.push(*it, undo_info);
         }
@@ -36,24 +36,24 @@ class Engine {
     void makeMove(const std::string& move) {
         if (move.size() != 4 && move.size() != 5) return;
 
-        auto moves = m_position.generateMoves<GenerationType::LEGAL>();
+        auto move_list = MoveList<GenerationType::LEGAL>(m_position);
 
         Move target = Move::fromString(move);
 
         if (move.size() == 4) {
             auto it = std::ranges::find_if(
-                moves, [&](const Move& m) { return m.from() == target.from() && m.to() == target.to(); });
+                move_list, [&](const Move& m) { return m.from() == target.from() && m.to() == target.to(); });
 
-            if (it != moves.end()) {
+            if (it != move_list.end()) {
                 auto undo_info = m_position.makeMove(*it);
                 m_history.push(*it, undo_info);
             }
         } else {
-            auto it = std::ranges::find_if(moves, [&](const Move& m) {
+            auto it = std::ranges::find_if(move_list, [&](const Move& m) {
                 return m.from() == target.from() && m.to() == target.to() && m.flag() == target.flag();
             });
 
-            if (it != moves.end()) {
+            if (it != move_list.end()) {
                 auto undo_info = m_position.makeMove(*it);
                 m_history.push(*it, undo_info);
             }
