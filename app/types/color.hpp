@@ -6,13 +6,8 @@
 
 #include "strong_value.hpp"
 
-class Color : public StrongValue<Color, uint8_t> {
-   public:
+struct Color : public StrongValue<Color, uint8_t, 1> {
     using StrongValue::StrongValue;
-
-    static constexpr ValueType count() noexcept { return static_cast<ValueType>(2); }
-    static constexpr uint8_t   bitlength() { return 1; }
-    static constexpr ValueType bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
 
     [[nodiscard]] constexpr Color operator!() const noexcept { return Color(static_cast<uint8_t>(m_value ^ 1)); }
 
@@ -22,9 +17,11 @@ class Color : public StrongValue<Color, uint8_t> {
     }
 };
 
-struct Colors {
-    static constexpr Color WHITE{0};
-    static constexpr Color BLACK{1};
+namespace Colors {
+inline constexpr Color WHITE{0};
+inline constexpr Color BLACK{1};
 
-    static constexpr std::array<Color, Color::count()> all() { return {WHITE, BLACK}; }
-};
+constexpr uint8_t count() noexcept { return 2; }
+
+constexpr std::array<Color, count()> all() { return {WHITE, BLACK}; }
+};  // namespace Colors

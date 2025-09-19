@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <array>
@@ -6,18 +5,13 @@
 
 #include "strong_value.hpp"
 
-class Rank : public StrongValue<Rank, uint8_t> {
-   public:
+struct Rank : public StrongValue<Rank, uint8_t, 3> {
     using StrongValue::StrongValue;
 
-    [[nodiscard]] constexpr bool hasValue() const { return value() < count(); }
-
-    static constexpr ValueType count() noexcept { return static_cast<ValueType>(8); }
-    static constexpr uint8_t   bitlength() { return 3; }
-    static constexpr ValueType bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
+    [[nodiscard]] constexpr bool hasValue() const { return m_value < 8; }
 
     static constexpr uint8_t distance(Rank from, Rank to) noexcept {
-        return from.value() > to.value() ? from.value() - to.value() : to.value() - from.value();
+        return from.m_value > to.m_value ? from.m_value - to.m_value : to.m_value - from.m_value;
     }
 
     static constexpr Rank fromChar(char c) noexcept {
@@ -25,35 +19,27 @@ class Rank : public StrongValue<Rank, uint8_t> {
         return Rank();
     }
 
-    [[nodiscard]] constexpr char toChar() const noexcept { return hasValue() ? static_cast<char>('1' + value()) : '?'; }
+    [[nodiscard]] constexpr char toChar() const noexcept { return hasValue() ? static_cast<char>('1' + m_value) : '?'; }
 
     constexpr Rank operator+(int offset) const noexcept {
-        return Rank(static_cast<uint8_t>(static_cast<int>(value()) + offset));
+        return Rank(static_cast<uint8_t>(static_cast<int>(m_value) + offset));
     }
-    constexpr Rank  operator-(int offset) const noexcept { return *this + (-offset); }
-    constexpr Rank& operator+=(int offset) noexcept { return *this = *this + offset; }
-    constexpr Rank& operator-=(int offset) noexcept { return *this = *this - offset; }
-
-   private:
-    // clang-format off
-    enum Values : uint8_t {
-        R1 = 0, R2, R3, R4, R5, R6, R7, R8,
-        NONE = 0xFF
-    };
-    // clang-format on
-
-    friend struct Ranks;
+    constexpr Rank operator-(int offset) const noexcept {
+        return Rank(static_cast<uint8_t>(static_cast<int>(m_value) - offset));
+    }
 };
 
-struct Ranks {
-    static constexpr Rank R1{Rank::Values::R1};
-    static constexpr Rank R2{Rank::Values::R2};
-    static constexpr Rank R3{Rank::Values::R3};
-    static constexpr Rank R4{Rank::Values::R4};
-    static constexpr Rank R5{Rank::Values::R5};
-    static constexpr Rank R6{Rank::Values::R6};
-    static constexpr Rank R7{Rank::Values::R7};
-    static constexpr Rank R8{Rank::Values::R8};
+namespace Ranks {
+inline constexpr Rank R1{0};
+inline constexpr Rank R2{1};
+inline constexpr Rank R3{2};
+inline constexpr Rank R4{3};
+inline constexpr Rank R5{4};
+inline constexpr Rank R6{5};
+inline constexpr Rank R7{6};
+inline constexpr Rank R8{7};
 
-    static constexpr std::array<Rank, Rank::count()> all() { return {R1, R2, R3, R4, R5, R6, R7, R8}; }
-};
+constexpr uint8_t count() noexcept { return 8; }
+
+constexpr std::array<Rank, count()> all() { return {R1, R2, R3, R4, R5, R6, R7, R8}; }
+};  // namespace Ranks

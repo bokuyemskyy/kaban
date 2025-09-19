@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <array>
@@ -6,17 +5,13 @@
 
 #include "strong_value.hpp"
 
-class File : public StrongValue<File, uint8_t> {
-   public:
+struct File : public StrongValue<File, uint8_t, 3> {
     using StrongValue::StrongValue;
 
-    static constexpr ValueType   count() noexcept { return static_cast<ValueType>(8); }
-    [[nodiscard]] constexpr bool hasValue() const { return value() < count(); }
-    static constexpr uint8_t     bitlength() { return 3; }
-    static constexpr ValueType   bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
+    [[nodiscard]] constexpr bool hasValue() const { return m_value < 8; }
 
     static constexpr uint8_t distance(File from, File to) noexcept {
-        return from.value() > to.value() ? from.value() - to.value() : to.value() - from.value();
+        return from.m_value > to.m_value ? from.m_value - to.m_value : to.m_value - from.m_value;
     }
 
     static constexpr File fromChar(char c) noexcept {
@@ -24,35 +19,27 @@ class File : public StrongValue<File, uint8_t> {
         return File();
     }
 
-    [[nodiscard]] constexpr char toChar() const noexcept { return hasValue() ? static_cast<char>('a' + value()) : '?'; }
+    [[nodiscard]] constexpr char toChar() const noexcept { return hasValue() ? static_cast<char>('a' + m_value) : '?'; }
 
     constexpr File operator+(int offset) const noexcept {
-        return File(static_cast<uint8_t>(static_cast<int>(value()) + offset));
+        return File(static_cast<uint8_t>(static_cast<int>(m_value) + offset));
     }
-    constexpr File  operator-(int offset) const noexcept { return *this + (-offset); }
-    constexpr File& operator+=(int offset) noexcept { return *this = *this + offset; }
-    constexpr File& operator-=(int offset) noexcept { return *this = *this - offset; }
-
-   private:
-    // clang-format off
-    enum Values : uint8_t {
-        FA = 0, FB, FC, FD, FE, FF, FG, FH,
-        NONE = 0xFF
-    };
-    // clang-format on
-
-    friend struct Files;
+    constexpr File operator-(int offset) const noexcept {
+        return File(static_cast<uint8_t>(static_cast<int>(m_value) - offset));
+    }
 };
 
-struct Files {
-    static constexpr File FA{File::Values::FA};
-    static constexpr File FB{File::Values::FB};
-    static constexpr File FC{File::Values::FC};
-    static constexpr File FD{File::Values::FD};
-    static constexpr File FE{File::Values::FE};
-    static constexpr File FF{File::Values::FF};
-    static constexpr File FG{File::Values::FG};
-    static constexpr File FH{File::Values::FH};
+namespace Files {
+inline constexpr File FA{0};
+inline constexpr File FB{1};
+inline constexpr File FC{2};
+inline constexpr File FD{3};
+inline constexpr File FE{4};
+inline constexpr File FF{5};
+inline constexpr File FG{6};
+inline constexpr File FH{7};
 
-    static constexpr std::array<File, File::count()> all() { return {FA, FB, FC, FD, FE, FF, FG, FH}; }
-};
+constexpr uint8_t count() noexcept { return 8; }
+
+constexpr std::array<File, count()> all() { return {FA, FB, FC, FD, FE, FF, FG, FH}; }
+};  // namespace Files
