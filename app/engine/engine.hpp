@@ -18,7 +18,7 @@ class Engine {
     void fromFen(const std::string& fen) { m_position.fromFen(fen); }
 
     uint64_t perft(int depth) { return m_position.perftRoot(depth); }
-    bool     isLegal() { return m_position.isLegal(); }
+    bool     isLegal() { return m_position.isLegal<false>(); }
 
     [[nodiscard]] auto board() const { return m_position.board(); }
     [[nodiscard]] auto at(Square square) { return m_position.at(square); }

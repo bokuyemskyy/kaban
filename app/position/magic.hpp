@@ -72,14 +72,15 @@ class Magics {
     static constexpr size_t ROOK_ATTACKS_SIZE   = 102400;
     static constexpr size_t BISHOP_ATTACKS_SIZE = 5248;
 
-    std::array<MagicEntry, Square::count()> bishop_magics{};
-    std::array<MagicEntry, Square::count()> rook_magics{};
+    std::array<MagicEntry, Squares::count()> bishop_magics{};
+    std::array<MagicEntry, Squares::count()> rook_magics{};
 
     std::array<Bitboard, BISHOP_ATTACKS_SIZE> bishop_attacks{};
     std::array<Bitboard, ROOK_ATTACKS_SIZE>   rook_attacks{};
 
     constexpr Bitboard premask(PieceType piece_type, Square square) {
         assert(piece_type == PieceTypes::BISHOP || piece_type == PieceTypes::ROOK);
+
         Bitboard edges;
         if (piece_type == PieceTypes::BISHOP) {
             edges = (Bitboard::rank(Ranks::R1) | Bitboard::rank(Ranks::R8) | Bitboard::file(Files::FA) |
@@ -89,11 +90,12 @@ class Magics {
             edges = ((Bitboard::rank(Ranks::R1) | Bitboard::rank(Ranks::R8)) & ~Bitboard::rank(square.rank())) |
                     ((Bitboard::file(Files::FA) | Bitboard::file(Files::FH)) & ~Bitboard::file(square.file()));
         }
-        return Bitboard::slidingAttacks(square, piece_type.directions(), Bitboards::ZERO) & ~edges;
+
+        return Bitboard::slidingAttacks(square, Directions::of(piece_type), Bitboards::ZERO) & ~edges;
     }
 
     template <size_t N>
-    constexpr void generate(PieceType piece_type, std::array<MagicEntry, Square::count()>& magics,
+    constexpr void generate(PieceType piece_type, std::array<MagicEntry, Squares::count()>& magics,
                             std::array<Bitboard, N>& attacks) {
         assert(piece_type == PieceTypes::BISHOP || piece_type == PieceTypes::ROOK);
         static_assert(sizeof(void*) == 8, "Must be 64-bit build");
@@ -106,7 +108,7 @@ class Magics {
         for (auto square : Squares::all()) {
             MagicEntry& magic_entry    = magics[square.value()];
             magic_entry.premask        = premask(piece_type, square);
-            magic_entry.shift          = Square::count() - popcount(magic_entry.premask);
+            magic_entry.shift          = Squares::count() - popcount(magic_entry.premask);
             magic_entry.attacks_offset = attacks_offset;
 
             std::array<Bitboard, MAX_OCCUPANCIES> occupancies{};
@@ -120,7 +122,7 @@ class Magics {
             Bitboard possible_occupancy = Bitboards::ZERO;
             do {
                 occupancies[size] = possible_occupancy;
-                reference[size]   = Bitboard::slidingAttacks(square, piece_type.directions(), possible_occupancy);
+                reference[size]   = Bitboard::slidingAttacks(square, Directions::of(piece_type), possible_occupancy);
                 size++;
                 possible_occupancy =
                     Bitboard(possible_occupancy.value() - magic_entry.premask.value()) & magic_entry.premask;
