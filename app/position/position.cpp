@@ -11,6 +11,8 @@
 
 #include "bitboard.hpp"
 #include "color.hpp"
+#include "direction.hpp"
+#include "en_passant.hpp"
 #include "file.hpp"
 #include "move_flag.hpp"
 #include "piece.hpp"
@@ -20,18 +22,19 @@
 #include "undo_info.hpp"
 
 void Position::fromFen(const std::string& fen) {
-    for (Square square : Squares::all()) {
-        unset(square);
-    }
     m_stm = Colors::WHITE;
+    for (Square square : Squares::all()) {
+        if (at(square).hasValue()) unsetPiece(square);
+    }
 
     std::stringstream ss(fen);
     std::string       argument;
     size_t            argument_index = 0;
+
     while (std::getline(ss, argument, ' ')) {
         switch (argument_index) {
             case 0: {
-                int current_rank = File::count() - 1;
+                int current_rank = Files::count() - 1;
                 int current_file = 0;
 
                 for (char c : argument) {
@@ -44,7 +47,7 @@ void Position::fromFen(const std::string& fen) {
                     } else {
                         Square s = Square(File(current_file), Rank(current_rank));
                         Piece  p = Piece::fromChar(c);
-                        set(s, p);
+                        setPiece(s, p);
                         ++current_file;
                     }
                 }
@@ -66,9 +69,9 @@ void Position::fromFen(const std::string& fen) {
 std::string Position::toFen() const {
     std::stringstream fen;
 
-    for (int r = Rank::count() - 1; r >= 0; r--) {
+    for (int r = Ranks::count() - 1; r >= 0; r--) {
         int empty = 0;
-        for (int f = 0; f < File::count(); ++f) {
+        for (int f = 0; f < Files::count(); ++f) {
             Square s = Square(File(f), Rank(r));
             Piece  p = m_board[s.value()];
 
@@ -91,51 +94,51 @@ std::string Position::toFen() const {
     return fen.str();
 }
 
-void Position::set(Square square, Piece piece) {
-    unset(square);
-    m_color[piece.color().value()] |= Bitboard::square(square);
-    m_piece_type[piece.pieceType().value()] |= Bitboard::square(square);
-    m_board[square.value()] = piece;
+void Position::setPiece(Square square, Piece piece) {
+    auto mask = Bitboard::square(square);
+    at(piece.color()) |= mask;
+    at(piece.type()) |= mask;
+    at(square) = piece;
 }
 
-void Position::unset(Square square) {
-    Piece set_piece = at(square);
-    if (!at(square).hasValue()) return;
-    m_color[set_piece.color().value()] &= ~Bitboard::square(square);
-    m_piece_type[set_piece.pieceType().value()] &= ~Bitboard::square(square);
+void Position::unsetPiece(Square square) {
+    Piece piece = at(square);
+    auto  mask  = Bitboard::square(square);
+    m_color[piece.color().value()] &= ~mask;
+    m_piece_type[piece.type().value()] &= ~mask;
     m_board[square.value()] = Pieces::NONE;
+}
+
+void Position::movePiece(Square from, Square to) {
+    Piece    piece     = at(from);
+    Bitboard move_mask = Bitboard::square(from) | Bitboard::square(to);
+    m_color[piece.color().value()] ^= move_mask;
+    m_piece_type[piece.type().value()] ^= move_mask;
+    m_board[from.value()] = Pieces::NONE;
+    m_board[to.value()]   = piece;
 }
 
 UndoInfo Position::makeMove(const Move move) {
     UndoInfo undo_info = {m_castling, m_en_passant, m_halfmove};
 
-    Square from  = move.from();
-    Square to    = move.to();
-    Piece  moved = at(from);
+    Square from = move.from();
+    Square to   = move.to();
 
-    Piece captured = Pieces::NONE;
+    Piece captured = move.flag() == MoveFlags::EN_PASSANT ? Piece(!m_stm, PieceTypes::PAWN) : at(to);
 
-    if (move.flag() == MoveFlags::EN_PASSANT) {
-        Square captured_square           = Square(to.file(), (m_stm == Colors::WHITE ? Ranks::R5 : Ranks::R4));
-        captured                         = at(captured_square);
-        m_board[captured_square.value()] = Pieces::NONE;
-        Bitboard mask                    = Bitboard::square(captured_square);
-        m_color[captured.color().value()] &= ~mask;
-        m_piece_type[captured.pieceType().value()] &= ~mask;
-    } else {
-        captured = at(to);
-        if (captured.hasValue()) {
-            Bitboard mask = Bitboard::square(to);
-            m_color[captured.color().value()] &= ~mask;
-            m_piece_type[captured.pieceType().value()] &= ~mask;
+    if (captured.hasValue()) {
+        Square captured_square = to;
+
+        if (captured.type() == PieceTypes::PAWN) {
+            if (move.flag() == MoveFlags::EN_PASSANT) {
+                captured_square = captured_square + (m_stm == Colors::WHITE ? Directions::S : Directions::N);
+            }
         }
+
+        unsetPiece(captured_square);
     }
 
-    m_board[to.value()]   = moved;
-    m_board[from.value()] = Pieces::NONE;
-    Bitboard move_mask    = Bitboard::square(from) | Bitboard::square(to);
-    m_color[moved.color().value()] ^= move_mask;
-    m_piece_type[moved.pieceType().value()] ^= move_mask;
+    movePiece(from, to);
 
     if (move.flag() == MoveFlags::PAWN_DOUBLE_PUSH) {
         m_en_passant.set(to.file());
@@ -146,66 +149,26 @@ UndoInfo Position::makeMove(const Move move) {
     m_stm.flip();
 
     undo_info.setCaptured(captured);
+
     return undo_info;
 }
-
-void Position::unmakeMove(Move move, UndoInfo undo_info) {
+void Position::unmakeMove(const Move move, const UndoInfo& undo_info) {
     m_stm.flip();
 
-    Square from  = move.from();
-    Square to    = move.to();
-    Piece  moved = at(to);
+    Square from = move.from();
+    Square to   = move.to();
 
-    m_board[from.value()] = moved;
-    Bitboard move_mask    = Bitboard::square(from) | Bitboard::square(to);
-    m_color[moved.color().value()] ^= move_mask;
-    m_piece_type[moved.pieceType().value()] ^= move_mask;
+    movePiece(to, from);
 
-    Piece captured = undo_info.captured();
-
-    if (captured.hasValue()) {
-        if (move.flag() == MoveFlags::EN_PASSANT) {
-            Square captured_square           = Square(to.file(), (m_stm == Colors::WHITE ? Ranks::R5 : Ranks::R4));
-            m_board[captured_square.value()] = captured;
-            Bitboard mask                    = Bitboard::square(captured_square);
-            m_color[captured.color().value()] |= mask;
-            m_piece_type[captured.pieceType().value()] |= mask;
-
-            m_board[to.value()] = Pieces::NONE;
-        } else {
-            m_board[to.value()] = captured;
-            Bitboard mask       = Bitboard::square(to);
-            m_color[captured.color().value()] |= mask;
-            m_piece_type[captured.pieceType().value()] |= mask;
+    if (undo_info.captured().hasValue()) {
+        Square captured_square = to;
+        if (undo_info.captured().type() == PieceTypes::PAWN && move.flag() == MoveFlags::EN_PASSANT) {
+            captured_square = captured_square + (m_stm == Colors::WHITE ? Directions::S : Directions::N);
         }
-    } else {
-        m_board[to.value()] = Pieces::NONE;
+        setPiece(captured_square, undo_info.captured());
     }
 
-    m_castling   = undo_info.castling();
     m_en_passant = undo_info.enPassant();
+    m_castling   = undo_info.castling();
     m_halfmove   = undo_info.halfmove();
-}
-
-[[nodiscard]] bool Position::isLegal() const {
-    Square king = lsb(occupancy<Side::THEM>(PieceTypes::KING));
-
-    if (m_stm == Colors::WHITE) {
-        if ((pawnAttacks<Colors::BLACK>(king) & occupancy<Side::US>(PieceTypes::PAWN)).hasValue()) return false;
-    } else {
-        if ((pawnAttacks<Colors::WHITE>(king) & occupancy<Side::US>(PieceTypes::PAWN)).hasValue()) return false;
-    }
-    if ((pseudoAttacks<PieceTypes::KING>(king) & occupancy<Side::US>(PieceTypes::KING)).hasValue()) return false;
-    if ((pseudoAttacks<PieceTypes::KNIGHT>(king) & occupancy<Side::US>(PieceTypes::KNIGHT)).hasValue()) return false;
-    if ((pseudoAttacks<PieceTypes::BISHOP>(king) &
-         (occupancy<Side::US>(PieceTypes::BISHOP) | occupancy<Side::US>(PieceTypes::QUEEN)))
-            .hasValue())
-        return false;
-
-    if ((pseudoAttacks<PieceTypes::ROOK>(king) &
-         (occupancy<Side::US>(PieceTypes::ROOK) | occupancy<Side::US>(PieceTypes::QUEEN)))
-            .hasValue())
-        return false;
-
-    return true;
 }

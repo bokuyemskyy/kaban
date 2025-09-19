@@ -90,7 +90,7 @@ class BoardView : IGuiComponent {
 
             Square clicked(file, rank);
 
-            if (selected.hasValue()) {
+            if (selected != Squares::NONE) {
                 auto moves = m_ctx.engine.moves();
                 auto it    = std::ranges::find_if(
                     moves, [&](const Move& m) { return m.from() == selected && m.to() == clicked; });
@@ -115,7 +115,7 @@ class BoardView : IGuiComponent {
 
         for (auto square : Squares::all()) {
             ImU32 color = square.light() ? IM_COL32(240, 217, 181, 255) : IM_COL32(181, 136, 99, 255);
-            Rect  rect  = square.normalized_rect().absolute(metrics.size, metrics.size);
+            Rect  rect  = square.normalizedRect().absolute(metrics.size, metrics.size);
 
             ImVec2 begin(metrics.origin.x + rect.left(), metrics.origin.y + rect.top());
             ImVec2 end(metrics.origin.x + rect.right(), metrics.origin.y + rect.bottom());
@@ -128,9 +128,9 @@ class BoardView : IGuiComponent {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
 
         auto selected = m_ctx.state.selected_square;
-        if (selected.hasValue()) {
+        if (selected != Squares::NONE) {
             const float THICKNESS = 0.05f * metrics.squareSize;
-            Rect        rect      = selected.normalized_rect().absolute(metrics.size, metrics.size);
+            Rect        rect      = selected.normalizedRect().absolute(metrics.size, metrics.size);
 
             ImVec2 begin(metrics.origin.x + rect.left() + THICKNESS * 0.25f,
                          metrics.origin.y + rect.top() + THICKNESS * 0.25f);
@@ -142,7 +142,7 @@ class BoardView : IGuiComponent {
             for (const auto& move : m_ctx.engine.moves()) {
                 if (move.from() != selected) continue;
 
-                Rect move_rect = move.to().normalized_rect().absolute(metrics.size, metrics.size);
+                Rect move_rect = move.to().normalizedRect().absolute(metrics.size, metrics.size);
 
                 ImVec2 move_begin(metrics.origin.x + move_rect.left(), metrics.origin.y + move_rect.top());
                 ImVec2 move_end(metrics.origin.x + move_rect.right(), metrics.origin.y + move_rect.bottom());
@@ -167,7 +167,7 @@ class BoardView : IGuiComponent {
         for (auto file : Files::all()) {
             std::string label(1, static_cast<char>(a_CHAR_INDEX + file.value()));
             Square      ref(file, Ranks::R1);
-            Rect        rect = ref.normalized_rect().absolute(metrics.size, metrics.size);
+            Rect        rect = ref.normalizedRect().absolute(metrics.size, metrics.size);
 
             float x = metrics.origin.x + rect.left() + rect.width / 2 - CHAR_SIZE.x / 2;
             drawList->AddText(ImVec2(x, metrics.origin.y - CHAR_SIZE.y - PIECE_MARGIN), IM_WHITE, label.c_str());
@@ -177,7 +177,7 @@ class BoardView : IGuiComponent {
         for (auto rank : Ranks::all()) {
             std::string label = std::to_string(rank.value() + 1);
             Square      ref(Files::FA, rank);
-            Rect        rect = ref.normalized_rect().absolute(metrics.size, metrics.size);
+            Rect        rect = ref.normalizedRect().absolute(metrics.size, metrics.size);
 
             float y = metrics.origin.y + rect.top() + rect.height / 2 - CHAR_SIZE.y / 2;
             drawList->AddText(ImVec2(metrics.origin.x - CHAR_SIZE.x - PIECE_MARGIN, y), IM_WHITE, label.c_str());
@@ -197,7 +197,7 @@ class BoardView : IGuiComponent {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
 
         for (Square square : Squares::all()) {
-            Rect rect = square.normalized_rect().absolute(metrics.size, metrics.size);
+            Rect rect = square.normalizedRect().absolute(metrics.size, metrics.size);
 
             ImVec2 begin(metrics.origin.x + rect.left() + PIECE_MARGIN, metrics.origin.y + rect.top() + PIECE_MARGIN);
             ImVec2 end(metrics.origin.x + rect.right() - PIECE_MARGIN, metrics.origin.y + rect.bottom() - PIECE_MARGIN);
