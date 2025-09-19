@@ -4,12 +4,8 @@
 
 #include "strong_value.hpp"
 
-class Halfmove : public StrongValue<Halfmove, uint8_t> {
-   public:
+struct Halfmove : public StrongValue<Halfmove, uint8_t, 7> {
     using StrongValue::StrongValue;
-
-    static constexpr uint8_t   bitlength() { return 7; }
-    static constexpr ValueType bitmask() { return static_cast<ValueType>((ValueType(1) << bitlength()) - 1); }
 
     constexpr Halfmove& operator++() noexcept {
         if (m_value < 100) {
