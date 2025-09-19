@@ -1,14 +1,24 @@
 #pragma once
 
-template <typename Derived, typename T>
-class StrongValue {
-   public:
-    using ValueType = T;
+#include <cassert>
+#include <cstdint>
+#include <type_traits>
 
-    constexpr StrongValue() noexcept = default;
-    explicit constexpr StrongValue(T value) noexcept : m_value(value) {}
+template <typename Derived, typename Type, uint8_t BitWidth = 0>
+struct StrongValue {
+    using ValueType = Type;
 
-    [[nodiscard]] constexpr T value() const { return m_value; }
+    constexpr StrongValue() noexcept : m_value{} {}
+    explicit constexpr StrongValue(Type value) noexcept : m_value(value) {}
+
+    [[nodiscard]] constexpr Type value() const noexcept {
+        if constexpr (!std::is_constant_evaluated()) {
+            if constexpr (BitWidth > 0) {
+                assert((m_value & mask()) == m_value);
+            }
+        }
+        return m_value;
+    }
 
     friend constexpr bool operator==(const Derived& lhs, const Derived& rhs) noexcept {
         return lhs.value() == rhs.value();
@@ -17,5 +27,16 @@ class StrongValue {
         return lhs.value() <=> rhs.value();
     }
 
-    T m_value{};
+    static constexpr uint8_t width() noexcept
+        requires(BitWidth > 0)
+    {
+        return BitWidth;
+    }
+    static constexpr ValueType mask() noexcept
+        requires(BitWidth > 0)
+    {
+        return (ValueType(1) << BitWidth) - 1;
+    }
+
+    ValueType m_value;
 };
