@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.20)
 project("kaban")
 
 # scripts
-add_subdirectory(scripts/compare_perft)
+add_subdirectory(scripts)
 
 # release optimization
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
@@ -13,7 +13,7 @@ foreach(var
         CMAKE_CXX_FLAGS_RELEASE
         CMAKE_EXE_LINKER_FLAGS_RELEASE
         CMAKE_SHARED_LINKER_FLAGS_RELEASE)
-    set(${var} "${${var}} -O3 -march=native -flto -DNDEBUG"
+    set(${var} "${${var}} -O3 -march=native -flto=auto -DNDEBUG"
         CACHE STRING "Tuned for performance" FORCE)
 endforeach()
 
@@ -28,27 +28,27 @@ add_compile_options(
     -Wshadow
     -Wformat
     -Wcomment
-    #-Wpedantic
-    #-Wnarrowing
-    #-Wcast-align
-    #-Wreturn-type
-    #-Winvalid-pch
-    #-Wunused-macros
-    #-Wunused-result
-    #-Wold-style-cast
-    #-Wsign-conversion
-    #-Wredundant-decls
-    #-Wnull-dereference
-    #-Wunused-parameter
-    #-Wnon-virtual-dtor
-    #-Wdouble-promotion
-    #-Woverloaded-virtual
-    #-Wimplicit-fallthrough
-    #-Wmissing-declarations
-    #-Wmissing-include-dirs
-    #-Wmisleading-indentation
-    #-Wmissing-format-attribute
-    #    -Wconversion
+    -Wpedantic
+    -Wnarrowing
+    -Wcast-align
+    -Wreturn-type
+    -Winvalid-pch
+    -Wunused-macros
+    -Wunused-result
+    -Wold-style-cast
+    -Wsign-conversion
+    -Wredundant-decls
+    -Wnull-dereference
+    -Wunused-parameter
+    -Wnon-virtual-dtor
+    -Wdouble-promotion
+    -Woverloaded-virtual
+    -Wimplicit-fallthrough
+    -Wmissing-declarations
+    -Wmissing-include-dirs
+    -Wmisleading-indentation
+    -Wmissing-format-attribute
+    # -Wconversion
 )
 
 # searching for sources
@@ -91,6 +91,15 @@ if(LIB_SOURCES)
     endif()
 endif()
 
+
+target_compile_options(kaban_lib PRIVATE
+    $<$<CONFIG:Release>:-O3 -march=native -flto=auto -DNDEBUG>
+)
+target_link_options(kaban_lib PRIVATE
+    $<$<CONFIG:Release>:-flto=auto>
+)
+
+
 # building executable
 add_executable("kaban" ${MAIN_SOURCE})
 if(PACKAGES)
@@ -105,7 +114,7 @@ endif()
 if(TEST_SOURCES)
     add_executable("kaban_tests" ${TEST_SOURCES})
 
-    if(LIBS)
+    if(PACKAGES)
         target_link_libraries("kaban_tests" PRIVATE ${PACKAGES})
     endif()
 
@@ -117,23 +126,3 @@ if(TEST_SOURCES)
 
     gtest_discover_tests("kaban_tests")
 endif()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-#    add_definitions(-DDEBUG)
-#    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
-#elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-#    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-#Pendif()

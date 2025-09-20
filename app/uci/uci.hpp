@@ -1,51 +1,31 @@
 #pragma once
 
-#include <unistd.h>
-
 #include <cassert>
 #include <deque>
 #include <iostream>
 #include <ostream>
 #include <sstream>
 #include <string>
-#include <vector>
 
 #include "app_info.hpp"
 #include "engine.hpp"
 
 class Uci {
    public:
-    Uci(Engine& engine) : m_engine(engine) { std::cout.setf(std::ios::unitbuf); }
+    explicit Uci(Engine& engine) : m_engine(engine) { std::cout.setf(std::ios::unitbuf); }
 
     void run() {
         std::string line;
 
         std::cout << AppInfo::NAME << " " << AppInfo::VERSION << " is running!" << std::endl;
 
-        while (!m_shouldQuit) {
-            if (inputAvailable()) {
-                if (std::getline(std::cin, line)) {
-                    if (line == "quit") {
-                        m_shouldQuit = true;
-                        break;
-                    }
-                    processCommand(line);
-                }
-            } else {
-                usleep(10000);
-            }
+        while (!m_shouldQuit && std::getline(std::cin, line)) {
+            if (line.empty()) continue;
+            processCommand(line);
         }
     }
 
    private:
-    static bool inputAvailable() {
-        fd_set readfds;
-        FD_ZERO(&readfds);
-        FD_SET(STDIN_FILENO, &readfds);
-        timeval timeout = {.tv_sec = 0, .tv_usec = 0};
-        return select(STDIN_FILENO + 1, &readfds, nullptr, nullptr, &timeout) > 0;
-    }
-
     void processCommand(const std::string& command) {
         std::istringstream      iss(command);
         std::deque<std::string> tokens;
@@ -59,21 +39,23 @@ class Uci {
         if (cmd == "uci") {
             std::cout << "id name " << AppInfo::NAME << " " << AppInfo::VERSION << std::endl;
             std::cout << "id author " << AppInfo::AUTHOR << std::endl;
-            std::cout << "uciok\n";
+            std::cout << "uciok" << std::endl;
         } else if (cmd == "isready") {
             std::cout << "readyok" << std::endl;
         } else if (cmd == "ucinewgame") {
             m_engine.newGame();
         } else if (cmd == "position") {
-            positions(tokens);
+            setPosition(tokens);
         } else if (cmd == "go") {
             go(tokens);
+        } else if (cmd == "quit") {
+            m_shouldQuit = true;
         } else {
-            std::cerr << "Unknown command: \"" << command << "\"." << std::endl;
+            std::cout << "Unknown command: " << command << std::endl;
         }
     }
 
-    void positions(std::deque<std::string>& tokens) {
+    void setPosition(std::deque<std::string>& tokens) {
         if (tokens.empty()) return;
 
         if (tokens.front() == "startpos") {
@@ -82,7 +64,7 @@ class Uci {
         } else if (tokens.front() == "fen") {
             tokens.pop_front();
             std::string fen;
-            for (int i = 0; i < 6 && !tokens.empty(); ++i) {
+            while (!tokens.empty() && tokens.front() != "moves") {
                 fen += tokens.front() + " ";
                 tokens.pop_front();
             }
@@ -108,8 +90,11 @@ class Uci {
                 depth = std::stoi(tokens.front());
                 tokens.pop_front();
             }
-            std::cout << "Running perft" << std::endl;
-            m_engine.perft(depth);
+
+            int nodes = m_engine.perft(depth);
+
+            std::cout << std::endl;
+            std::cout << "Nodes searched: " << nodes << std::endl;
         }
     }
 
@@ -117,26 +102,3 @@ class Uci {
 
     Engine& m_engine;
 };
-
-/*
-Just a piece of code I have used, I have to find place for it in UCI
-int testPerformance(Game& game, int depth, bool verbose = false) {
-    auto start = std::chrono::high_resolution_clock::now();
-
-    int nodes = Movegen::perft(game.getPosition(), depth, verbose);
-
-    auto                          end     = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed = end - start;
-
-    double seconds     = elapsed.count();
-    double nodesPerSec = nodes / seconds;
-    double secPerNode  = seconds / nodes;
-
-    std::cout << std::fixed << std::setprecision(6);
-    std::cout << "Perft(" << depth << "): " << nodes << " nodes\n";
-    std::cout << "Time: " << seconds << " sec\n";
-    std::cout << "Speed: " << nodesPerSec << " nodes/sec\n";
-    std::cout << "Efficiency: " << secPerNode << " sec/node\n";
-
-    return nodes;
-}*/

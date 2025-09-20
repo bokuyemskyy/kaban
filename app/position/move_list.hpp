@@ -6,7 +6,7 @@
 #include "move.hpp"
 #include "position.hpp"
 
-template <GenerationType T>
+template <GenerationTypes T>
 struct MoveList {
     explicit MoveList(Position& position) : m_last(position.generateMoves<T>(m_data.data())) {}
     const Move* begin() const { return m_data.data(); }
@@ -15,8 +15,8 @@ struct MoveList {
     bool        contains(Move move) const { return std::find(begin(), end(), move) != end(); }
 
    private:
-    static constexpr size_t MAX_MOVES = 256;
+    static constexpr size_t MAX_MOVES{256};
 
-    std::array<Move, MAX_MOVES> m_data;
-    Move*                       m_last;
+    std::array<Move, MAX_MOVES> m_data{};
+    Move*                       m_last{};
 };

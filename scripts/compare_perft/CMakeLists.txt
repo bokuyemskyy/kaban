@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(perft_compare LANGUAGES CXX)
+project(compare_perft LANGUAGES CXX)
 
-add_executable(perft_compare main.cpp)
+add_executable(compare_perft main.cpp)
 
 find_package(boost_process CONFIG REQUIRED)
-target_link_libraries(perft_compare PRIVATE Boost::process)
+target_link_libraries(compare_perft PRIVATE Boost::process)

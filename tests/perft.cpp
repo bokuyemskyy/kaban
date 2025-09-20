@@ -2,7 +2,6 @@
 
 #include "engine.hpp"
 #include "movegen.hpp"
-#include "position.hpp"
 
 TEST(Perft, PerftMicroset) {
     Engine engine;
@@ -14,7 +13,7 @@ TEST(Perft, PerftMicroset) {
 
 TEST(Perft, PerftMegaset) {
     Engine engine;
-    engine.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+    engine.fromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w");
     EXPECT_EQ(engine.perft(4), 197281);
     EXPECT_EQ(engine.perft(6), 119060324);
 
@@ -248,7 +247,6 @@ TEST(Perft, PerftMegaset) {
     EXPECT_EQ(engine.perft(4), 4573);
     EXPECT_EQ(engine.perft(5), 80619);
     EXPECT_EQ(engine.perft(6), 413018);
-
     engine.fromFen("r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 0 1");
     EXPECT_EQ(engine.perft(1), 26);
     EXPECT_EQ(engine.perft(2), 568);

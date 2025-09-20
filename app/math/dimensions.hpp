@@ -9,5 +9,5 @@ struct Dimensions {
     T height;
 
     constexpr Dimensions() = default;
-    constexpr Dimensions(T width, T height) : width(width), height(height) {};
+    constexpr Dimensions(T _width, T _height) : width(_width), height(_height) {};
 };

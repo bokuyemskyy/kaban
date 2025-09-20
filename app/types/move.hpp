@@ -21,7 +21,7 @@ struct Move : public StrongValue<Move, uint16_t> {
     static constexpr Move fromString(const std::string& str) {
         MoveFlag promotion = MoveFlags::USUAL;
         if (str.size() == 5) {
-            switch (str[5]) {
+            switch (str[4]) {
                 case 'q':
                     promotion = MoveFlags::PROMOTION_QUEEN;
                     break;
@@ -34,13 +34,15 @@ struct Move : public StrongValue<Move, uint16_t> {
                 case 'n':
                     promotion = MoveFlags::PROMOTION_KNIGHT;
                     break;
+                default:
+                    break;
             }
         }
         return Move(Square::fromString(str.substr(0, 2)), Square::fromString(str.substr(2, 2)), promotion);
     }
 
     [[nodiscard]] constexpr std::string toString() const {
-        std::string promotion = "";
+        std::string promotion;
 
         if (flag() == MoveFlags::PROMOTION_QUEEN) {
             promotion = "q";

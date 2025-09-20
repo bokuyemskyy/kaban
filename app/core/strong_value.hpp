@@ -11,14 +11,7 @@ struct StrongValue {
     constexpr StrongValue() noexcept : m_value{} {}
     explicit constexpr StrongValue(Type value) noexcept : m_value(value) {}
 
-    [[nodiscard]] constexpr Type value() const noexcept {
-        if constexpr (!std::is_constant_evaluated()) {
-            if constexpr (BitWidth > 0) {
-                assert((m_value & mask()) == m_value);
-            }
-        }
-        return m_value;
-    }
+    [[nodiscard]] constexpr Type value() const noexcept { return m_value; }
 
     friend constexpr bool operator==(const Derived& lhs, const Derived& rhs) noexcept {
         return lhs.value() == rhs.value();

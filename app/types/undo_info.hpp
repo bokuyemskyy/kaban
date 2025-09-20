@@ -21,7 +21,9 @@ struct UndoInfo : public StrongValue<UndoInfo, uint32_t> {
     constexpr Halfmove  halfmove() const { return Halfmove((m_value >> HALFMOVE_SHIFT) & Halfmove::mask()); }
     constexpr Piece     captured() const { return Piece((m_value >> CAPTURED_SHIFT) & Piece::mask()); }
 
-    constexpr void setCaptured(Piece captured) { m_value |= (captured.value() << CAPTURED_SHIFT); }
+    constexpr void setCaptured(Piece captured) {
+        m_value |= static_cast<ValueType>(captured.value() << CAPTURED_SHIFT);
+    }
 
    private:
     static constexpr int CASTLING_SHIFT   = 0;
