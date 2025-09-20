@@ -30,30 +30,29 @@ struct Direction : public StrongValue<Direction, int8_t> {
     // needs optimization
     [[nodiscard]] constexpr int8_t vertical() const noexcept {
         switch (m_value) {
-            case 8:
-            case 7:
-            case 9:
-                return 1;
+            case 17:
             case 16:
             case 15:
-            case 17:
                 return 2;
-            case -8:
-            case -9:
-            case -7:
-                return -1;
-            case -16:
-            case -17:
-            case -15:
-                return -2;
+            case 10:
+            case 9:
+            case 8:
+            case 7:
+            case 6:
+                return 1;
             case 1:
             case -1:
                 return 0;
-            case 10:
             case -6:
-            case 6:
+            case -7:
+            case -8:
+            case -9:
             case -10:
-                return 1;
+                return -1;
+            case -15:
+            case -16:
+            case -17:
+                return -2;
             default:
                 return 0;
         }
