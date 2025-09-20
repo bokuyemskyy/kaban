@@ -10,11 +10,9 @@
 struct PieceType : public StrongValue<PieceType, uint8_t, 3> {
     using StrongValue::StrongValue;
 
-    static constexpr ValueType count() noexcept { return static_cast<ValueType>(6); }
-
     static constexpr PieceType fromChar(char c) {
         c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-        for (uint8_t i = 0; i < count(); ++i)
+        for (uint8_t i = 0; i < 6; ++i)
             if (chars[i] == c) return PieceType(i);
         return PieceType();
     }
@@ -32,5 +30,7 @@ inline constexpr PieceType ROOK{3};
 inline constexpr PieceType QUEEN{4};
 inline constexpr PieceType KING{5};
 
-constexpr std::array<PieceType, PieceType::count()> all() { return {PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING}; }
+constexpr uint8_t count() noexcept { return 6; }
+
+constexpr std::array<PieceType, count()> all() { return {PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING}; }
 };  // namespace PieceTypes

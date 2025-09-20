@@ -40,7 +40,7 @@ inline constexpr Castling W_SIDE{W_KING_SIDE | W_QUEEN_SIDE};
 inline constexpr Castling B_SIDE{B_KING_SIDE | B_QUEEN_SIDE};
 inline constexpr Castling ANY{W_SIDE | B_SIDE};
 
-static constexpr uint8_t count() noexcept { return 4; }
+constexpr uint8_t count() noexcept { return 4; }
 
 constexpr std::array<Castling, count()> all() { return {W_KING_SIDE, W_QUEEN_SIDE, B_KING_SIDE, B_QUEEN_SIDE}; }
 };  // namespace Castlings

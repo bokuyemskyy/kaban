@@ -10,5 +10,5 @@ class WindowRegistry {
     void                                          clear() { windows.clear(); }
 
    private:
-    std::vector<std::string> windows;
+    std::vector<std::string> windows{};
 };

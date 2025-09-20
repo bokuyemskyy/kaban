@@ -13,7 +13,7 @@ struct Rect {
     T height;
 
     constexpr Rect() = default;
-    constexpr Rect(T x, T y, T width, T height) : x(x), y(y), width(width), height(height) {}
+    constexpr Rect(T _x, T _y, T _width, T _height) : x(_x), y(_y), width(_width), height(_height) {}
 
     constexpr T top() const { return y; }
     constexpr T left() const { return x; }
@@ -31,11 +31,11 @@ struct NormalizedRect {
     T height;
 
     constexpr NormalizedRect() = default;
-    constexpr NormalizedRect(T x, T y, T width, T height)
-        : x(std::clamp(x, static_cast<T>(0), static_cast<T>(1))),
-          y(std::clamp(y, static_cast<T>(0), static_cast<T>(1))),
-          width(std::clamp(width, static_cast<T>(0), static_cast<T>(1))),
-          height(std::clamp(height, static_cast<T>(0), static_cast<T>(1))) {}
+    constexpr NormalizedRect(T _x, T _y, T _width, T _height)
+        : x(std::clamp(_x, static_cast<T>(0), static_cast<T>(1))),
+          y(std::clamp(_y, static_cast<T>(0), static_cast<T>(1))),
+          width(std::clamp(_width, static_cast<T>(0), static_cast<T>(1))),
+          height(std::clamp(_height, static_cast<T>(0), static_cast<T>(1))) {}
 
     constexpr T top() const { return y; }
     constexpr T left() const { return x; }

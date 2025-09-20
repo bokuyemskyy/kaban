@@ -30,7 +30,7 @@ class TextureManager {
     }
 
    private:
-    std::unordered_map<Piece, ImTextureID> m_pieceTextures;
+    std::unordered_map<Piece, ImTextureID> m_pieceTextures{};
 
     static ImTextureID create_gl_texture(const Resource* resource);
 };

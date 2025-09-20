@@ -55,9 +55,9 @@ class Gui {
     GlfwWrapper  m_glfw;
     ImGuiWrapper m_imgui;
 
-    GuiState       m_state;
-    TextureManager m_texture_manager;
-    WindowRegistry m_window_registry;
+    GuiState       m_state{};
+    TextureManager m_texture_manager{};
+    WindowRegistry m_window_registry{};
 
     GuiContext m_context;
 
