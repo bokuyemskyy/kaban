@@ -15,7 +15,7 @@
 #include "direction.hpp"
 #include "en_passant.hpp"
 #include "halfmove.hpp"
-#include "magic.hpp"
+#include "magics.hpp"
 #include "move.hpp"
 #include "move_flag.hpp"
 #include "piece.hpp"
