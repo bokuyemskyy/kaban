@@ -1,9 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
-project(compare_perft LANGUAGES CXX)
-
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+cmake_policy(SET CMP0167 NEW)
 
 find_package(Boost 1.83 REQUIRED COMPONENTS system filesystem)
 
