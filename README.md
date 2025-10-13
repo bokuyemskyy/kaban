@@ -1,7 +1,7 @@
 # Kaban
 **Chess move generation library with GUI**
 
-[![Build Release](https://github.com/bokuyemskyy/kaban/actions/workflows/build-release.yml/badge.svg?branch=main)](https://github.com/bokuyemskyy/kaban/actions/workflows/build-release.yml)
+[![Build Release](https://github.com/bokuyemskyy/kaban/actions/workflows/build-release.yml/badge.svg?branch=main)](https://github.com/bokuyemskyy/kaban/actions/workflows/build-release.yml)  
 [Documentation (WIP)](https://bokuyemskyy.github.io/kaban/docs/html/)
 
 ## Overview
