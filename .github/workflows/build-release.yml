@@ -41,12 +41,4 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         title: Release ${{ github.ref_name }}
-        prerelease: false
-
-    - name: Upload release asset
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./build/app/Release/kaban
-        asset_name: kaban-release.zip
-        asset_content_type: application/zip
+        prerelease: true
