@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install -y cmake ninja-build build-essential libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev libasound2-dev libboost-all-dev
+        sudo apt install -y cmake ninja-build build-essential libgl1-mesa-dev libxinerama libx11-dev libxrandr-dev libxi-dev libasound2-dev libboost-all-dev
 
     - name: Configure CMake
       run: cmake --preset ninja
