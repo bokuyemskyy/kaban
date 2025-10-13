@@ -12,8 +12,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS YES)
-set(CMAKE_CXX_FLAGS_DEBUG   "-g -O0 -flto=auto")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -flto=auto -DNDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG   "-g -O0")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -DNDEBUG")
 
 # configuring packages
 set(PACKAGES "imgui::imgui glfw OpenGL::GL rt pthread dl")
