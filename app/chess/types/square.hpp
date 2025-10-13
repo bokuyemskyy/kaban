@@ -8,7 +8,6 @@
 #include "direction.hpp"
 #include "file.hpp"
 #include "rank.hpp"
-#include "rect.hpp"
 #include "strong_value.hpp"
 
 struct Square : public StrongValue<Square, uint8_t, 6> {
@@ -31,11 +30,6 @@ struct Square : public StrongValue<Square, uint8_t, 6> {
 
     [[nodiscard]] constexpr bool light() const noexcept { return ((file().value() + rank().value()) % 2) == 1; }
 
-    [[nodiscard]] constexpr NormalizedRect<float> normalizedRect() const noexcept {
-        return {static_cast<float>(file().value()) / Files::count(),
-                1 - (1.0f / Ranks::count()) - (static_cast<float>(rank().value()) / Ranks::count()),
-                1.0f / Files::count(), 1.0f / Ranks::count()};
-    }
 
     static constexpr uint8_t distance(Square from, Square to) noexcept {
         static constexpr auto table = []() constexpr {

@@ -1,6 +1,5 @@
 #include "position.hpp"
 
-#include <imgui.h>
 
 #include <cassert>
 #include <deque>
