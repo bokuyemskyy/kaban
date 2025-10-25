@@ -34,7 +34,7 @@ jobs:
            sudo DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends cmake ninja-build build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
            sudo apt install -y cppcheck clang-format clang-tidy
       - run: cmake --preset ninja
-      - run: cppcheck --enable=all --project=build/compile_commands.json --error-exitcode=1 -i interface/gui/resources/generated --suppress=missingIncludeSystem --suppress=normalCheckLevelMaxBranches  --check-level=normal --disable=unusedFunction --suppress=variableScope --suppress=checkersReport
+      - run: cppcheck --enable=all --project=build/compile_commands.json --error-exitcode=1 -i interface/gui/resources/generated --suppress=missingIncludeSystem  --check-level=normal --disable=unusedFunction --suppress=variableScope --suppress=checkersReport
      
   tests:
     runs-on: ubuntu-latest
