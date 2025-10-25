@@ -1,0 +1,1 @@
+clang-format -i $(find app -type f \( -name "*.cpp" -o -name "*.hpp" \) ! -path "*/generated/*")

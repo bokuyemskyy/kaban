@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <cstdint>
-#include <type_traits>
 
 template <typename Derived, typename Type, uint8_t BitWidth = 0>
 struct StrongValue {

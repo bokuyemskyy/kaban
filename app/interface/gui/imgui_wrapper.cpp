@@ -19,12 +19,12 @@ ImGuiWrapper::ImGuiWrapper(GLFWwindow *window, const Config &cfg) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO &_io = ImGui::GetIO();
 
     // if (m_cfg.enable_docking) io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     // if (m_cfg.enable_viewports) io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.IniFilename = m_cfg.ini_filename;
+    _io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    _io.IniFilename = m_cfg.ini_filename;
     if (m_cfg.dark_style)
         ImGui::StyleColorsDark();
     else
@@ -64,8 +64,8 @@ void ImGuiWrapper::finishFrame() {
 }
 
 Dimensions<int> ImGuiWrapper::dimensions() const {
-    ImGuiIO &io = ImGui::GetIO();
-    return Dimensions{static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y)};
+    ImGuiIO &_io = ImGui::GetIO();
+    return Dimensions{static_cast<int>(_io.DisplaySize.x), static_cast<int>(_io.DisplaySize.y)};
 }
 
 void ImGuiWrapper::keepWindowInBounds(const char *windowName) const {

@@ -2,6 +2,7 @@
 
 int main() {
     Engine engine;
-    Uci uci(engine);
+    Uci    uci(engine);
+
     uci.run();
 }

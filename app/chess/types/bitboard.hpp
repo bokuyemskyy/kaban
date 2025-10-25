@@ -129,14 +129,13 @@ struct Bitboard : public StrongValue<Bitboard, uint64_t> {
     static constexpr std::array<Bitboard, Squares::count()> pseudoAttacks(
         const std::span<const Direction>& directions) {
         std::array<Bitboard, Squares::count()> table{};
-
-        for (auto square : Squares::all()) {
+        for (auto _square : Squares::all()) {
             Bitboard pseudo_attacks = Bitboard(0);
             for (const auto& direction : directions) {
-                Square destination = square.move(direction);
+                Square destination = _square.move(direction);
                 if (destination != Squares::NONE) pseudo_attacks |= Bitboard::square(destination);
             }
-            table[square.value()] = pseudo_attacks;
+            table[_square.value()] = pseudo_attacks;
         }
 
         return table;
@@ -145,9 +144,9 @@ struct Bitboard : public StrongValue<Bitboard, uint64_t> {
     static constexpr Bitboard slidingAttacks(Square from, std::span<const Direction> directions, Bitboard occupancy) {
         Bitboard attacks{};
         for (Direction direction : directions) {
-            Square square = from;
-            while ((square = square.move(direction)) != Squares::NONE) {
-                auto bitboard = Bitboard::square(square);
+            Square _square = from;
+            while ((_square = _square.move(direction)) != Squares::NONE) {
+                auto bitboard = Bitboard::square(_square);
                 attacks |= bitboard;
                 if ((occupancy & bitboard).any()) break;
             }
@@ -158,9 +157,9 @@ struct Bitboard : public StrongValue<Bitboard, uint64_t> {
     static constexpr Bitboard slidingAttacks(Square from, Direction direction, Bitboard occupancy) {
         Bitboard attacks{};
 
-        Square square = from;
-        while ((square = square.move(direction)) != Squares::NONE) {
-            auto bitboard = Bitboard::square(square);
+        Square _square = from;
+        while ((_square = _square.move(direction)) != Squares::NONE) {
+            auto bitboard = Bitboard::square(_square);
             attacks |= bitboard;
             if ((occupancy & bitboard).any()) break;
         }
