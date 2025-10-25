@@ -13,8 +13,9 @@
 struct Square : public StrongValue<Square, uint8_t, 6> {
     using StrongValue::StrongValue;
 
-    constexpr Square(uint8_t v) noexcept : StrongValue((v < 64) ? v : 64) {}
-    constexpr Square(File file, Rank rank) noexcept : StrongValue((rank.value() << File::width()) | file.value()) {}
+    explicit constexpr Square(uint8_t v) noexcept : StrongValue((v < 64) ? v : 64) {}
+    explicit constexpr Square(File file, Rank rank) noexcept
+        : StrongValue((rank.value() << File::width()) | file.value()) {}
 
     [[nodiscard]] constexpr Square operator+(const Direction& other) const { return Square(m_value + other.value()); }
     [[nodiscard]] constexpr Square operator-(const Direction& other) const { return Square(m_value - other.value()); }
@@ -29,7 +30,6 @@ struct Square : public StrongValue<Square, uint8_t, 6> {
     [[nodiscard]] constexpr std::string toString() const { return {file().toChar(), rank().toChar()}; }
 
     [[nodiscard]] constexpr bool light() const noexcept { return ((file().value() + rank().value()) % 2) == 1; }
-
 
     static constexpr uint8_t distance(Square from, Square to) noexcept {
         static constexpr auto table = []() constexpr {

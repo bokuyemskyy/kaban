@@ -36,7 +36,7 @@ enum class GenerationTypes : uint8_t {
 
 class Position {
    public:
-    Position(const std::string& fen = DEFAULT_FEN) { fromFen(fen); }
+    explicit Position(const std::string& fen = DEFAULT_FEN) { fromFen(fen); }
 
     void fromFen(const std::string& fen = DEFAULT_FEN);
     void reset();
@@ -49,7 +49,7 @@ class Position {
     [[nodiscard]] auto us() const { return m_stm; }
     [[nodiscard]] auto castling() const { return m_castling; }
 
-    [[nodiscard]] auto board() const { return m_board; }
+    [[nodiscard]] const auto& board() const { return m_board; }
 
     Piece&                        at(Square square) { return m_board[square.value()]; }
     [[nodiscard]] const Piece&    at(Square square) const { return m_board[square.value()]; }
@@ -137,6 +137,7 @@ class Position {
 
             return legal_move_list;
         }
+        return move_list;
     };
     uint64_t perftRoot(int depth) {
         static constexpr size_t MAX_MOVES = 256;

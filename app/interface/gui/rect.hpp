@@ -7,10 +7,10 @@ template <typename T>
 struct Rect {
     static_assert(std::is_arithmetic_v<T>, "Type should be arithmetic");
 
-    T x;
-    T y;
-    T width;
-    T height;
+    T x      = 0;
+    T y      = 0;
+    T width  = 0;
+    T height = 0;
 
     constexpr Rect() = default;
     constexpr Rect(T _x, T _y, T _width, T _height) : x(_x), y(_y), width(_width), height(_height) {}
@@ -25,10 +25,10 @@ template <typename T>
 struct NormalizedRect {
     static_assert(std::is_floating_point_v<T>, "Type should be a floating point number");
 
-    T x;
-    T y;
-    T width;
-    T height;
+    T x      = 0;
+    T y      = 0;
+    T width  = 0;
+    T height = 0;
 
     constexpr NormalizedRect() = default;
     constexpr NormalizedRect(T _x, T _y, T _width, T _height)
