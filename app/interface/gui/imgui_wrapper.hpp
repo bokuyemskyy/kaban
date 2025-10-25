@@ -27,7 +27,7 @@ class ImGuiWrapper {
               ini_filename(nullptr) {}
     };
 
-    ImGuiWrapper(GLFWwindow *window, const Config &cfg = Config{});
+    explicit ImGuiWrapper(GLFWwindow *window, const Config &cfg = Config{});
     ~ImGuiWrapper() noexcept;
 
     ImGuiWrapper(const ImGuiWrapper &)            = delete;

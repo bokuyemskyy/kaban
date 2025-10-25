@@ -1,3 +1,5 @@
+#pragma once
+
 #include <imgui.h>
 
 #include <algorithm>
@@ -8,9 +10,9 @@
 #include "gui_context.hpp"
 #include "move.hpp"
 #include "piece.hpp"
+#include "rect.hpp"
 #include "square.hpp"
 #include "texture_manager.hpp"
-#include "rect.hpp"
 
 constexpr int   a_CHAR_INDEX = 97;
 constexpr int   BOARD_MARGIN = 16;

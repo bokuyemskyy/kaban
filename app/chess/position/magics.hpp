@@ -55,7 +55,7 @@ class Magics {
         }
 
        public:
-        constexpr Prng(uint64_t seed) : s(seed) { assert(seed); }
+        explicit constexpr Prng(uint64_t seed) : s(seed) { assert(seed); }
 
         template <typename T>
         constexpr T rand() {

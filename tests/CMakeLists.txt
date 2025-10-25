@@ -1,3 +1,5 @@
+find_package(GTest CONFIG REQUIRED)
+
 enable_testing()
 include(GoogleTest)
 
@@ -9,8 +11,6 @@ if(PACKAGES)
     target_link_libraries(kaban_tests PRIVATE ${PACKAGES})
 endif()
 
-target_include_directories(kaban_tests PRIVATE ${INCLUDE_DIRS})
 target_link_libraries(kaban_tests PRIVATE kaban_lib GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
-
 
 gtest_discover_tests(kaban_tests)
