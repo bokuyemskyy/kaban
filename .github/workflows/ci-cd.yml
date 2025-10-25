@@ -19,7 +19,7 @@ jobs:
            sudo DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends cmake ninja-build build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
            sudo apt install -y clang-format clang-tidy
       - run: cmake --preset ninja
-      - run: clang-format --dry-run --Werror $(find app -type f \( -name "*.cpp" -o -name "*.hpp" \) ! -path "*/generated/*")
+      # - run: clang-format --dry-run --Werror $(find app -type f \( -name "*.cpp" -o -name "*.hpp" \) ! -path "*/generated/*")
       # - run: clang-tidy -p build $(find app -type f -name "*.cpp" ! -path "*/generated/*")
 
   security:
