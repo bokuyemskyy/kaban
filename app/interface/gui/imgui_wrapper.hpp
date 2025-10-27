@@ -6,7 +6,7 @@
 
 #include "dimensions.hpp"
 
-class GLFWwindow;
+struct GLFWwindow;
 
 class ImGuiWrapper {
    public:

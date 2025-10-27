@@ -48,17 +48,17 @@ void Position::fromFen(const std::string& fen) {
     const std::string piece_placement = tokens.front();
     tokens.pop_front();
 
-    int current_rank = Files::count() - 1;
-    int current_file = 0;
+    Rank current_rank = Ranks::R8;
+    File current_file = Files::FA;
     for (const char c : piece_placement) {
         if (c == '/') {
             current_rank--;
-            current_file = 0;
+            current_file = Files::FA;
         } else if (std::isdigit(c) != 0) {
             const int num = c - '0';
             current_file += num;
         } else {
-            const Square s = Square(File(current_file), Rank(current_rank));
+            const Square s = Square(current_file, current_rank);
             const Piece  p = Piece::fromChar(c);
             setPiece(s, p);
             ++current_file;
@@ -123,16 +123,16 @@ void Position::fromFen(const std::string& fen) {
     const std::string halfmove = tokens.front();
     tokens.pop_front();
 
-    m_halfmove.set(std::stoi(halfmove));
+    m_halfmove.set(static_cast<uint8_t>(std::stoi(halfmove)));
 }
 
 std::string Position::toFen() const {
     std::stringstream fen;
 
-    for (int r = Ranks::count() - 1; r >= 0; r--) {
+    for (Rank r = Ranks::R8; r >= Ranks::R1; --r) {
         int empty = 0;
-        for (int f = 0; f < Files::count(); ++f) {
-            const Square s = Square(File(f), Rank(r));
+        for (File f = Files::FA; f <= Files::FH; ++f) {
+            const Square s = Square(f, r);
             const Piece  p = m_board[s.value()];
 
             if (p.hasValue()) {
@@ -148,7 +148,7 @@ std::string Position::toFen() const {
         if (empty > 0) {
             fen << empty;
         }
-        if (r > 0) fen << '/';
+        if (r > Ranks::R1) fen << '/';
     }
 
     return fen.str();

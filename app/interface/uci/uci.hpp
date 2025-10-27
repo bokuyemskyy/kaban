@@ -91,7 +91,7 @@ class Uci {
                 tokens.pop_front();
             }
 
-            int nodes = m_engine.perft(depth);
+            auto nodes = m_engine.perft(depth);
 
             std::cout << std::endl;
             std::cout << "Nodes searched: " << nodes << std::endl;

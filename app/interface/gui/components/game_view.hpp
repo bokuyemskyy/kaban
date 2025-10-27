@@ -7,8 +7,8 @@
 #include "gui_context.hpp"
 
 constexpr float ITEM_SPACING         = 6;
-constexpr float LEFT_PANEL_RATIO     = 0.6;
-constexpr float VERTICAL_BOARD_RATIO = 0.86;
+constexpr float LEFT_PANEL_RATIO     = 0.6f;
+constexpr float VERTICAL_BOARD_RATIO = 0.86f;
 
 class GameView : IGuiComponent {
    public:

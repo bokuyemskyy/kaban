@@ -11,7 +11,7 @@
 struct PieceType : public StrongValue<PieceType, uint8_t, 3> {
     using StrongValue::StrongValue;
 
-    static constexpr PieceType fromChar(char c) {
+    static PieceType fromChar(char c) {
         c       = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
         auto it = std::find_if(chars.begin(), chars.end(), [c](char ch) { return ch == c; });
         if (it != chars.end()) return PieceType(static_cast<uint8_t>(it - chars.begin()));

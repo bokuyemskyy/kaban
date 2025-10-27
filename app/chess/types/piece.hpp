@@ -23,14 +23,14 @@ struct Piece : public StrongValue<Piece, uint8_t, 6> {
 
     [[nodiscard]] constexpr PieceType type() const noexcept { return PieceType(m_value & PieceType::mask()); }
 
-    static constexpr Piece fromChar(char c) noexcept {
+    static Piece fromChar(char c) noexcept {
         Color     _color     = isupper(static_cast<unsigned char>(c)) ? Colors::WHITE : Colors::BLACK;
         PieceType piece_type = PieceType::fromChar(c);
         return Piece(_color, piece_type);
     }
 
     [[nodiscard]] constexpr char toChar() const noexcept {
-        return color() == Colors::WHITE ? toupper(type().toChar()) : type().toChar();
+        return static_cast<char>(color() == Colors::WHITE ? toupper(type().toChar()) : type().toChar());
     }
 };
 

@@ -18,7 +18,7 @@ class TextureManager {
             const Resource* resource = ResourceManager::get(name + ".png");
             if (!resource) throw std::runtime_error("Texture not found");
 
-            m_pieceTextures[piece] = create_gl_texture(resource);
+            m_pieceTextures[piece] = createGlTexture(resource);
         }
     }
 
@@ -33,5 +33,5 @@ class TextureManager {
    private:
     std::unordered_map<Piece, ImTextureID> m_pieceTextures{};
 
-    static ImTextureID create_gl_texture(const Resource* resource);
+    static ImTextureID createGlTexture(const Resource* resource);
 };
