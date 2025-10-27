@@ -12,35 +12,43 @@ set(INCLUDE_DIRS ${INCLUDE_DIRS})
 
 target_include_directories(kaban_lib PUBLIC ${INCLUDE_DIRS})
 
-target_compile_options(kaban_lib PUBLIC
-    -Wall
-    -Werror
-    -Wextra
-    -Wundef
-    -Wunused
-    -Weffc++
-    -Wshadow
-    -Wformat
-    -Wcomment
-    -Wpedantic
-    -Wnarrowing
-    -Wcast-align
-    -Wreturn-type
-    -Winvalid-pch
-    -Wunused-macros
-    -Wunused-result
-    -Wold-style-cast
-    -Wsign-conversion
-    -Wredundant-decls
-    -Wnull-dereference
-    -Wunused-parameter
-    -Wnon-virtual-dtor
-    -Wdouble-promotion
-    -Woverloaded-virtual
-    -Wimplicit-fallthrough
-    -Wmissing-declarations
-    -Wmissing-include-dirs
-    -Wmisleading-indentation
-    -Wmissing-format-attribute
-    # -Wconversion
-)
+if (MSVC)
+    target_compile_options(kaban_lib PUBLIC
+        /W4
+        /WX
+        /permissive-
+    )
+else()
+    target_compile_options(kaban_lib PUBLIC
+        -Wall
+        -Wextra
+        -Werror
+        -Wundef
+        -Wunused
+        -Weffc++
+        -Wshadow
+        -Wformat
+        -Wcomment
+        -Wpedantic
+        -Wnarrowing
+        -Wcast-align
+        -Wreturn-type
+        -Winvalid-pch
+        -Wunused-macros
+        -Wunused-result
+        -Wold-style-cast
+        -Wsign-conversion
+        -Wredundant-decls
+        -Wnull-dereference
+        -Wunused-parameter
+        -Wnon-virtual-dtor
+        -Wdouble-promotion
+        -Woverloaded-virtual
+        -Wimplicit-fallthrough
+        -Wmissing-declarations
+        -Wmissing-include-dirs
+        -Wmisleading-indentation
+        -Wmissing-format-attribute
+        # -Wconversion
+    )
+endif()
