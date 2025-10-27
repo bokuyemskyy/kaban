@@ -1,6 +1,7 @@
 #pragma once
 
-#include <GL/gl.h>
+#include "gl_includes.hpp"
+
 #include <imgui.h>
 #include <stb_image.h>
 
