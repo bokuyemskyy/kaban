@@ -8,7 +8,7 @@ foreach(path ${HEADER_DIRS})
 endforeach()
 set(INCLUDE_DIRS ${INCLUDE_DIRS})
 
-set(PACKAGES "imgui::imgui glfw OpenGL::GL rt pthread dl")
+
 separate_arguments(PACKAGES)
 
 set(OpenGL_GL_PREFERENCE "GLVND")
@@ -21,4 +21,9 @@ find_package(GTest CONFIG REQUIRED)
 
 add_executable("kaban_gui" ${SOURCES})
 target_include_directories(kaban_gui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${INCLUDE_DIRS})
-target_link_libraries("kaban_gui" PRIVATE kaban_lib ${PACKAGES})
+
+if(WIN32)
+    target_link_libraries("kaban_gui" PRIVATE kaban_lib imgui::imgui glfw opengl32)
+elseif(UNIX)
+    target_link_libraries("kaban_gui" PRIVATE kaban_lib imgui::imgui glfw OpenGL::GL rt pthread dl)
+endif()

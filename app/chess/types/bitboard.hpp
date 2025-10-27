@@ -84,14 +84,12 @@ struct Bitboard : public StrongValue<Bitboard, uint64_t> {
 
             for (auto _square : Squares::all()) {
                 Bitboard diag = Bitboard(0);
-                File     file = _square.file();
-                Rank     rank = _square.rank();
-
-                for (auto _rank : Ranks::all()) {
-                    for (auto _file : Files::all()) {
-                        Square possible_square = Square(_file, _rank);
-                        if (_file.value() - _rank.value() == file.value() - rank.value()) {
-                            diag = diag | Bitboard::square(possible_square);
+                
+                for (auto rank : Ranks::all()) {
+                    for (auto file : Files::all()) {
+                        Square square_to_check = Square(file, rank);
+                        if (square_to_check.diag() == _square.diag()) {
+                            diag = diag | Bitboard::square(square_to_check);
                         }
                     }
                 }
@@ -108,14 +106,12 @@ struct Bitboard : public StrongValue<Bitboard, uint64_t> {
             std::array<Bitboard, Squares::count()> _table{};
             for (auto _square : Squares::all()) {
                 Bitboard anti_diag = Bitboard(0);
-                File     file      = _square.file();
-                Rank     rank      = _square.rank();
 
-                for (auto _rank : Ranks::all()) {
-                    for (auto _file : Files::all()) {
-                        Square possible_square = Square(_file, _rank);
-                        if (_file.value() + _rank.value() == file.value() + rank.value()) {
-                            anti_diag = anti_diag | Bitboard::square(possible_square);
+                for (auto rank : Ranks::all()) {
+                    for (auto file : Files::all()) {
+                        Square square_to_check = Square(file, rank);
+                        if (square_to_check.antiDiag() == _square.antiDiag()) {
+                            anti_diag = anti_diag | Bitboard::square(square_to_check);
                         }
                     }
                 }
@@ -211,6 +207,64 @@ struct Bitboard : public StrongValue<Bitboard, uint64_t> {
 
         return table[from.value()][to.value()];
     }
+    // static constexpr Bitboard line(Square from, Square to) {
+    //     static constexpr auto table = []() constexpr {
+    //         std::array<std::array<Bitboard, Squares::count()>, Squares::count()> _table{};
+
+    //         for (auto square1 : Squares::all()) {
+    //             for (auto square2 : Squares::all()) {
+    //                 // if (square1.value() >= square2.value()) continue;
+                    
+                    // if (square1.file() == square2.file()) {
+                    //     for ()
+                    // }
+                    // if (square1.rank() == square2.rank()) {
+                    //     for ()
+                    // }
+                    // if (square1.diag() == square2.diag()) {
+                    //     for ()
+                    // }
+                    // if (square1.antiDiag() == square2.antiDiag()) {
+                    //     for ()
+                    // }
+                    // else if (sq)
+                    // if (Square::distance(square1, square2) <= 1) continue;
+
+                    // Bitboard between;
+
+                    // int dr = square2.rank().value() - square1.rank().value();
+                    // int df = square2.file().value() - square1.file().value();
+
+                    // if (square1.rank() == square2.rank()) {
+                    //     between =
+                    //         slidingAttacks(square1, dr < 0 ? Directions::W : Directions::E, Bitboard::square(square2)) &
+                    //         slidingAttacks(square2, dr < 0 ? Directions::E : Directions::W, Bitboard::square(square1));
+                    // } else if (square1.file() == square2.file()) {
+                    //     between =
+                    //         slidingAttacks(square1, df < 0 ? Directions::S : Directions::N, Bitboard::square(square2)) &
+                    //         slidingAttacks(square2, df < 0 ? Directions::N : Directions::S, Bitboard::square(square1));
+                    // } else if (dr == df) {
+                    //     between = slidingAttacks(square1, dr < 0 ? Directions::SW : Directions::NE,
+                    //                              Bitboard::square(square2)) &
+                    //               slidingAttacks(square2, dr < 0 ? Directions::NE : Directions::SW,
+                    //                              Bitboard::square(square1));
+                    // } else if (dr == -df) {
+                    //     between = slidingAttacks(square1, dr < 0 ? Directions::NW : Directions::SE,
+                    //                              Bitboard::square(square2)) &
+                    //               slidingAttacks(square2, dr < 0 ? Directions::SE : Directions::NW,
+                    //                              Bitboard::square(square1));
+                    // }
+
+        //             _table[square1.value()][square2.value()] = line;
+        //             _table[square2.value()][square1.value()] = line;
+        //         }
+        //     }
+
+        //     return _table;
+        // }();
+
+    //     return table[from.value()][to.value()];
+    // }
 };
 
 namespace Bitboards {
