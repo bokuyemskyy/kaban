@@ -51,8 +51,8 @@ class BoardView : IGuiComponent {
     }
 
     BoardMetrics boardMetrics(const Rect<float>& panel) {
-        const int WINDOW_PADDING = ImGui::GetStyle().WindowPadding.x;
-        const int FONT_SIZE      = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
+        const float WINDOW_PADDING = ImGui::GetStyle().WindowPadding.x;
+        const float FONT_SIZE      = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
         ImVec2    availSize(panel.width, panel.height);
 
         float  boardSize = std::min(availSize.x, availSize.y) - 2.0f * (FONT_SIZE + WINDOW_PADDING + BOARD_MARGIN);
@@ -83,8 +83,8 @@ class BoardView : IGuiComponent {
             float rel_x = mouse.x - metrics.origin.x;
             float rel_y = mouse.y - metrics.origin.y;
 
-            File file = File(std::floor(rel_x / metrics.squareSize));
-            Rank rank = Rank(7 - std::floor(rel_y / metrics.squareSize));
+            File file = File(static_cast<uint8_t>(std::floor(rel_x / metrics.squareSize)));
+            Rank rank = Rank(static_cast<uint8_t>(7 - std::floor(rel_y / metrics.squareSize)));
 
             if (!file.hasValue() || !rank.hasValue()) {
                 selected = Squares::NONE;
@@ -190,10 +190,10 @@ class BoardView : IGuiComponent {
 
     void playerNames(const Rect<float>& panel) {
         ImDrawList* drawList  = ImGui::GetWindowDrawList();
-        int         FONT_SIZE = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
+        float         FONT_SIZE = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
 
         drawList->AddText(ImVec2(panel.x, panel.y), IM_WHITE, "Player White");
-        drawList->AddText(ImVec2(panel.x, panel.bottom() - static_cast<float>(FONT_SIZE)), IM_WHITE, "Player Black");
+        drawList->AddText(ImVec2(panel.x, panel.bottom() - FONT_SIZE), IM_WHITE, "Player Black");
     }
 
     void pieces(const BoardMetrics& metrics) {
