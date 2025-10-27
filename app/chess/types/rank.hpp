@@ -27,6 +27,47 @@ struct Rank : public StrongValue<Rank, uint8_t, 3> {
     constexpr Rank operator-(int offset) const noexcept {
         return Rank(static_cast<uint8_t>(static_cast<int>(m_value) - offset));
     }
+    
+    constexpr Rank& operator++() noexcept {
+        ++m_value;
+        return *this;
+    }
+
+    constexpr Rank operator++(int) noexcept {
+        Rank tmp = *this;
+        ++m_value;
+        return tmp;
+    }
+
+    constexpr Rank& operator--() noexcept {
+        --m_value;
+        return *this;
+    }
+
+    constexpr Rank operator--(int) noexcept {
+        Rank tmp = *this;
+        --m_value;
+        return tmp;
+    }
+
+    constexpr Rank& operator+=(int offset) noexcept {
+        m_value = static_cast<uint8_t>(static_cast<int>(m_value) + offset);
+        return *this;
+    }
+
+    constexpr Rank& operator-=(int offset) noexcept {
+        m_value = static_cast<uint8_t>(static_cast<int>(m_value) - offset);
+        return *this;
+    }
+    
+    constexpr int operator-(Rank other) const noexcept {
+        return static_cast<int>(m_value) - static_cast<int>(other.m_value);
+    }
+
+    constexpr Rank operator+(Rank other) const noexcept {
+        return Rank(m_value + other.m_value);
+    }
+
 };
 
 namespace Ranks {

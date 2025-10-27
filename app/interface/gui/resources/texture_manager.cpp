@@ -5,7 +5,7 @@
 
 #include "resource_manager.hpp"
 
-ImTextureID TextureManager::create_gl_texture(const Resource* resource) {
+ImTextureID TextureManager::createGlTexture(const Resource* resource) {
     GLuint texture{};
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
