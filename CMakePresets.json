@@ -5,7 +5,6 @@
       "name": "default",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "g++",
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake"        
       }
     },
