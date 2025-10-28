@@ -22,16 +22,16 @@ This project is a high-performance, rule-compliant chess move generation library
 
 ### Requirements
 - C++23
-- CMake 3.25+
+- CMake 3.30+
+- g++15, clang++20 or MSVC 2022
+- Make 4.4 or Ninja 1.12
 - VCPKG (included as a submodule)
 - OpenGL, GLFW3, ImGui, stb (managed by VCPKG)
 - Linux packages: libxinerama-dev, libxcursor-dev, xorg-dev, libglu1-mesa-dev, pkg-config
 
 ### Optional requirements
 - Shell
-- clang++
-- Ninja
-- Boost (header-only, required by scripts)
+- Boost library (header-only, required by scripts)
 - clangd, clang-format, clang-tidy
 
 ### Other technologies
