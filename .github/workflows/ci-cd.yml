@@ -7,57 +7,52 @@ on:
   workflow_dispatch:
 
 jobs:
-  clang:
+  style:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/bokuyemskyy/kaban-ubuntu-base:latest
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - run: |
-           sudo rm /var/lib/man-db/auto-update
-           sudo apt update
-           - run: cmake --preset ninja
-      # - run: clang-format --dry-run --Werror $(find app -type f \( -name "*.cpp" -o -name "*.hpp" \) ! -path "*/generated/*")
-      # - run: clang-tidy -p build $(find app -type f -name "*.cpp" ! -path "*/generated/*")
+      - run: cmake --preset default -DCMAKE_BUILD_TYPE=Release
+      - run: clang-format --dry-run --Werror $(find app -type f \( -name "*.cpp" -o -name "*.hpp" \) ! -path "*/generated/*")
+      - run: clang-tidy -p build -header-filter='^/home/amon/Code/kaban/app/.*' $(find ./app -name '*.cpp' ! -path './app/interface/gui/stb_image_impl.cpp')
 
-  security:
+  safety:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/bokuyemskyy/kaban-ubuntu-base:latest
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - run: cmake --preset ninja
-      - run: cppcheck --enable=all --project=build/compile_commands.json --error-exitcode=1 -i interface/gui/resources/generated --suppress=missingIncludeSystem  --check-level=normal --disable=unusedFunction --suppress=variableScope --suppress=checkersReport
-     
+      - run: cmake --preset default -DCMAKE_BUILD_TYPE=Release
+      - run: cppcheck --enable=all --project=build/compile_commands.json --error-exitcode=1 -i interface/gui/resources/generated --suppress=missingIncludeSystem  --check-level=exhaustive --disable=unusedFunction --suppress=variableScope --suppress=checkersReport
+        
   tests:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/bokuyemskyy/kaban-ubuntu-base:latest
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - run: cmake --preset ninja -DBUILD_TESTS=ON
-      - run: cmake --build --preset release
+      - run: cmake --preset default -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+      - run: cmake --build build
       - run: ctest --test-dir build/tests -R Perft.PerftMidset -V
 
   build:
-    needs: [clang, security, tests]
+    needs: [style, safety, tests]
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/bokuyemskyy/kaban-ubuntu-base:latest
     steps:
     - uses: actions/checkout@v3
       with:
         submodules: recursive
-
-    - name: Install dependencies
-      run: |
-        sudo rm /var/lib/man-db/auto-update
-        sudo apt update
-        sudo DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends cmake ninja-build build-essential libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
-
-    - name: Configure CMake
-      run: cmake --preset ninja
-
-    - name: Build Release
-      run: cmake --build --preset release
+    - run: cmake --preset default -DCMAKE_BUILD_TYPE=Release
+    - run: cmake --build build
 
     - name: Upload binary
       uses: actions/upload-artifact@v4
