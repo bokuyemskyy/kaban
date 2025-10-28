@@ -136,11 +136,10 @@ class Position {
             }
 
             return legal_move_list;
-        }
-        else {
+        } else {
             return move_list;
         }
-    };
+    }
     uint64_t perftRoot(int depth) {
         static constexpr size_t MAX_MOVES = 256;
         static constexpr size_t MAX_DEPTH = 10;

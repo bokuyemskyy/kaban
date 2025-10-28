@@ -1,6 +1,8 @@
 #include "imgui_wrapper.hpp"
 
 #include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include <imgui_internal.h>
 
 #include <algorithm>
@@ -64,21 +66,21 @@ void ImGuiWrapper::finishFrame() {
 }
 
 Dimensions<int> ImGuiWrapper::dimensions() const {
-    ImGuiIO &_io = ImGui::GetIO();
+    const ImGuiIO &_io = ImGui::GetIO();
     return Dimensions{static_cast<int>(_io.DisplaySize.x), static_cast<int>(_io.DisplaySize.y)};
 }
 
 void ImGuiWrapper::keepWindowInBounds(const char *windowName) const {
     ImGuiWindow *window = ImGui::FindWindowByName(windowName);
 
-    auto   frame_dimensions = dimensions();
-    ImVec2 maxPosition{static_cast<float>(frame_dimensions.width) - window->Size.x,
-                       static_cast<float>(frame_dimensions.height) - window->Size.y};
+    auto         frame_dimensions = dimensions();
+    const ImVec2 maxPosition{static_cast<float>(frame_dimensions.width) - window->Size.x,
+                             static_cast<float>(frame_dimensions.height) - window->Size.y};
 
-    ImVec2 newPosition{maxPosition.x > 0 ? std::clamp(window->Pos.x, 0.0F, maxPosition.x) : 0,
-                       maxPosition.y > 0 ? std::clamp(window->Pos.y, 0.0F, maxPosition.y) : 0};
-    ImVec2 newSize{maxPosition.x > 0 ? window->Size.x : static_cast<float>(frame_dimensions.width),
-                   maxPosition.y > 0 ? window->Size.y : static_cast<float>(frame_dimensions.height)};
+    const ImVec2 newPosition{maxPosition.x > 0 ? std::clamp(window->Pos.x, 0.0F, maxPosition.x) : 0,
+                             maxPosition.y > 0 ? std::clamp(window->Pos.y, 0.0F, maxPosition.y) : 0};
+    const ImVec2 newSize{maxPosition.x > 0 ? window->Size.x : static_cast<float>(frame_dimensions.width),
+                         maxPosition.y > 0 ? window->Size.y : static_cast<float>(frame_dimensions.height)};
 
     if (newPosition.x != window->Pos.x || newPosition.y != window->Pos.y || newSize.x != window->Size.x ||
         newSize.y != window->Size.y) {

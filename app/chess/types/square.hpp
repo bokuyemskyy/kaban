@@ -20,8 +20,8 @@ struct Square : public StrongValue<Square, uint8_t, 6> {
     [[nodiscard]] constexpr Square operator+(const Direction& other) const { return Square(m_value + other.value()); }
     [[nodiscard]] constexpr Square operator-(const Direction& other) const { return Square(m_value - other.value()); }
 
-    [[nodiscard]] constexpr File file() const noexcept { return File(value() & File::mask()); }
-    [[nodiscard]] constexpr Rank rank() const noexcept { return Rank(value() >> File::width()); }
+    [[nodiscard]] constexpr File    file() const noexcept { return File(value() & File::mask()); }
+    [[nodiscard]] constexpr Rank    rank() const noexcept { return Rank(value() >> File::width()); }
     [[nodiscard]] constexpr uint8_t diag() const noexcept { return file().value() - rank().value(); }
     [[nodiscard]] constexpr uint8_t antiDiag() const noexcept { return file().value() + rank().value(); }
 
