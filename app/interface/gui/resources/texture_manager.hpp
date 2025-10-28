@@ -1,11 +1,18 @@
 #pragma once
 
-#include "gl_includes.hpp"
-
 #include <imgui.h>
 #include <stb_image.h>
 
 #include <stdexcept>
+
+#include "color.hpp"
+
+#ifdef _WIN32
+#include <GL/gl.h>
+#include <windows.h>
+#elif __linux__
+#include <GL/gl.h>
+#endif
 
 #include "piece.hpp"
 #include "resource_manager.hpp"
@@ -14,7 +21,9 @@ class TextureManager {
    public:
     TextureManager() {
         for (Piece piece : Pieces::all()) {
-            std::string     name(1, piece.toChar());
+            std::string name;
+            name += static_cast<char>(std::tolower(piece.toChar()));
+            name += piece.color() == Colors::WHITE ? 'w' : 'b';
             const Resource* resource = ResourceManager::get(name + ".png");
             if (!resource) throw std::runtime_error("Texture not found");
 
@@ -22,16 +31,16 @@ class TextureManager {
         }
     }
 
-    ImTextureID get(Piece piece) const { return m_pieceTextures.at(piece); }
+    ImTextureID get(Piece piece) const { return ImTextureID(m_pieceTextures.at(piece)); }
 
     ~TextureManager() {
         for (auto& [piece, texture] : m_pieceTextures) {
-            glDeleteTextures(1, reinterpret_cast<GLuint*>(&texture));
+            glDeleteTextures(1, &texture);
         }
     }
 
    private:
-    std::unordered_map<Piece, ImTextureID> m_pieceTextures{};
+    std::unordered_map<Piece, GLuint> m_pieceTextures{};
 
-    static ImTextureID createGlTexture(const Resource* resource);
+    static GLuint createGlTexture(const Resource* resource);
 };

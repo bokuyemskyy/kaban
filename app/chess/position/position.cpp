@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cctype>
+#include <cstdint>
 #include <deque>
 #include <iostream>
 #include <sstream>
@@ -52,7 +53,7 @@ void Position::fromFen(const std::string& fen) {
     File current_file = Files::FA;
     for (const char c : piece_placement) {
         if (c == '/') {
-            current_rank--;
+            --current_rank;
             current_file = Files::FA;
         } else if (std::isdigit(c) != 0) {
             const int num = c - '0';

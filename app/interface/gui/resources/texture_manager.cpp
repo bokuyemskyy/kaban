@@ -1,11 +1,21 @@
 #include "texture_manager.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
+#ifdef _WIN32
+#include <GL/gl.h>
+#include <windows.h>
+#elif __linux__
+#include <GL/gl.h>
+#endif
+
+#include <imgui.h>
+
+#include <stdexcept>
 
 #include "resource_manager.hpp"
 
-ImTextureID TextureManager::createGlTexture(const Resource* resource) {
+GLuint TextureManager::createGlTexture(const Resource* resource) {
     GLuint texture{};
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -24,5 +34,5 @@ ImTextureID TextureManager::createGlTexture(const Resource* resource) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    return ImTextureID(texture);
+    return texture;
 }

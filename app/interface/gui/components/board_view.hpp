@@ -53,7 +53,7 @@ class BoardView : IGuiComponent {
     BoardMetrics boardMetrics(const Rect<float>& panel) {
         const float WINDOW_PADDING = ImGui::GetStyle().WindowPadding.x;
         const float FONT_SIZE      = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
-        ImVec2    availSize(panel.width, panel.height);
+        ImVec2      availSize(panel.width, panel.height);
 
         float  boardSize = std::min(availSize.x, availSize.y) - 2.0f * (FONT_SIZE + WINDOW_PADDING + BOARD_MARGIN);
         ImVec2 origin(panel.x + (availSize.x - boardSize) / 2, panel.y + (availSize.y - boardSize) / 2);
@@ -190,7 +190,7 @@ class BoardView : IGuiComponent {
 
     void playerNames(const Rect<float>& panel) {
         ImDrawList* drawList  = ImGui::GetWindowDrawList();
-        float         FONT_SIZE = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
+        float       FONT_SIZE = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
 
         drawList->AddText(ImVec2(panel.x, panel.y), IM_WHITE, "Player White");
         drawList->AddText(ImVec2(panel.x, panel.bottom() - FONT_SIZE), IM_WHITE, "Player Black");

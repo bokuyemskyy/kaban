@@ -84,7 +84,7 @@ struct Bitboard : public StrongValue<Bitboard, uint64_t> {
 
             for (auto _square : Squares::all()) {
                 Bitboard diag = Bitboard(0);
-                
+
                 for (auto rank : Ranks::all()) {
                     for (auto file : Files::all()) {
                         Square square_to_check = Square(file, rank);
@@ -169,11 +169,18 @@ struct Bitboard : public StrongValue<Bitboard, uint64_t> {
 
             auto addLine = [](Square s1, Square s2) constexpr {
                 Bitboard b{};
-                int df = s2.file() - s1.file();
-                int dr = s2.rank() - s1.rank();
-                
-                if (df != 0) df /= (df < 0 ? -df : df);
-                if (dr != 0) dr /= (dr < 0 ? -dr : dr);
+                int      df = s2.file() - s1.file();
+                int      dr = s2.rank() - s1.rank();
+
+                if (df > 0)
+                    df = 1;
+                else if (df < 0)
+                    df = -1;
+
+                if (dr > 0)
+                    dr = 1;
+                else if (dr < 0)
+                    dr = -1;
 
                 File f = s1.file();
                 Rank r = s1.rank();
@@ -189,8 +196,8 @@ struct Bitboard : public StrongValue<Bitboard, uint64_t> {
             for (Square s1 : Squares::all()) {
                 for (Square s2 : Squares::all()) {
                     if (s1 != s2) {
-                        if (s1.file() == s2.file() || s1.rank() == s2.rank() ||
-                            s1.diag() == s2.diag() || s1.antiDiag() == s2.antiDiag()) {
+                        if (s1.file() == s2.file() || s1.rank() == s2.rank() || s1.diag() == s2.diag() ||
+                            s1.antiDiag() == s2.antiDiag()) {
                             t[s1.value()][s2.value()] = addLine(s1, s2);
                         }
                     }
@@ -208,11 +215,17 @@ struct Bitboard : public StrongValue<Bitboard, uint64_t> {
 
             auto addLine = [](Square s1, Square s2) constexpr {
                 Bitboard b{};
-                int df = s2.file() - s1.file();
-                int dr = s2.rank() - s1.rank();
+                int      df = s2.file() - s1.file();
+                int      dr = s2.rank() - s1.rank();
 
-                if (df != 0) df /= (df < 0 ? -df : df);
-                if (dr != 0) dr /= (dr < 0 ? -dr : dr);
+                if (df > 0)
+                    df = 1;
+                else if (df < 0)
+                    df = -1;
+                if (dr > 0)
+                    dr = 1;
+                else if (dr < 0)
+                    dr = -1;
 
                 File f = s1.file() + df;
                 Rank r = s1.rank() + dr;
@@ -228,8 +241,8 @@ struct Bitboard : public StrongValue<Bitboard, uint64_t> {
             for (Square s1 : Squares::all()) {
                 for (Square s2 : Squares::all()) {
                     if (s1 != s2) {
-                        if (s1.file() == s2.file() || s1.rank() == s2.rank() ||
-                            s1.diag() == s2.diag() || s1.antiDiag() == s2.antiDiag()) {
+                        if (s1.file() == s2.file() || s1.rank() == s2.rank() || s1.diag() == s2.diag() ||
+                            s1.antiDiag() == s2.antiDiag()) {
                             t[s1.value()][s2.value()] = addLine(s1, s2);
                         }
                     }

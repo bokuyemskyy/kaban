@@ -59,14 +59,12 @@ struct File : public StrongValue<File, uint8_t, 3> {
         m_value = static_cast<uint8_t>(static_cast<int>(m_value) - offset);
         return *this;
     }
-    
+
     constexpr int operator-(File other) const noexcept {
         return static_cast<int>(m_value) - static_cast<int>(other.m_value);
     }
 
-    constexpr File operator+(File other) const noexcept {
-        return File(m_value + other.m_value);
-    }
+    constexpr File operator+(File other) const noexcept { return File(m_value + other.m_value); }
 };
 
 namespace Files {

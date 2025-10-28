@@ -1,3 +1,4 @@
+#include "engine.hpp"
 #include "uci.hpp"
 
 int main() {

@@ -13,10 +13,10 @@ struct Direction : public StrongValue<Direction, int8_t> {
     using StrongValue::StrongValue;
 
     [[nodiscard]] constexpr Direction operator+(const Direction& other) const {
-        return Direction(m_value + other.value());
+        return Direction(static_cast<int8_t>(m_value + other.value()));
     }
     [[nodiscard]] constexpr Direction operator-(const Direction& other) const {
-        return Direction(m_value - other.value());
+        return Direction(static_cast<int8_t>(m_value - other.value()));
     }
 
     // needs optimization
@@ -27,7 +27,6 @@ struct Direction : public StrongValue<Direction, int8_t> {
         return h;
     }
 
-    // needs optimization
     [[nodiscard]] constexpr int8_t vertical() const noexcept {
         switch (m_value) {
             case 17:

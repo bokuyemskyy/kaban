@@ -1,59 +1,70 @@
-    #include "glfw_wrapper.hpp"
+#include "glfw_wrapper.hpp"
 
-    #include "gl_includes.hpp"
+#include <stdexcept>
 
-    #include <stdexcept>
+#ifdef _WIN32
+#include <GL/gl.h>
+#include <windows.h>
+#elif __linux__
+#include <GL/gl.h>
+#endif
 
-    GlfwWrapper::GlfwWrapper(int width, int height, const std::string& title, bool use_vsync) {
-        if (glfwInit() != GL_TRUE) {
-            throw std::runtime_error("Failed to initialize GLFW");
-        }
+#include <GLFW/glfw3.h>
 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+#include <string>
 
-        m_monitor = glfwGetPrimaryMonitor();
-        m_window  = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+#include "dimensions.hpp"
 
-        if (!m_window) {
-            throw std::runtime_error("Failed to create GLFW window");
-        }
-
-        glfwSetWindowSizeLimits(m_window, width, height, GLFW_DONT_CARE, GLFW_DONT_CARE);
-        glfwMakeContextCurrent(m_window);
-        glfwSwapInterval(use_vsync ? 1 : 0);
-
-        glEnable(GL_BLEND);
+GlfwWrapper::GlfwWrapper(int width, int height, const std::string& title, bool use_vsync) {
+    if (glfwInit() != GL_TRUE) {
+        throw std::runtime_error("Failed to initialize GLFW");
     }
 
-    GlfwWrapper::~GlfwWrapper() noexcept {
-        if (m_window) {
-            glfwDestroyWindow(m_window);
-            m_window = nullptr;
-        }
-        glfwTerminate();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
+    m_monitor = glfwGetPrimaryMonitor();
+    m_window  = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+
+    if (!m_window) {
+        throw std::runtime_error("Failed to create GLFW window");
     }
 
-    Dimensions<int> GlfwWrapper::dimensions() const {
-        Dimensions<int> dimensions{};
-        glfwGetFramebufferSize(m_window, &dimensions.width, &dimensions.height);
-        return dimensions;
-    }
+    glfwSetWindowSizeLimits(m_window, width, height, GLFW_DONT_CARE, GLFW_DONT_CARE);
+    glfwMakeContextCurrent(m_window);
+    glfwSwapInterval(use_vsync ? 1 : 0);
 
-    void GlfwWrapper::finishFrame() const {
-        glfwSwapBuffers(m_window);
-        glfwPollEvents();
-    }
+    glEnable(GL_BLEND);
+}
 
-    void GlfwWrapper::fillFrame(float r, float g, float b, float a) const {
-        const auto dims = dimensions();
-        glViewport(0, 0, dims.width, dims.height);
-        glClearColor(r, g, b, a);
-        glClear(GL_COLOR_BUFFER_BIT);
+GlfwWrapper::~GlfwWrapper() noexcept {
+    if (m_window) {
+        glfwDestroyWindow(m_window);
+        m_window = nullptr;
     }
+    glfwTerminate();
+}
 
-    bool GlfwWrapper::shouldClose() const noexcept { return glfwWindowShouldClose(m_window) != 0; }
+Dimensions<int> GlfwWrapper::dimensions() const {
+    Dimensions<int> dimensions{};
+    glfwGetFramebufferSize(m_window, &dimensions.width, &dimensions.height);
+    return dimensions;
+}
 
-    void GlfwWrapper::setShouldClose(bool value) noexcept {
-        glfwSetWindowShouldClose(m_window, value ? GLFW_TRUE : GLFW_FALSE);
-    }
+void GlfwWrapper::finishFrame() const {
+    glfwSwapBuffers(m_window);
+    glfwPollEvents();
+}
+
+void GlfwWrapper::fillFrame(float r, float g, float b, float a) const {
+    const auto dims = dimensions();
+    glViewport(0, 0, dims.width, dims.height);
+    glClearColor(r, g, b, a);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+bool GlfwWrapper::shouldClose() const noexcept { return glfwWindowShouldClose(m_window) != 0; }
+
+void GlfwWrapper::setShouldClose(bool value) noexcept {
+    glfwSetWindowShouldClose(m_window, value ? GLFW_TRUE : GLFW_FALSE);
+}
