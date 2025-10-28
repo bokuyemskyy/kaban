@@ -1,14 +1,8 @@
-######## BINARIES ########
-*
-!*.*
-!*/
-
 ######## VSCODE ########
 .vscode/
 
 ######## CMAKE ########
 /build/
-/out/
 
 ######## PROFILER ######## 
 perf.data
@@ -19,9 +13,6 @@ perf.data.old
 
 ######## IMGUI ########
 imgui.ini
-
-######## DOXYGEN ########
-!Doxyfile
 
 ######## VCPKG ########
 /vcpkg_installed/
