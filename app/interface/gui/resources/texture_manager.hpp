@@ -2,16 +2,21 @@
 
 #include <imgui.h>
 #include <stb_image.h>
-
+#include <string>
 #include <stdexcept>
 
 #include "color.hpp"
 
-#ifdef _WIN32
-#include <GL/gl.h>
-#include <windows.h>
-#elif __linux__
-#include <GL/gl.h>
+#if defined(_WIN32)
+    #include <windows.h>
+    #include <GL/gl.h>
+#elif defined(__linux__)
+    #include <GL/gl.h>
+#elif defined(__APPLE__)
+    #define GL_SILENCE_DEPRECATION
+    #include <TargetConditionals.h>
+    #include <OpenGL/gl3.h>
+    #include <OpenGL/gl3ext.h>
 #endif
 
 #include "piece.hpp"
@@ -21,7 +26,7 @@ class TextureManager {
    public:
     TextureManager() {
         for (Piece piece : Pieces::all()) {
-            std::string name;
+            std::string name = {};
             name += static_cast<char>(std::tolower(piece.toChar()));
             name += piece.color() == Colors::WHITE ? 'w' : 'b';
             const Resource* resource = ResourceManager::get(name + ".png");

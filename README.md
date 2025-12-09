@@ -2,7 +2,7 @@
 
 [![CI/CD](https://github.com/bokuyemskyy/kaban/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/bokuyemskyy/kaban/actions/workflows/ci-cd.yml)   
 
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black) ![Windows](https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black) ![Windows](https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white) [![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=F0F0F0)]
 
 ![Documentation](https://img.shields.io/badge/Documentation-WIP-cc2a34?labelColor=31393f)
 
@@ -78,7 +78,7 @@ cmake --build build
 ```
 With Ninja:
 ```
-cmake --build --preset Release   # or Debug
+cmake --build --preset release   # or debug
 ```
 
 ### Run
