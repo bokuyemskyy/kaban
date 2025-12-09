@@ -2,12 +2,19 @@
 
 #include <stb_image.h>
 
-#ifdef _WIN32
-#include <GL/gl.h>
-#include <windows.h>
-#elif __linux__
-#include <GL/gl.h>
+
+
+#if defined(_WIN32)
+    #include <windows.h>
+    #include <GL/gl.h>
+#elif defined(__linux__)
+    #include <GL/gl.h>
+#elif defined(__APPLE__)
+    #include <TargetConditionals.h>
+    #include <OpenGL/gl3.h>
+    #include <OpenGL/gl3ext.h>
 #endif
+
 
 #include <imgui.h>
 

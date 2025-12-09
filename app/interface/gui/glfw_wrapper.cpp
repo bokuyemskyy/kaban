@@ -2,14 +2,18 @@
 
 #include <stdexcept>
 
-#ifdef _WIN32
-#include <GL/gl.h>
-#include <windows.h>
-#elif __linux__
-#include <GL/gl.h>
+#if defined(_WIN32)
+    #include <windows.h>
+    #include <GL/gl.h>
+    #include <GLFW/glfw3.h>
+#elif defined(__linux__)
+    #include <GL/gl.h>
+    #include <GLFW/glfw3.h>
+#elif defined(__APPLE__)
+    #include <TargetConditionals.h>
+    #include <OpenGL/gl3.h>
+    #include <OpenGL/gl3ext.h>
 #endif
-
-#include <GLFW/glfw3.h>
 
 #include <string>
 
@@ -21,8 +25,13 @@ GlfwWrapper::GlfwWrapper(int width, int height, const std::string& title, bool u
     }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    #if defined(__APPLE__)
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
+    #endif
+    
     m_monitor = glfwGetPrimaryMonitor();
     m_window  = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
