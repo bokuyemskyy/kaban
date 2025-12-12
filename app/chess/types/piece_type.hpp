@@ -35,3 +35,10 @@ constexpr uint8_t count() noexcept { return 6; }
 
 constexpr std::array<PieceType, count()> all() { return {PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING}; }
 };  // namespace PieceTypes
+
+namespace std {
+template <>
+struct hash<PieceType> {
+    std::size_t operator()(const PieceType& piece) const noexcept { return std::hash<uint8_t>()(piece.value()); }
+};
+}  // namespace std

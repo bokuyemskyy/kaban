@@ -34,6 +34,8 @@ enum class GenerationTypes : uint8_t {
     LEGAL
 };
 
+using Board = std::array<Piece, Squares::count()>;
+
 class Position {
    public:
     explicit Position(const std::string& fen = DEFAULT_FEN) { fromFen(fen); }
@@ -42,6 +44,26 @@ class Position {
     void reset();
 
     [[nodiscard]] std::string toFen() const;
+
+    [[nodiscard]] bool isGameOver() {
+        std::array<Move, 256> move_list{};
+        auto                  size = generateMoves<GenerationTypes::LEGAL>(move_list.data());
+        return (size == 0);
+    };
+    [[nodiscard]] bool isCheckmate() {
+        if (isGameOver()) {
+            Square king = lsb(occupancy<Sides::US>(PieceTypes::KING));
+            return !isSafe<Sides::THEM>(king);
+        }
+        return false;
+    }
+    [[nodiscard]] bool isStalemate() {
+        if (isGameOver()) {
+            Square king = lsb(occupancy<Sides::US>(PieceTypes::KING));
+            return isSafe<Sides::THEM>(king);
+        }
+        return false;
+    }
 
     UndoInfo makeMove(Move move);
     void     unmakeMove(Move move, const UndoInfo& undo_info);
@@ -79,7 +101,7 @@ class Position {
 
     template <Sides Attacker>
     [[nodiscard]] bool isSafe(Square square) const {
-        assert(Attacker == Sides::US || Attacker == Sides::THEM);
+        assert(Attacker != Sides::BOTH);
         if constexpr (Attacker == Sides::US) {
             if (m_stm == Colors::WHITE) {
                 if ((pawnAttacks<Colors::BLACK>(square) & occupancy<Attacker>(PieceTypes::PAWN)).any()) return false;
@@ -109,7 +131,8 @@ class Position {
     }
 
     template <GenerationTypes GT>
-    Move* generateMoves(Move* move_list) {
+    size_t generateMoves(Move* move_list) {
+        Move* first = move_list;
         if constexpr (GT == GenerationTypes::ALL) {
             if (m_stm == Colors::WHITE)
                 move_list = generatePawnMoves<Colors::WHITE>(occupancy<Sides::US>(PieceTypes::PAWN), move_list);
@@ -123,71 +146,24 @@ class Position {
             move_list = generatePieceMoves<PieceTypes::KING>(occupancy<Sides::US>(PieceTypes::KING), move_list);
 
             move_list = generateCastling(move_list);
-            return move_list;
+            return static_cast<size_t>(move_list - first);
         } else if constexpr (GT == GenerationTypes::LEGAL) {
-            Move* legal_move_list = move_list;
+            Move* start = move_list;
+            Move* end   = start + generateMoves<GenerationTypes::ALL>(move_list);
 
-            move_list = generateMoves<GenerationTypes::ALL>(move_list);
+            Move* out = start;
 
-            for (Move* i = legal_move_list; i < move_list; i++) {
-                UndoInfo undo_info = makeMove(*i);
-                if (isLegal<false>()) *legal_move_list++ = *i;
-                unmakeMove(*i, undo_info);
+            for (Move* m = start; m < end; ++m) {
+                UndoInfo undo = makeMove(*m);
+                if (isLegal<false>()) *out++ = *m;
+                unmakeMove(*m, undo);
             }
 
-            return legal_move_list;
+            return static_cast<size_t>(out - start);
         } else {
-            return move_list;
+            return static_cast<size_t>(move_list - first);
         }
     }
-    uint64_t perftRoot(int depth) {
-        static constexpr size_t MAX_MOVES = 256;
-        static constexpr size_t MAX_DEPTH = 10;
-
-        static std::array<Move, MAX_MOVES * MAX_DEPTH> move_stack;
-        uint64_t                                       total = 0;
-
-        using Clock = std::chrono::high_resolution_clock;
-        auto start  = Clock::now();
-
-        Move* move_list_end = generateMoves<GenerationTypes::ALL>(move_stack.data());
-
-        for (Move* i = move_stack.data(); i < move_list_end; ++i) {
-            UndoInfo undo = makeMove(*i);
-            if (isLegal<false>()) {
-                uint64_t nodes = (depth == 1) ? 1 : perft(depth - 1, move_list_end);
-                std::cout << (*i).toString() << ": " << nodes << std::endl;
-                total += nodes;
-            }
-            unmakeMove(*i, undo);
-        }
-
-        auto                          end     = Clock::now();
-        std::chrono::duration<double> elapsed = end - start;
-        std::cout << "Total nodes: " << total << "\n";
-        std::cout << "Elapsed time: " << elapsed.count() << " seconds\n";
-        std::cout << "Nodes per second: " << std::floor(total / elapsed.count()) << std::endl;
-
-        return total;
-    }
-
-    uint64_t perft(int depth, Move* move_list) {
-        if (depth == 0) return 1;
-
-        Move*    move_list_end = generateMoves<GenerationTypes::ALL>(move_list);
-        uint64_t nodes         = 0;
-
-        for (Move* i = move_list; i < move_list_end; ++i) {
-            UndoInfo undo = makeMove(*i);
-            if (isLegal<false>()) [[likely]] {
-                nodes += perft(depth - 1, move_list_end);
-            }
-            unmakeMove(*i, undo);
-        }
-
-        return nodes;
-    }
-
     template <Sides S>
     [[nodiscard]] Bitboard occupancy() const {
         if constexpr (S == Sides::US)
@@ -210,7 +186,7 @@ class Position {
     void unsetPiece(Square square);
     void movePiece(Square from, Square to);
 
-    std::array<Piece, Squares::count()>       m_board{};
+    Board                                     m_board{};
     std::array<Bitboard, Colors::count()>     m_color{Bitboards::ZERO};
     std::array<Bitboard, PieceTypes::count()> m_piece_type{Bitboards::ZERO};
 

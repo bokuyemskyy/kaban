@@ -48,6 +48,10 @@ class Uci {
             setPosition(tokens);
         } else if (cmd == "go") {
             go(tokens);
+        } else if (cmd == "fen") {
+            std::cout << m_engine.toFen() << std::endl;
+        } else if (cmd == "stop") {
+            stop();
         } else if (cmd == "quit") {
             m_shouldQuit = true;
         } else {
@@ -81,14 +85,19 @@ class Uci {
     }
 
     void go(std::deque<std::string>& tokens) {
-        if (tokens.empty()) return;
+        if (tokens.empty()) m_engine.go(SearchParameters{});
 
         if (tokens.front() == "perft") {
             tokens.pop_front();
             int depth = 1;
             if (!tokens.empty()) {
-                depth = std::stoi(tokens.front());
-                tokens.pop_front();
+                try {
+                    depth = std::stoi(tokens.front());
+                    tokens.pop_front();
+                } catch (const std::exception& e) {
+                    std::cerr << "Error: " << e.what() << std::endl;
+                    return;
+                }
             }
 
             auto nodes = m_engine.perft(depth);
@@ -96,7 +105,38 @@ class Uci {
             std::cout << std::endl;
             std::cout << "Nodes searched: " << nodes << std::endl;
         }
+
+        SearchParameters params;
+
+        while (!tokens.empty()) {
+            std::string token = tokens.front();
+            tokens.pop_front();
+
+            try {
+                if (token == "wtime" && !tokens.empty()) {
+                    params.wtime_ms = std::stoi(tokens.front());
+                    tokens.pop_front();
+                } else if (token == "btime" && !tokens.empty()) {
+                    params.btime_ms = std::stoi(tokens.front());
+                    tokens.pop_front();
+                } else if (token == "movetime" && !tokens.empty()) {
+                    params.max_time_ms = std::stoi(tokens.front());
+                    tokens.pop_front();
+                } else if (token == "depth" && !tokens.empty()) {
+                    params.max_depth = std::stoi(tokens.front());
+                    tokens.pop_front();
+                }
+
+            } catch (const std::exception& e) {
+                std::cerr << "Error parsing search parameter: " << token << std::endl;
+                break;
+            }
+        }
+
+        m_engine.go(params);
     }
+
+    void stop() { m_engine.stop(); }
 
     bool m_shouldQuit{false};
 
