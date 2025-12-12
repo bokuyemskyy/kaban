@@ -144,9 +144,9 @@ class Engine {
         size_t                size = pos.generateMoves<GenerationTypes::LEGAL>(possible_moves.data());
 
         auto scoreMove = [&](const Move& m) {
-            if (m_position.at(m.to()) != Pieces::NONE) {
-                return 10 * Evaluation::pieceValue(m_position.at(m.to()).type()) -
-                       Evaluation::pieceValue(m_position.at(m.from()).type());
+            if (pos.at(m.to()) != Pieces::NONE) {
+                return 10 * Evaluation::pieceValue(pos.at(m.to()).type()) -
+                       Evaluation::pieceValue(pos.at(m.from()).type());
             }
             return 0;
         };
