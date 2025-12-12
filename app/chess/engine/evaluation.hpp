@@ -6,7 +6,7 @@
 
 class Evaluation {
    public:
-    inline static const double MATE_SCORE = -10000.0;
+    inline static const double MATE_SCORE = -100000.0;
 
     static double evaluatePosition(Position& position) {
         if (position.isGameOver()) {
@@ -20,6 +20,7 @@ class Evaluation {
 
         return evaluatePeSTO(position);
     }
+    static int pieceValue(PieceType piece_type) { return mg_value[piece_type.value()]; }
 
    private:
     // clang-format off
@@ -27,7 +28,7 @@ class Evaluation {
     inline static const int eg_value[6] = { 94, 281, 297, 512,  936, 0 };
 
     inline static const int game_phase_weights[6] = { 0, 1, 1, 2, 4, 0 };
-    
+
     inline static const int pawn_pst[64] = {
           0,   0,   0,   0,   0,   0,   0,   0,
          98, 134,  61,  95,  68, 126,  34, -11,
