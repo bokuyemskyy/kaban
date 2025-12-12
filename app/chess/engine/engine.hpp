@@ -34,7 +34,7 @@ class Engine {
 
         SearchParameters effective_params = params;
 
-        auto calculate_time_limit = [](int time_ms) -> int { return std::max(time_ms / 300, 2); };
+        auto calculate_time_limit = [](int time_ms) -> int { return std::max(time_ms / 100, 2); };
 
         if (params.wtime_ms != -1 && m_position.us() == Colors::WHITE) {
             effective_params.max_time_ms = calculate_time_limit(params.wtime_ms);
@@ -48,6 +48,18 @@ class Engine {
     void search(const SearchParameters& params) {
         std::array<Move, 256> possible_moves{};
         size_t                size = m_position.generateMoves<GenerationTypes::LEGAL>(possible_moves.data());
+
+        auto scoreMove = [&](const Move& m) {
+            if (m_position.at(m.to()) != Pieces::NONE) {
+                return 10 * Evaluation::pieceValue(m_position.at(m.to()).type()) -
+                       Evaluation::pieceValue(m_position.at(m.from()).type());
+            }
+            return 0;
+        };
+
+        std::sort(possible_moves.begin(), possible_moves.begin() + size,
+                  [&](const Move& a, const Move& b) { return scoreMove(a) > scoreMove(b); });
+
         if (size == 0) {
             m_best_move   = Move();
             m_stop_search = true;
@@ -130,6 +142,17 @@ class Engine {
 
         std::array<Move, 256> possible_moves{};
         size_t                size = pos.generateMoves<GenerationTypes::LEGAL>(possible_moves.data());
+
+        auto scoreMove = [&](const Move& m) {
+            if (m_position.at(m.to()) != Pieces::NONE) {
+                return 10 * Evaluation::pieceValue(m_position.at(m.to()).type()) -
+                       Evaluation::pieceValue(m_position.at(m.from()).type());
+            }
+            return 0;
+        };
+
+        std::sort(possible_moves.begin(), possible_moves.begin() + size,
+                  [&](const Move& a, const Move& b) { return scoreMove(a) > scoreMove(b); });
 
         double best_score = -std::numeric_limits<double>::infinity();
 
