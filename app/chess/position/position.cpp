@@ -130,13 +130,13 @@ void Position::fromFen(const std::string& fen) {
 std::string Position::toFen() const {
     std::stringstream fen;
 
-    for (Rank r = Ranks::R8; r >= Ranks::R1; --r) {
+    for (Rank r = Ranks::R8; r >= Ranks::R1 && r <= Ranks::R8; --r) {
         int empty = 0;
         for (File f = Files::FA; f <= Files::FH; ++f) {
             const Square s = Square(f, r);
             const Piece  p = m_board[s.value()];
 
-            if (p.hasValue()) {
+            if (p == Pieces::NONE) {
                 ++empty;
             } else {
                 if (empty > 0) {

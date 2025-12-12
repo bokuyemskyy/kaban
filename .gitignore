@@ -41,3 +41,7 @@ imgui.ini
 *.exe
 *.out
 *.app
+
+.continue/
+.DS_Store
+archive/
