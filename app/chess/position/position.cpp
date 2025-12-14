@@ -127,6 +127,25 @@ void Position::fromFen(const std::string& fen) {
     m_halfmove.set(static_cast<uint8_t>(std::stoi(halfmove)));
 }
 
+bool Position::isAttacked(Square square, Color attacker) const {
+    if (attacker == Colors::WHITE) {
+        if ((pawnAttacks<Colors::BLACK>(square) & occupancy(Colors::WHITE, PieceTypes::PAWN)).any()) return true;
+    } else {
+        if ((pawnAttacks<Colors::WHITE>(square) & occupancy(Colors::BLACK, PieceTypes::PAWN)).any()) return true;
+    }
+    if ((pseudoAttacks<PieceTypes::KING>(square) & occupancy(attacker, PieceTypes::KING)).any()) return true;
+    if ((pseudoAttacks<PieceTypes::KNIGHT>(square) & occupancy(attacker, PieceTypes::KNIGHT)).any()) return true;
+
+    Bitboard queens  = occupancy(attacker, PieceTypes::QUEEN);
+    Bitboard bishops = occupancy(attacker, PieceTypes::BISHOP) | queens;
+    Bitboard rooks   = occupancy(attacker, PieceTypes::ROOK) | queens;
+
+    if (bishops.any() && (pseudoAttacks<PieceTypes::BISHOP>(square) & bishops).any()) return true;
+
+    if (rooks.any() && (pseudoAttacks<PieceTypes::ROOK>(square) & rooks).any()) return true;
+
+    return false;
+}
 std::string Position::toFen() const {
     std::stringstream fen;
 

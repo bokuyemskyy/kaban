@@ -1,26 +1,61 @@
 #pragma once
-
-#include <array>
-
 #include "position.hpp"
 
 class Evaluation {
    public:
-    inline static const double MATE_SCORE = -100000.0;
+    static constexpr int MATE_SCORE     = 30000;
+    static constexpr int MATE_THRESHOLD = 29000;
 
-    static double evaluatePosition(Position& position) {
-        if (position.isGameOver()) {
-            if (position.isCheckmate()) {
-                return MATE_SCORE;
+    static int evaluate(const Position& position) {
+        int mg_score[2] = {0, 0};
+        int eg_score[2] = {0, 0};
+        int game_phase  = 0;
+
+        for (Square sq : Squares::all()) {
+            Piece piece = position.at(sq);
+            if (piece == Pieces::NONE) continue;
+
+            PieceType type  = piece.type();
+            Color     color = piece.color();
+            int       c_idx = color.value();
+
+            int pst_index = (color == Colors::WHITE) ? sq.value() : (sq.value() ^ 56);
+
+            int mg_val = mg_value[type.value()];
+            int eg_val = eg_value[type.value()];
+
+            int mg_pst_val = 0;
+            int eg_pst_val = 0;
+
+            if (type == PieceTypes::KING) {
+                mg_pst_val = king_mg_pst[pst_index];
+                eg_pst_val = king_eg_pst[pst_index];
+            } else {
+                const int* table = getPstTable(type);
+                if (table) {
+                    mg_pst_val = table[pst_index];
+                    eg_pst_val = table[pst_index];
+                }
             }
-            if (position.isStalemate()) {
-                return 0.0;
-            }
+
+            mg_score[c_idx] += (mg_val + mg_pst_val);
+            eg_score[c_idx] += (eg_val + eg_pst_val);
+            game_phase += game_phase_weights[type.value()];
         }
 
-        return evaluatePeSTO(position);
+        if (game_phase > 24) game_phase = 24;
+        int mg_phase = game_phase;
+        int eg_phase = 24 - game_phase;
+
+        int score_white =
+            (mg_score[Colors::WHITE.value()] * mg_phase + eg_score[Colors::WHITE.value()] * eg_phase) / 24;
+        int score_black =
+            (mg_score[Colors::BLACK.value()] * mg_phase + eg_score[Colors::BLACK.value()] * eg_phase) / 24;
+
+        return (position.us() == Colors::WHITE) ? (score_white - score_black) : (score_black - score_white);
     }
-    static int pieceValue(PieceType piece_type) { return mg_value[piece_type.value()]; }
+
+    static int pieceValue(PieceType pt) { return mg_value[pt.value()]; }
 
    private:
     // clang-format off
@@ -107,21 +142,20 @@ class Evaluation {
     };
     // clang-format on
 
-    static const int* getPstTable(PieceType pieceType, bool isEndgameForKing) {
-        if (pieceType == PieceTypes::PAWN) {
-            return pawn_pst;
-        } else if (pieceType == PieceTypes::KNIGHT) {
-            return knight_pst;
-        } else if (pieceType == PieceTypes::BISHOP) {
-            return bishop_pst;
-        } else if (pieceType == PieceTypes::ROOK) {
-            return rook_pst;
-        } else if (pieceType == PieceTypes::QUEEN) {
-            return queen_pst;
-        } else if (pieceType == PieceTypes::KING) {
-            return isEndgameForKing ? king_eg_pst : king_mg_pst;
-        } else {
-            return nullptr;
+    static const int* getPstTable(PieceType pieceType) {
+        switch (pieceType.value()) {
+            case PieceTypes::PAWN.value():
+                return pawn_pst;
+            case PieceTypes::KNIGHT.value():
+                return knight_pst;
+            case PieceTypes::BISHOP.value():
+                return bishop_pst;
+            case PieceTypes::ROOK.value():
+                return rook_pst;
+            case PieceTypes::QUEEN.value():
+                return queen_pst;
+            default:
+                return nullptr;
         }
     }
     static double evaluatePeSTO(Position& position) {
@@ -151,7 +185,7 @@ class Evaluation {
                 mg_pos = king_mg_pst[pst_index];
                 eg_pos = king_eg_pst[pst_index];
             } else {
-                const int* table = getPstTable(type, false);
+                const int* table = getPstTable(type);
                 if (table) {
                     mg_pos = table[pst_index];
                     eg_pos = table[pst_index];

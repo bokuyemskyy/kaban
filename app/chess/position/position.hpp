@@ -45,24 +45,9 @@ class Position {
 
     [[nodiscard]] std::string toFen() const;
 
-    [[nodiscard]] bool isGameOver() {
-        std::array<Move, 256> move_list{};
-        auto                  size = generateMoves<GenerationTypes::LEGAL>(move_list.data());
-        return (size == 0);
-    };
-    [[nodiscard]] bool isCheckmate() {
-        if (isGameOver()) {
-            Square king = lsb(occupancy<Sides::US>(PieceTypes::KING));
-            return !isSafe<Sides::THEM>(king);
-        }
-        return false;
-    }
-    [[nodiscard]] bool isStalemate() {
-        if (isGameOver()) {
-            Square king = lsb(occupancy<Sides::US>(PieceTypes::KING));
-            return isSafe<Sides::THEM>(king);
-        }
-        return false;
+    [[nodiscard]] bool isCheck() {
+        Square king = lsb(occupancy(m_stm, PieceTypes::KING));
+        return isAttacked(king, !m_stm);
     }
 
     UndoInfo makeMove(Move move);
@@ -83,67 +68,37 @@ class Position {
     template <bool F>
     [[nodiscard]] bool isLegal() const {
         if constexpr (F) {  // first check, when new position is set. the moves are guaranteed to be legal
-            if (popcount(occupancy<Sides::US>(PieceTypes::KING)) != 1) return false;
-            if (popcount(occupancy<Sides::THEM>(PieceTypes::KING)) != 1) return false;
-            if (popcount(occupancy<Sides::US>(PieceTypes::PAWN)) > 8) return false;
-            if (popcount(occupancy<Sides::THEM>(PieceTypes::PAWN)) > 8) return false;
-            if (popcount(occupancy<Sides::US>()) > 16) return false;
-            if (popcount(occupancy<Sides::THEM>()) > 16) return false;
-            if ((occupancy<Sides::BOTH>(PieceTypes::PAWN) & (Bitboard::rank(Ranks::R1) | Bitboard::rank(Ranks::R8)))
-                    .any())
+            if (popcount(occupancy(m_stm, PieceTypes::KING)) != 1) return false;
+            if (popcount(occupancy(!m_stm, PieceTypes::KING)) != 1) return false;
+            if (popcount(occupancy(m_stm, PieceTypes::PAWN)) > 8) return false;
+            if (popcount(occupancy(!m_stm, PieceTypes::PAWN)) > 8) return false;
+            if (popcount(occupancy(m_stm)) > 16) return false;
+            if (popcount(occupancy(!m_stm)) > 16) return false;
+            if ((occupancy(PieceTypes::PAWN) & (Bitboard::rank(Ranks::R1) | Bitboard::rank(Ranks::R8))).any())
                 return false;
         }
 
-        Square king = lsb(occupancy<Sides::THEM>(PieceTypes::KING));
+        Square king = lsb(occupancy(!m_stm, PieceTypes::KING));
 
-        return isSafe<Sides::US>(king);
+        return !isAttacked(king, m_stm);
     }
 
-    template <Sides Attacker>
-    [[nodiscard]] bool isSafe(Square square) const {
-        assert(Attacker != Sides::BOTH);
-        if constexpr (Attacker == Sides::US) {
-            if (m_stm == Colors::WHITE) {
-                if ((pawnAttacks<Colors::BLACK>(square) & occupancy<Attacker>(PieceTypes::PAWN)).any()) return false;
-            } else {
-                if ((pawnAttacks<Colors::WHITE>(square) & occupancy<Attacker>(PieceTypes::PAWN)).any()) return false;
-            }
-        } else {
-            if (m_stm == Colors::WHITE) {
-                if ((pawnAttacks<Colors::WHITE>(square) & occupancy<Attacker>(PieceTypes::PAWN)).any()) return false;
-            } else {
-                if ((pawnAttacks<Colors::BLACK>(square) & occupancy<Attacker>(PieceTypes::PAWN)).any()) return false;
-            }
-        }
-        if ((pseudoAttacks<PieceTypes::KING>(square) & occupancy<Attacker>(PieceTypes::KING)).any()) return false;
-        if ((pseudoAttacks<PieceTypes::KNIGHT>(square) & occupancy<Attacker>(PieceTypes::KNIGHT)).any()) return false;
-        if ((pseudoAttacks<PieceTypes::BISHOP>(square) &
-             (occupancy<Attacker>(PieceTypes::BISHOP) | occupancy<Attacker>(PieceTypes::QUEEN)))
-                .any())
-            return false;
-
-        if ((pseudoAttacks<PieceTypes::ROOK>(square) &
-             (occupancy<Attacker>(PieceTypes::ROOK) | occupancy<Attacker>(PieceTypes::QUEEN)))
-                .any())
-            return false;
-
-        return true;
-    }
+    [[nodiscard]] bool isAttacked(Square square, Color attacker) const;
 
     template <GenerationTypes GT>
     size_t generateMoves(Move* move_list) {
         Move* first = move_list;
         if constexpr (GT == GenerationTypes::ALL) {
             if (m_stm == Colors::WHITE)
-                move_list = generatePawnMoves<Colors::WHITE>(occupancy<Sides::US>(PieceTypes::PAWN), move_list);
+                move_list = generatePawnMoves<Colors::WHITE>(occupancy(m_stm, PieceTypes::PAWN), move_list);
             else
-                move_list = generatePawnMoves<Colors::BLACK>(occupancy<Sides::US>(PieceTypes::PAWN), move_list);
+                move_list = generatePawnMoves<Colors::BLACK>(occupancy(m_stm, PieceTypes::PAWN), move_list);
 
-            move_list = generatePieceMoves<PieceTypes::KNIGHT>(occupancy<Sides::US>(PieceTypes::KNIGHT), move_list);
-            move_list = generatePieceMoves<PieceTypes::BISHOP>(occupancy<Sides::US>(PieceTypes::BISHOP), move_list);
-            move_list = generatePieceMoves<PieceTypes::ROOK>(occupancy<Sides::US>(PieceTypes::ROOK), move_list);
-            move_list = generatePieceMoves<PieceTypes::QUEEN>(occupancy<Sides::US>(PieceTypes::QUEEN), move_list);
-            move_list = generatePieceMoves<PieceTypes::KING>(occupancy<Sides::US>(PieceTypes::KING), move_list);
+            move_list = generatePieceMoves<PieceTypes::KNIGHT>(occupancy(m_stm, PieceTypes::KNIGHT), move_list);
+            move_list = generatePieceMoves<PieceTypes::BISHOP>(occupancy(m_stm, PieceTypes::BISHOP), move_list);
+            move_list = generatePieceMoves<PieceTypes::ROOK>(occupancy(m_stm, PieceTypes::ROOK), move_list);
+            move_list = generatePieceMoves<PieceTypes::QUEEN>(occupancy(m_stm, PieceTypes::QUEEN), move_list);
+            move_list = generatePieceMoves<PieceTypes::KING>(occupancy(m_stm, PieceTypes::KING), move_list);
 
             move_list = generateCastling(move_list);
             return static_cast<size_t>(move_list - first);
@@ -164,22 +119,15 @@ class Position {
             return static_cast<size_t>(move_list - first);
         }
     }
-    template <Sides S>
-    [[nodiscard]] Bitboard occupancy() const {
-        if constexpr (S == Sides::US)
-            return m_color[m_stm.value()];
-        else if constexpr (S == Sides::THEM)
-            return m_color[(!m_stm).value()];
-        else
-            return m_color[Colors::WHITE.value()] | m_color[Colors::BLACK.value()];
-    }
 
-    template <Sides S>
-    [[nodiscard]] Bitboard occupancy(PieceType pt) const {
-        return occupancy<S>() & m_piece_type[pt.value()];
+    [[nodiscard]] Bitboard occupancy(Color c) const { return m_color[c.value()]; }
+    [[nodiscard]] Bitboard occupancy(Color c, PieceType pt) const {
+        return m_color[c.value()] & m_piece_type[pt.value()];
     }
-
     [[nodiscard]] Bitboard occupancy(PieceType pt) const { return m_piece_type[pt.value()]; }
+    [[nodiscard]] Bitboard occupancyAll() const {
+        return m_color[Colors::WHITE.value()] | m_color[Colors::BLACK.value()];
+    }
 
    private:
     void setPiece(Square square, Piece p);
@@ -206,12 +154,12 @@ class Position {
             static constexpr auto table = Bitboard::pseudoAttacks(Directions::of(PieceTypes::KING));
             return table[square.value()];
         } else if constexpr (PT == PieceTypes::BISHOP) {
-            return m_magics.lookup<PieceTypes::BISHOP>(square, occupancy<Sides::BOTH>());
+            return m_magics.lookup<PieceTypes::BISHOP>(square, occupancyAll());
         } else if constexpr (PT == PieceTypes::ROOK) {
-            return m_magics.lookup<PieceTypes::ROOK>(square, occupancy<Sides::BOTH>());
+            return m_magics.lookup<PieceTypes::ROOK>(square, occupancyAll());
         } else if constexpr (PT == PieceTypes::QUEEN) {
-            return m_magics.lookup<PieceTypes::ROOK>(square, occupancy<Sides::BOTH>()) |
-                   m_magics.lookup<PieceTypes::BISHOP>(square, occupancy<Sides::BOTH>());
+            return m_magics.lookup<PieceTypes::ROOK>(square, occupancyAll()) |
+                   m_magics.lookup<PieceTypes::BISHOP>(square, occupancyAll());
         }
     }
 
@@ -231,7 +179,7 @@ class Position {
         while (pieces.any()) {
             Square from = poplsb(pieces);
 
-            Bitboard attacks = pawnAttacks<C>(from) & occupancy<Sides::THEM>();
+            Bitboard attacks = pawnAttacks<C>(from) & occupancy(!m_stm);
             while (attacks.any()) {
                 Square to = poplsb(attacks);
                 if (to.rank() == (C == Colors::WHITE ? Ranks::R8 : Ranks::R1)) {
@@ -256,7 +204,7 @@ class Position {
             }
 
             Square single_push = from.move(C == Colors::WHITE ? Directions::N : Directions::S);
-            if ((Bitboard::square(single_push) & ~occupancy<Sides::BOTH>()).any()) {
+            if ((Bitboard::square(single_push) & ~occupancyAll()).any()) {
                 if (single_push.rank() == (C == Colors::WHITE ? Ranks::R8 : Ranks::R1)) {
                     *move_list++ = Move(from, single_push, MoveFlags::PROMOTION_QUEEN);
                     *move_list++ = Move(from, single_push, MoveFlags::PROMOTION_ROOK);
@@ -268,13 +216,13 @@ class Position {
                     if constexpr (C == Colors::WHITE) {
                         if (from.rank() == Ranks::R2) {
                             Square double_push = single_push.move(Directions::N);
-                            if ((Bitboard::square(double_push) & ~occupancy<Sides::BOTH>()).any())
+                            if ((Bitboard::square(double_push) & ~occupancyAll()).any())
                                 *move_list++ = Move(from, double_push, MoveFlags::PAWN_DOUBLE_PUSH);
                         }
                     } else {
                         if (from.rank() == Ranks::R7) {
                             Square double_push = single_push.move(Directions::S);
-                            if ((Bitboard::square(double_push) & ~occupancy<Sides::BOTH>()).any())
+                            if ((Bitboard::square(double_push) & ~occupancyAll()).any())
                                 *move_list++ = Move(from, double_push, MoveFlags::PAWN_DOUBLE_PUSH);
                         }
                     }
@@ -288,7 +236,7 @@ class Position {
     Move* generatePieceMoves(Bitboard pieces, Move* move_list) const {
         while (pieces.any()) {
             Square   from    = poplsb(pieces);
-            Bitboard targets = pseudoAttacks<PT>(from) & ~occupancy<Sides::US>();
+            Bitboard targets = pseudoAttacks<PT>(from) & ~occupancy(m_stm);
             while (targets.any()) {
                 *move_list++ = Move(from, poplsb(targets));
             }
@@ -299,24 +247,24 @@ class Position {
     Move* generateCastling(Move* move_list) const {
         if (m_stm == Colors::WHITE) {
             if (m_castling.has(Castlings::W_KING_SIDE) &&
-                !(Bitboard::between(Squares::E1, Squares::H1) & occupancy<Sides::BOTH>()).any()) {
-                if (isSafe<Sides::THEM>(Squares::E1) && isSafe<Sides::THEM>(Squares::F1))
+                !(Bitboard::between(Squares::E1, Squares::H1) & occupancyAll()).any()) {
+                if (!isAttacked(Squares::E1, Colors::BLACK) && !isAttacked(Squares::F1, Colors::BLACK))
                     *move_list++ = Move(Squares::E1, Squares::G1, MoveFlags::CASTLING_KING);
             }
             if (m_castling.has(Castlings::W_QUEEN_SIDE) &&
-                !(Bitboard::between(Squares::E1, Squares::A1) & occupancy<Sides::BOTH>()).any()) {
-                if (isSafe<Sides::THEM>(Squares::E1) && isSafe<Sides::THEM>(Squares::D1))
+                !(Bitboard::between(Squares::E1, Squares::A1) & occupancyAll()).any()) {
+                if (!isAttacked(Squares::E1, Colors::BLACK) && !isAttacked(Squares::D1, Colors::BLACK))
                     *move_list++ = Move(Squares::E1, Squares::C1, MoveFlags::CASTLING_QUEEN);
             }
         } else {
             if (m_castling.has(Castlings::B_KING_SIDE) &&
-                !(Bitboard::between(Squares::E8, Squares::H8) & occupancy<Sides::BOTH>()).any()) {
-                if (isSafe<Sides::THEM>(Squares::E8) && isSafe<Sides::THEM>(Squares::F8))
+                !(Bitboard::between(Squares::E8, Squares::H8) & occupancyAll()).any()) {
+                if (!isAttacked(Squares::E8, Colors::WHITE) && !isAttacked(Squares::F8, Colors::WHITE))
                     *move_list++ = Move(Squares::E8, Squares::G8, MoveFlags::CASTLING_KING);
             }
             if (m_castling.has(Castlings::B_QUEEN_SIDE) &&
-                !(Bitboard::between(Squares::E8, Squares::A8) & occupancy<Sides::BOTH>()).any()) {
-                if (isSafe<Sides::THEM>(Squares::E8) && isSafe<Sides::THEM>(Squares::D8))
+                !(Bitboard::between(Squares::E8, Squares::A8) & occupancyAll()).any()) {
+                if (!isAttacked(Squares::E8, Colors::WHITE) && !isAttacked(Squares::D8, Colors::WHITE))
                     *move_list++ = Move(Squares::E8, Squares::C8, MoveFlags::CASTLING_QUEEN);
             }
         }

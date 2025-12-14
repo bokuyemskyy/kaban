@@ -26,86 +26,75 @@ class Engine {
     void        fromFen(const std::string& fen) { m_position.fromFen(fen); }
     std::string toFen() { return m_position.toFen(); }
     void        go(const SearchParameters& params) {
+        // 1. Reset State
         m_stop_search = false;
-
         if (m_search_thread.joinable()) {
             m_search_thread.join();
         }
 
         SearchParameters effective_params = params;
 
-        auto calculate_time_limit = [](int time_ms) -> int { return std::max(time_ms / 100, 2); };
+        if (params.wtime_ms != -1 || params.btime_ms != -1) {
+            int time_left = (m_position.us() == Colors::WHITE) ? params.wtime_ms : params.btime_ms;
 
-        if (params.wtime_ms != -1 && m_position.us() == Colors::WHITE) {
-            effective_params.max_time_ms = calculate_time_limit(params.wtime_ms);
-        } else if (params.btime_ms != -1 && m_position.us() == Colors::BLACK) {
-            effective_params.max_time_ms = calculate_time_limit(params.btime_ms);
+            if (time_left != -1) {
+                int time_to_use = time_left / 50;
+
+                int max_allowable            = std::max(0, time_left - 50);
+                effective_params.max_time_ms = std::min(std::max(time_to_use, 5), max_allowable);
+            }
         }
 
         m_search_thread = std::thread(&Engine::search, this, effective_params);
     }
 
     void search(const SearchParameters& params) {
+        m_nodes          = 0;
+        m_start_time     = std::chrono::steady_clock::now();
+        m_allocated_time = params.max_time_ms;
+
         std::array<Move, 256> possible_moves{};
         size_t                size = m_position.generateMoves<GenerationTypes::LEGAL>(possible_moves.data());
-
-        auto scoreMove = [&](const Move& m) {
-            if (m_position.at(m.to()) != Pieces::NONE) {
-                return 10 * Evaluation::pieceValue(m_position.at(m.to()).type()) -
-                       Evaluation::pieceValue(m_position.at(m.from()).type());
-            }
-            return 0;
-        };
-
-        std::sort(possible_moves.begin(), possible_moves.begin() + size,
-                  [&](const Move& a, const Move& b) { return scoreMove(a) > scoreMove(b); });
-
         if (size == 0) {
-            m_best_move   = Move();
+            std::cout << "bestmove (none)" << std::endl;
             m_stop_search = true;
             return;
         }
 
-        auto start_time = std::chrono::steady_clock::now();
-
+        m_best_move   = possible_moves[0];
         int max_depth = (params.max_depth != -1) ? params.max_depth : 64;
 
-        m_best_move = possible_moves[0];
-
         for (int depth = 1; depth <= max_depth; ++depth) {
-            std::cout << "Depth " << depth << std::endl;
-            if (params.max_time_ms != -1) {
-                auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() -
-                                                                                     start_time);
+            if (m_stop_search) break;
 
-                std::cout << elapsed.count() << " " << params.max_time_ms << std::endl;
-                if (elapsed.count() >= params.max_time_ms * 1000) {
-                    std::cout << "a" << std::endl;
-                    m_stop_search = true;
+            int alpha = -Evaluation::MATE_SCORE;
+            int beta  = Evaluation::MATE_SCORE;
+
+            for (size_t i = 0; i < size; ++i) {
+                if (possible_moves[i] == m_best_move) {
+                    std::swap(possible_moves[0], possible_moves[i]);
+                    break;
                 }
             }
-            std::cout << "b" << std::endl;
 
-            double alpha               = -std::numeric_limits<double>::infinity();
-            double beta                = std::numeric_limits<double>::infinity();
-            double best_score_at_depth = -std::numeric_limits<double>::infinity();
-            Move   current_best_move   = m_best_move;
+            Move current_best_move   = m_best_move;
+            int  best_score_at_depth = -Evaluation::MATE_SCORE;
 
             for (size_t i = 0; i < size; i++) {
+                if (m_stop_search) break;
+
                 Move& move = possible_moves[i];
-                if (m_stop_search) {
-                    break;
-                };
-                auto undo_info = m_position.makeMove(move);
+                auto  undo = m_position.makeMove(move);
 
-                double score = -minimax(m_position, depth - 1, -beta, -alpha);
+                int score = -minimax(m_position, depth - 1, -beta, -alpha, 1);
 
-                m_position.unmakeMove(move, undo_info);
+                m_position.unmakeMove(move, undo);
+
+                if (m_stop_search) break;
 
                 if (score > best_score_at_depth) {
                     best_score_at_depth = score;
                     current_best_move   = move;
-                    std::cout << "Score: " << score << " for move " << move.toString() << std::endl;
                 }
 
                 alpha = std::max(alpha, best_score_at_depth);
@@ -113,35 +102,22 @@ class Engine {
 
             if (!m_stop_search) {
                 m_best_move = current_best_move;
-            } else {
-                break;
             }
         }
-        if (m_best_move.hasValue()) {
-            std::cout << "bestmove " << m_best_move.toString() << std::endl;
-        }
+
+        std::cout << "bestmove " << m_best_move.toString() << std::endl;
         m_stop_search = true;
-        m_best_move   = Move();
     }
+    int minimax(Position& pos, int depth, int alpha, int beta, int ply) {
+        if ((m_nodes++ & 1023) == 0) checkTime();
+        if (m_stop_search) return 0;
 
-    double minimax(Position& pos, int depth, double alpha, double beta) {
-        if (m_stop_search) return 0.0;
-
-        if (pos.isGameOver()) {
-            if (pos.isCheckmate()) {
-                return Evaluation::MATE_SCORE - depth;
-            }
-            if (pos.isStalemate()) {
-                return 0.0;
-            }
+        if (depth <= 0) {
+            return Evaluation::evaluate(pos);
         }
 
-        if (depth == 0) {
-            return Evaluation::evaluatePosition(pos);
-        }
-
-        std::array<Move, 256> possible_moves{};
-        size_t                size = pos.generateMoves<GenerationTypes::LEGAL>(possible_moves.data());
+        std::array<Move, 256> moves{};
+        size_t                size = pos.generateMoves<GenerationTypes::ALL>(moves.data());
 
         auto scoreMove = [&](const Move& m) {
             if (pos.at(m.to()) != Pieces::NONE) {
@@ -150,34 +126,58 @@ class Engine {
             }
             return 0;
         };
-
-        std::sort(possible_moves.begin(), possible_moves.begin() + size,
+        std::sort(moves.begin(), moves.begin() + size,
                   [&](const Move& a, const Move& b) { return scoreMove(a) > scoreMove(b); });
 
-        double best_score = -std::numeric_limits<double>::infinity();
+        int best_score        = -Evaluation::MATE_SCORE;
+        int legal_moves_count = 0;
 
         for (size_t i = 0; i < size; i++) {
-            Move& move      = possible_moves[i];
-            auto  undo_info = pos.makeMove(move);
+            Move& move = moves[i];
+            auto  undo = pos.makeMove(move);
 
-            double score = -minimax(pos, depth - 1, -beta, -alpha);
+            if (pos.isLegal<false>()) {
+                legal_moves_count++;
 
-            pos.unmakeMove(move, undo_info);
+                int score = -minimax(pos, depth - 1, -beta, -alpha, ply + 1);
 
-            best_score = std::max(best_score, score);
+                pos.unmakeMove(move, undo);
 
-            alpha = std::max(alpha, best_score);
-            if (alpha >= beta) {
-                break;
+                if (m_stop_search) return 0;
+
+                if (score > best_score) {
+                    best_score = score;
+                    if (score > alpha) {
+                        alpha = score;
+                        if (alpha >= beta) break;
+                    }
+                }
+            } else {
+                pos.unmakeMove(move, undo);
             }
+        }
+
+        if (legal_moves_count == 0) {
+            if (pos.isCheck()) return -Evaluation::MATE_SCORE + ply;
+            return 0;
         }
 
         return best_score;
     }
 
+    void checkTime() {
+        if (m_allocated_time == -1) return;
+
+        auto now        = std::chrono::steady_clock::now();
+        auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_start_time).count();
+
+        if (elapsed_ms >= m_allocated_time) {
+            m_stop_search = true;
+        }
+    }
+
     void stop() {
         m_stop_search = true;
-
         if (m_search_thread.joinable()) {
             m_search_thread.join();
         }
@@ -287,7 +287,10 @@ class Engine {
         return nodes;
     }
 
-    Move              m_best_move = Move();
-    std::thread       m_search_thread;
-    std::atomic<bool> m_stop_search = false;
+    Move                                  m_best_move = Move();
+    std::thread                           m_search_thread;
+    std::atomic<bool>                     m_stop_search = false;
+    std::chrono::steady_clock::time_point m_start_time;
+    int                                   m_allocated_time = -1;
+    uint64_t                              m_nodes          = 0;
 };
