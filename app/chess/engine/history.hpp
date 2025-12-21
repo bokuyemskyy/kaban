@@ -16,6 +16,16 @@ class History {
         m_entries.pop_back();
         return last;
     }
+    [[nodiscard]] std::vector<Move> getMoveHistory() const {
+        std::vector<Move> moves;
+        moves.reserve(m_entries.size());
+
+        for (const auto& entry : m_entries) {
+            moves.push_back(entry.move);
+        }
+
+        return moves;
+    }
 
    private:
     std::vector<HistoryEntry> m_entries{};
