@@ -12,9 +12,9 @@
 
 class Magics {
    public:
-    Magics() {
-        generate(PieceTypes::BISHOP, bishop_magics, bishop_attacks);
-        generate(PieceTypes::ROOK, rook_magics, rook_attacks);
+    static Magics& get() {
+        static Magics instance;
+        return instance;
     }
 
     template <PieceType PT>
@@ -32,6 +32,10 @@ class Magics {
     }
 
    private:
+    Magics() {
+        generate(PieceTypes::BISHOP, bishop_magics, bishop_attacks);
+        generate(PieceTypes::ROOK, rook_magics, rook_attacks);
+    }
     using Shift = uint8_t;
     using Magic = uint64_t;
 

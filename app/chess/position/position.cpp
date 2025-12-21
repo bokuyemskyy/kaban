@@ -152,7 +152,7 @@ std::string Position::toFen() const {
     for (Rank r = Ranks::R8; r >= Ranks::R1 && r <= Ranks::R8; --r) {
         int empty = 0;
         for (File f = Files::FA; f <= Files::FH; ++f) {
-            const Square s = Square(f, r);
+            const Square s(f, r);
             const Piece  p = m_board[s.value()];
 
             if (p == Pieces::NONE) {
@@ -165,11 +165,33 @@ std::string Position::toFen() const {
                 fen << p.toChar();
             }
         }
-        if (empty > 0) {
-            fen << empty;
-        }
-        if (r > Ranks::R1) fen << '/';
+        if (empty > 0) fen << empty;
+
+        if (r != Ranks::R1) fen << '/';
     }
+
+    fen << ' ' << (m_stm == Colors::WHITE ? 'w' : 'b');
+
+    fen << ' ';
+    if (m_castling == Castlings::NONE) {
+        fen << '-';
+    } else {
+        if (m_castling.has(Castlings::W_KING_SIDE)) fen << 'K';
+        if (m_castling.has(Castlings::W_QUEEN_SIDE)) fen << 'Q';
+        if (m_castling.has(Castlings::B_KING_SIDE)) fen << 'k';
+        if (m_castling.has(Castlings::B_QUEEN_SIDE)) fen << 'q';
+    }
+
+    fen << ' ';
+    if (m_en_passant.hasValue()) {
+        fen << Square(m_en_passant.file(), m_stm == Colors::WHITE ? Ranks::R6 : Ranks::R3).toString();
+    } else {
+        fen << '-';
+    }
+
+    fen << ' ' << int(m_halfmove.value());
+
+    fen << " 1";
 
     return fen.str();
 }

@@ -143,8 +143,6 @@ class Position {
     EnPassant m_en_passant{};
     Halfmove  m_halfmove{};
 
-    Magics m_magics{};
-
     template <PieceType PT>
     [[nodiscard]] constexpr Bitboard pseudoAttacks(Square square) const {
         if constexpr (PT == PieceTypes::KNIGHT) {
@@ -154,12 +152,12 @@ class Position {
             static constexpr auto table = Bitboard::pseudoAttacks(Directions::of(PieceTypes::KING));
             return table[square.value()];
         } else if constexpr (PT == PieceTypes::BISHOP) {
-            return m_magics.lookup<PieceTypes::BISHOP>(square, occupancyAll());
+            return Magics::get().lookup<PieceTypes::BISHOP>(square, occupancyAll());
         } else if constexpr (PT == PieceTypes::ROOK) {
-            return m_magics.lookup<PieceTypes::ROOK>(square, occupancyAll());
+            return Magics::get().lookup<PieceTypes::ROOK>(square, occupancyAll());
         } else if constexpr (PT == PieceTypes::QUEEN) {
-            return m_magics.lookup<PieceTypes::ROOK>(square, occupancyAll()) |
-                   m_magics.lookup<PieceTypes::BISHOP>(square, occupancyAll());
+            return Magics::get().lookup<PieceTypes::ROOK>(square, occupancyAll()) |
+                   Magics::get().lookup<PieceTypes::BISHOP>(square, occupancyAll());
         }
     }
 
