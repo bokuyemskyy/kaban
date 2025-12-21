@@ -19,7 +19,7 @@ find_package(Stb REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
 
-add_executable("kaban_gui" ${SOURCES})
+add_executable(kaban_gui ${SOURCES})
 message(${CMAKE_CURRENT_SOURCE_DIR})
 message(${INCLUDE_DIRS})
 target_include_directories(kaban_gui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${INCLUDE_DIRS})

@@ -9,7 +9,7 @@ int main() {
         const int WIDTH  = 800;
         const int HEIGHT = 600;
 
-        Engine engine;
+        Engine engine(true, 5000);
         Gui    gui(engine, WIDTH, HEIGHT, "Kaban", true);
 
         gui.run();

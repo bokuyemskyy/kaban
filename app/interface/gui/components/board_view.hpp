@@ -23,7 +23,6 @@ constexpr ImU32 IM_REDDISH   = IM_COL32(255, 80, 80, 255);
 class BoardView : IGuiComponent {
    public:
     using IGuiComponent::IGuiComponent;
-
     void draw() override {
         handleInput();
 
