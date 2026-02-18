@@ -45,7 +45,7 @@ class Position {
 
     [[nodiscard]] std::string toFen() const;
 
-    [[nodiscard]] bool isCheck() {
+    [[nodiscard]] bool isCheck() const {
         Square king = lsb(occupancy(m_stm, PieceTypes::KING));
         return isAttacked(king, !m_stm);
     }
@@ -103,12 +103,12 @@ class Position {
             move_list = generateCastling(move_list);
             return static_cast<size_t>(move_list - first);
         } else if constexpr (GT == GenerationTypes::LEGAL) {
-            Move* start = move_list;
-            Move* end   = start + generateMoves<GenerationTypes::ALL>(move_list);
+            Move*       start = move_list;
+            Move const* end   = start + generateMoves<GenerationTypes::ALL>(move_list);
 
             Move* out = start;
 
-            for (Move* m = start; m < end; ++m) {
+            for (Move const* m = start; m < end; ++m) {
                 UndoInfo undo = makeMove(*m);
                 if (isLegal<false>()) *out++ = *m;
                 unmakeMove(*m, undo);
@@ -162,7 +162,7 @@ class Position {
     }
 
     template <Color C>
-    [[nodiscard]] constexpr Bitboard pawnAttacks(Square square) const {
+    [[nodiscard]] static constexpr Bitboard pawnAttacks(Square square) {
         if constexpr (C == Colors::WHITE) {
             static constexpr auto table = Bitboard::pseudoAttacks(Directions::of(Pieces::W_PAWN));
             return table[square.value()];

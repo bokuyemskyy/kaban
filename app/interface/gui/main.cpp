@@ -6,10 +6,11 @@
 
 int main() {
     try {
-        const int WIDTH  = 800;
-        const int HEIGHT = 600;
+        constexpr int WIDTH              = 800;
+        constexpr int HEIGHT             = 600;
+        constexpr int MAX_SEARCH_TIME_MS = 5000;
 
-        Engine engine(true, 5000);
+        Engine engine(true, MAX_SEARCH_TIME_MS);
         Gui    gui(engine, WIDTH, HEIGHT, "Kaban", true);
 
         gui.run();

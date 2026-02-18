@@ -82,7 +82,7 @@ class Magics {
     std::array<Bitboard, BISHOP_ATTACKS_SIZE> bishop_attacks{};
     std::array<Bitboard, ROOK_ATTACKS_SIZE>   rook_attacks{};
 
-    constexpr Bitboard premask(PieceType piece_type, Square square) {
+    static constexpr Bitboard premask(PieceType piece_type, Square square) {
         assert(piece_type == PieceTypes::BISHOP || piece_type == PieceTypes::ROOK);
 
         Bitboard edges;

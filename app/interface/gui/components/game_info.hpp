@@ -1,5 +1,6 @@
 #include <imgui.h>
 
+#include <cstring>
 #include <iomanip>
 #include <string>
 
@@ -51,7 +52,7 @@ class GameInfo : IGuiComponent {
         static std::string           lastFen;
 
         if (currentFen != lastFen) {
-            std::strncpy(fenBuffer.data(), currentFen.c_str(), fenBuffer.size() - 1);
+            strncpy(fenBuffer.data(), currentFen.c_str(), fenBuffer.size() - 1);
             fenBuffer[fenBuffer.size() - 1] = '\0';
             lastFen                         = currentFen;
         }
@@ -99,7 +100,7 @@ class GameInfo : IGuiComponent {
     }
 
    private:
-    std::string evalToString(int score) {
+    static std::string evalToString(int score) {
         const int MATE_THRESHOLD        = 10000;
         const int MAX_SCORE_FOR_DISPLAY = 500;
 

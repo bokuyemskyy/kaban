@@ -43,13 +43,13 @@ class BoardView : IGuiComponent {
         float  squareSize;
     };
 
-    Rect<float> calculatePanel() {
+    static Rect<float> calculatePanel() {
         ImVec2 panelMin  = ImGui::GetCursorScreenPos();
         ImVec2 availSize = ImGui::GetContentRegionAvail();
         return Rect(panelMin.x, panelMin.y, availSize.x, availSize.y);
     }
 
-    BoardMetrics boardMetrics(const Rect<float>& panel) {
+    static BoardMetrics boardMetrics(const Rect<float>& panel) {
         const float WINDOW_PADDING = ImGui::GetStyle().WindowPadding.x;
         const float FONT_SIZE      = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
         ImVec2      availSize(panel.width, panel.height);
@@ -60,7 +60,7 @@ class BoardView : IGuiComponent {
         return BoardMetrics{.origin = origin, .size = boardSize, .squareSize = boardSize / 8.0f};
     }
 
-    void handleInput() {
+    void handleInput() const {
         if (!ImGui::IsWindowHovered()) return;
 
         Rect<float>  panel   = calculatePanel();
@@ -112,7 +112,7 @@ class BoardView : IGuiComponent {
         }
     }
 
-    void squares(const BoardMetrics& metrics) {
+    static void squares(const BoardMetrics& metrics) {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
 
         for (auto square : Squares::all()) {
@@ -126,7 +126,7 @@ class BoardView : IGuiComponent {
         }
     }
 
-    void highlights(const BoardMetrics& metrics) {
+    void highlights(const BoardMetrics& metrics) const {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
 
         auto selected = m_ctx.state.selected_square;
@@ -162,7 +162,7 @@ class BoardView : IGuiComponent {
         }
     }
 
-    void labels(const BoardMetrics& metrics) {
+    static void labels(const BoardMetrics& metrics) {
         ImDrawList*  drawList  = ImGui::GetWindowDrawList();
         const ImVec2 CHAR_SIZE = ImGui::CalcTextSize("A");
 
@@ -187,7 +187,7 @@ class BoardView : IGuiComponent {
         }
     }
 
-    void playerNames(const Rect<float>& panel) {
+    static void playerNames(const Rect<float>& panel) {
         ImDrawList* drawList  = ImGui::GetWindowDrawList();
         float       FONT_SIZE = ImGui::GetIO().Fonts->Fonts[0]->FontSize;
 
@@ -211,7 +211,7 @@ class BoardView : IGuiComponent {
         }
     }
 
-    NormalizedRect<float> getNormalizedRect(Square square) const {
+    static NormalizedRect<float> getNormalizedRect(Square square) {
         return {static_cast<float>(square.file().value()) / Files::count(),
                 1 - (1.0f / Ranks::count()) - (static_cast<float>(square.rank().value()) / Ranks::count()),
                 1.0f / Files::count(), 1.0f / Ranks::count()};

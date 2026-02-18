@@ -22,7 +22,7 @@ class GlfwWrapper {
     void finishFrame() const;
 
     [[nodiscard]] bool shouldClose() const noexcept;
-    void               setShouldClose(bool value) noexcept;
+    void               setShouldClose(bool value) const noexcept;
 
     [[nodiscard]] GLFWwindow*     window() const noexcept { return m_window; }
     [[nodiscard]] static double   time() noexcept { return glfwGetTime(); }

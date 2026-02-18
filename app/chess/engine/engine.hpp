@@ -23,7 +23,7 @@ struct SearchParameters {
 
 class Engine {
    public:
-    Engine(bool run_search_on_change = false, int search_max_time_ms = 5000) {
+    explicit Engine(bool run_search_on_change = false, int search_max_time_ms = 5000) {
         Magics::get();
 
         if (run_search_on_change) {
@@ -81,11 +81,11 @@ class Engine {
             int alpha       = -Evaluation::MATE_SCORE;
             int beta        = Evaluation::MATE_SCORE;
 
-            for (size_t i = 0; i < size; ++i) {
-                if (possible_moves[i] == m_best_move) {
-                    std::swap(possible_moves[0], possible_moves[i]);
-                    break;
-                }
+            auto it = std::find_if(possible_moves.begin(), possible_moves.end(),
+                                   [this](const Move& move) { return move == this->m_best_move; });
+
+            if (it != possible_moves.end()) {
+                std::swap(possible_moves[0], *it);
             }
 
             Move current_best_move   = m_best_move;
@@ -94,8 +94,8 @@ class Engine {
             for (size_t i = 0; i < size; i++) {
                 if (m_stop_search) break;
 
-                Move& move = possible_moves[i];
-                auto  undo = position.makeMove(move);
+                Move const& move = possible_moves[i];
+                auto        undo = position.makeMove(move);
 
                 int score = -minimax(position, depth - 1, -beta, -alpha, 1);
 
@@ -129,8 +129,8 @@ class Engine {
             return Evaluation::evaluate(position);
         }
 
-        std::array<Move, 256> moves{};
-        size_t                size = position.generateMoves<GenerationTypes::ALL>(moves.data());
+        std::array<Move, 256> moves_{};
+        size_t                size = position.generateMoves<GenerationTypes::ALL>(moves_.data());
 
         auto scoreMove = [&](const Move& m) {
             if (position.at(m.to()) != Pieces::NONE) {
@@ -139,15 +139,15 @@ class Engine {
             }
             return 0;
         };
-        std::sort(moves.begin(), moves.begin() + size,
+        std::sort(moves_.begin(), moves_.begin() + size,
                   [&](const Move& a, const Move& b) { return scoreMove(a) > scoreMove(b); });
 
         int best_score        = -Evaluation::MATE_SCORE;
         int legal_moves_count = 0;
 
         for (size_t i = 0; i < size; i++) {
-            Move& move = moves[i];
-            auto  undo = position.makeMove(move);
+            Move const& move = moves_[i];
+            auto        undo = position.makeMove(move);
 
             if (position.isLegal<false>()) {
                 legal_moves_count++;
@@ -333,20 +333,20 @@ class Engine {
         return nodes;
     }
 
-    Move m_best_move = Move();
-    Move m_current_best_move;
-    int  m_current_depth = 0;
-    int  m_current_eval  = 0;
+    Move m_best_move{};
+    Move m_current_best_move{};
+    int  m_current_depth{};
+    int  m_current_eval{};
 
-    std::thread                           m_search_thread;
-    std::atomic<bool>                     m_stop_search = false;
-    std::chrono::steady_clock::time_point m_start_time;
+    std::thread                           m_search_thread{};
+    std::atomic<bool>                     m_stop_search{};
+    std::chrono::steady_clock::time_point m_start_time{};
 
-    int m_search_max_time_ms = -1;
+    int m_search_max_time_ms{-1};
 
-    bool              m_moves_dirty = true;
-    std::vector<Move> m_moves_cache = {};
+    bool              m_moves_dirty{true};
+    std::vector<Move> m_moves_cache{};
 
-    int      m_allocated_time = -1;
-    uint64_t m_nodes          = 0;
+    int      m_allocated_time{-1};
+    uint64_t m_nodes{};
 };

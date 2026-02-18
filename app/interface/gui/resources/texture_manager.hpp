@@ -1,24 +1,22 @@
 #pragma once
 
-#include <imgui.h>
-#include <stb_image.h>
-#include <string>
-#include <stdexcept>
-
-#include "color.hpp"
-
 #if defined(_WIN32)
-    #include <windows.h>
-    #include <GL/gl.h>
+#include <GL/gl.h>
+#include <windows.h>
 #elif defined(__linux__)
-    #include <GL/gl.h>
+#include <GL/gl.h>
 #elif defined(__APPLE__)
-    #define GL_SILENCE_DEPRECATION
-    #include <TargetConditionals.h>
-    #include <OpenGL/gl3.h>
-    #include <OpenGL/gl3ext.h>
+#define GL_SILENCE_DEPRECATION
+#include <OpenGL/gl3.h>
+#include <OpenGL/gl3ext.h>
 #endif
 
+#include <imgui.h>
+
+#include <stdexcept>
+#include <string>
+
+#include "color.hpp"
 #include "piece.hpp"
 #include "resource_manager.hpp"
 

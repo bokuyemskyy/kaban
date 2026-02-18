@@ -16,8 +16,8 @@ jobs:
         with:
           submodules: recursive
       - run: cmake --preset default -DCMAKE_BUILD_TYPE=Release
-      - run: clang-format --dry-run --Werror $(find app -type f \( -name "*.cpp" -o -name "*.hpp" \) ! -path "*/generated/*")
-      - run: clang-tidy -p build -header-filter='^/home/amon/Code/kaban/app/.*' $(find ./app -name '*.cpp' ! -path './app/interface/gui/stb_image_impl.cpp')
+      - run: ./tools/check-format.sh
+      - run: ./tools/tidy.sh
 
   safety:
     runs-on: ubuntu-latest
@@ -28,8 +28,7 @@ jobs:
         with:
           submodules: recursive
       - run: cmake --preset default -DCMAKE_BUILD_TYPE=Release
-      - run: cppcheck --enable=all --project=build/compile_commands.json --error-exitcode=1 -i interface/gui/resources/generated --suppress=missingIncludeSystem  --check-level=exhaustive --disable=unusedFunction --suppress=variableScope --suppress=checkersReport
-        
+      - run: ./tools/cppcheck.sh
   tests:
     runs-on: ubuntu-latest
     container:
@@ -54,11 +53,13 @@ jobs:
     - run: cmake --preset default -DCMAKE_BUILD_TYPE=Release
     - run: cmake --build build
 
-    - name: Upload binary
+    - name: Upload binaries
       uses: actions/upload-artifact@v4
       with:
         name: kaban-release
-        path: ./build/app/interface/gui/Release/kaban_gui
+        path: |
+          ./build/app/interface/gui/Release/kaban_gui
+          ./build/app/interface/uci/Release/kaban_uci
 
   # release:
   #   needs: build

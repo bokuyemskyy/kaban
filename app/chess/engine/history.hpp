@@ -20,9 +20,8 @@ class History {
         std::vector<Move> moves;
         moves.reserve(m_entries.size());
 
-        for (const auto& entry : m_entries) {
-            moves.push_back(entry.move);
-        }
+        std::ranges::transform(m_entries, std::back_inserter(moves),
+                               [](const HistoryEntry& entry) { return entry.move; });
 
         return moves;
     }

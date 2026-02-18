@@ -136,9 +136,9 @@ bool Position::isAttacked(Square square, Color attacker) const {
     if ((pseudoAttacks<PieceTypes::KING>(square) & occupancy(attacker, PieceTypes::KING)).any()) return true;
     if ((pseudoAttacks<PieceTypes::KNIGHT>(square) & occupancy(attacker, PieceTypes::KNIGHT)).any()) return true;
 
-    Bitboard queens  = occupancy(attacker, PieceTypes::QUEEN);
-    Bitboard bishops = occupancy(attacker, PieceTypes::BISHOP) | queens;
-    Bitboard rooks   = occupancy(attacker, PieceTypes::ROOK) | queens;
+    const Bitboard queens  = occupancy(attacker, PieceTypes::QUEEN);
+    const Bitboard bishops = occupancy(attacker, PieceTypes::BISHOP) | queens;
+    const Bitboard rooks   = occupancy(attacker, PieceTypes::ROOK) | queens;
 
     if (bishops.any() && (pseudoAttacks<PieceTypes::BISHOP>(square) & bishops).any()) return true;
 

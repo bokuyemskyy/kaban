@@ -2,28 +2,21 @@
 
 #include <stb_image.h>
 
-
-
 #if defined(_WIN32)
-    #include <windows.h>
-    #include <GL/gl.h>
+#include <GL/gl.h>
+#include <windows.h>
 #elif defined(__linux__)
-    #include <GL/gl.h>
+#include <GL/gl.h>
 #elif defined(__APPLE__)
-    #include <TargetConditionals.h>
-    #include <OpenGL/gl3.h>
-    #include <OpenGL/gl3ext.h>
+#include <OpenGL/gl3.h>
 #endif
-
-
-#include <imgui.h>
 
 #include <stdexcept>
 
 #include "resource_manager.hpp"
 
-GLuint TextureManager::createGlTexture(const Resource* resource) {
-    GLuint texture{};
+GLuint TextureManager::createGlTexture(const Resource* resource) {  // NOLINT
+    GLuint texture{};                                               // NOLINT
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 

@@ -3,16 +3,14 @@
 #include <stdexcept>
 
 #if defined(_WIN32)
-    #include <windows.h>
-    #include <GL/gl.h>
-    #include <GLFW/glfw3.h>
+#include <GL/gl.h>
+#include <GLFW/glfw3.h>
+#include <windows.h>
 #elif defined(__linux__)
-    #include <GL/gl.h>
-    #include <GLFW/glfw3.h>
+#include <GL/gl.h>
+#include <GLFW/glfw3.h>
 #elif defined(__APPLE__)
-    #include <TargetConditionals.h>
-    #include <OpenGL/gl3.h>
-    #include <OpenGL/gl3ext.h>
+#include <OpenGL/gl3.h>
 #endif
 
 #include <string>
@@ -26,12 +24,12 @@ GlfwWrapper::GlfwWrapper(int width, int height, const std::string& title, bool u
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    #if defined(__APPLE__)
+#if defined(__APPLE__)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
-    #endif
-    
+#endif
+
     m_monitor = glfwGetPrimaryMonitor();
     m_window  = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
@@ -74,6 +72,6 @@ void GlfwWrapper::fillFrame(float r, float g, float b, float a) const {
 
 bool GlfwWrapper::shouldClose() const noexcept { return glfwWindowShouldClose(m_window) != 0; }
 
-void GlfwWrapper::setShouldClose(bool value) noexcept {
+void GlfwWrapper::setShouldClose(bool value) const noexcept {
     glfwSetWindowShouldClose(m_window, value ? GLFW_TRUE : GLFW_FALSE);
 }

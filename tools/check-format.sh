@@ -1,0 +1,1 @@
+clang-format --dry-run --Werror $(find ./app -type f \( -name "*.cpp" -o -name "*.hpp" \) ! -path "*/generated/*")

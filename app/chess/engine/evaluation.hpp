@@ -158,6 +158,7 @@ class Evaluation {
                 return nullptr;
         }
     }
+    /*
     static double evaluatePeSTO(Position& position) {
         int mg_score   = 0;
         int eg_score   = 0;
@@ -209,4 +210,5 @@ class Evaluation {
 
         return static_cast<double>(final_score) / 100.0;
     }
+    */
 };

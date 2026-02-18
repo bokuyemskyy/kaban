@@ -10,7 +10,7 @@
 
 #include "dimensions.hpp"
 
-ImGuiWrapper::ImGuiWrapper(GLFWwindow *window, const Config &cfg) {
+ImGuiWrapper::ImGuiWrapper(GLFWwindow* window, const Config& cfg) {  // NOLINT
     if (!window) {
         throw std::invalid_argument("ImGuiWrapper::initialize: window is null");
     }
@@ -21,7 +21,7 @@ ImGuiWrapper::ImGuiWrapper(GLFWwindow *window, const Config &cfg) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    ImGuiIO &_io = ImGui::GetIO();
+    ImGuiIO& _io = ImGui::GetIO();
 
     // if (m_cfg.enable_docking) io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     // if (m_cfg.enable_viewports) io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
@@ -32,7 +32,7 @@ ImGuiWrapper::ImGuiWrapper(GLFWwindow *window, const Config &cfg) {
     else
         ImGui::StyleColorsLight();
     if (m_cfg.enable_viewports) {
-        ImGuiStyle &style                 = ImGui::GetStyle();
+        ImGuiStyle& style                 = ImGui::GetStyle();
         style.WindowRounding              = 0.0f;
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
@@ -65,13 +65,13 @@ void ImGuiWrapper::finishFrame() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-Dimensions<int> ImGuiWrapper::dimensions() const {
-    const ImGuiIO &_io = ImGui::GetIO();
+Dimensions<int> ImGuiWrapper::dimensions() {
+    const ImGuiIO& _io = ImGui::GetIO();
     return Dimensions{static_cast<int>(_io.DisplaySize.x), static_cast<int>(_io.DisplaySize.y)};
 }
 
-void ImGuiWrapper::keepWindowInBounds(const char *windowName) const {
-    ImGuiWindow *window = ImGui::FindWindowByName(windowName);
+void ImGuiWrapper::keepWindowInBounds(const char* windowName) {
+    ImGuiWindow const* window = ImGui::FindWindowByName(windowName);
 
     auto         frame_dimensions = dimensions();
     const ImVec2 maxPosition{static_cast<float>(frame_dimensions.width) - window->Size.x,

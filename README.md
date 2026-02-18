@@ -2,12 +2,10 @@
 
 [![CI/CD](https://github.com/bokuyemskyy/kaban/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/bokuyemskyy/kaban/actions/workflows/ci-cd.yml)   
 
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black) ![Windows](https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white) [![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=F0F0F0)]
-
-![Documentation](https://img.shields.io/badge/Documentation-WIP-cc2a34?labelColor=31393f)
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat&logo=linux&logoColor=black) ![Windows](https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white) ![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=F0F0F0)
 
 ## Overview
-This project is a high-performance, rule-compliant chess move generation library. It includes optional UCI and GUI components that can be built as part of the project.
+This project is a high-performance, rule-compliant chess move generation and simple minimax engine library. It includes optional UCI and GUI components that can be built as part of the project.
 
 ## Features
 - Provides a standalone core chess library `kaban_lib`.
@@ -30,7 +28,7 @@ This project is a high-performance, rule-compliant chess move generation library
 - Linux packages: libxinerama-dev, libxcursor-dev, xorg-dev, libglu1-mesa-dev, pkg-config
 
 ### Optional requirements
-- Shell
+- POSIX shell
 - Boost library (header-only, required by scripts)
 - clangd, clang-format, clang-tidy
 
@@ -80,12 +78,7 @@ With Ninja:
 ```
 cmake --build --preset release   # or debug
 ```
-
-### Run
-Binaries are located under:
-```
-build/app/
-```
+The binaries appear under the build directory.
 
 ## Credits
 - Source of truth for perft is [Stockfish](https://stockfishchess.org/). Also uses the Stockfish PRNGs to generate magics.
